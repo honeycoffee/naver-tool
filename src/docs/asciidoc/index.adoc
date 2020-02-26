@@ -1,0 +1,166 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+= API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+[[introduction]]
+== 소개
+
+네이버 대중교통 내재화 API
+
+[[common]]
+== [00]공통 사항
+
+API 공통 사항을 설명합니다
+
+=== Domain
+
+|===
+| 환경 | Domain
+
+| dev
+| `http://localhost`
+
+| stg
+|
+
+| active
+|
+|===
+
+=== 공통 응답
+|===
+| 코드 | 설명
+
+| code
+| 결과코드
+
+| message
+| 결과 메시지
+|===
+
+=== 응답 결과코드
+include::common-code.adoc[]
+
+&#160;
+
+== [01]회원 API
+
+[[member-register]]
+=== 회원 등록
+회원 데이터를 등록한다.
+
+==== Request
+include::{snippets}/memberRegister/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/memberRegister/http-request.adoc[]
+
+==== Response
+include::{snippets}/memberRegister/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/memberRegister/http-response.adoc[]
+
+&#160;
+
+
+[[check-duplicate]]
+=== ID 중복 확인
+회원 ID를 중복 확인한다.
+
+==== Request
+include::{snippets}/checkDuplicate/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/checkDuplicate/http-request.adoc[]
+
+==== Response
+include::{snippets}/checkDuplicate/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/checkDuplicate/http-response.adoc[]
+
+&#160;
+
+== [99]샘플 API
+
+[[sample-list]]
+=== 샘플 List
+샘플 목록을 조회한다
+
+==== Request
+include::{snippets}/sampleList/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/sampleList/http-request.adoc[]
+
+==== Response
+include::{snippets}/sampleList/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/sampleList/http-response.adoc[]
+
+&#160;
+
+[[sample-detail]]
+=== 샘플 상세
+샘플 상세내용을 조회한다
+
+==== Request
+include::{snippets}/sampleDetail/path-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/sampleDetail/http-request.adoc[]
+
+==== Response
+include::{snippets}/sampleDetail/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/sampleDetail/http-response.adoc[]
+
+&#160;
+
+
+[[sample-register]]
+=== 샘플 등록
+샘플을 등록한다
+
+==== Request
+include::{snippets}/sampleRegister/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/sampleRegister/http-request.adoc[]
+
+==== Response
+include::{snippets}/sampleRegister/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/sampleRegister/http-response.adoc[]
+
+&#160;
+
+
+[[sample-edit]]
+=== 샘플 수정
+샘플 데이터를 수정한다
+
+==== Request
+include::{snippets}/sampleEdit/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/sampleEdit/http-request.adoc[]
+
+==== Response
+include::{snippets}/sampleEdit/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/sampleEdit/http-response.adoc[]
+
+&#160;

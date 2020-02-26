@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.pubtrans.itn.api.dao.MemberDao">
+
+ 
+    <select id="checkDuplicate" parameterType="String" resultType="int">
+    	SELECT
+			count(*)
+		FROM
+			tb_z_svc_member
+		WHERE
+			user_id = #{userId}
+    </select>	
+    
+    <select id="getMemberSchema" resultType="com.naver.pubtrans.itn.api.vo.common.StructureVo">
+    	show full columns from tb_z_svc_member
+    </select>
+    
+	
+	<insert id="insMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
+		INSERT INTO 
+			tb_z_svc_member(user_id, user_name, user_pw, company) 
+		VALUES
+			(#{userId}, #{userName}, #{userPw}, #{company})
+	</insert>
+
+</mapper>

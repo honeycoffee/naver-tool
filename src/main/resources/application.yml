@@ -1,0 +1,29 @@
+# 서버 실행시 JVM 옵션 추가. 미 지정시 local 자동 지정
+# [로컬] -Dspring.profiles.active=local
+# [개발] -Dspring.profiles.active=dev
+# [스테이징] -Dspring.profiles.active=stg
+# [운영] -Dspring.profiles.active=real
+
+server:
+  port: 80
+  tomcat:
+    uri-encoding: UTF-8
+
+spring:
+  profiles:
+    active: local  
+  application:
+    name: pubtrans_itn_api
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  messages:
+    encoding: UTF-8
+    
+    
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath*:mappers/*_mapper.xml
+    

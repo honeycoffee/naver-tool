@@ -1,0 +1,99 @@
+plugins {
+	id 'org.springframework.boot' version '2.2.2.RELEASE'
+	id "org.asciidoctor.convert" version "1.5.9.2"
+}
+
+
+apply plugin: 'java'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'idea'
+apply plugin: 'war'
+
+group 'com.naver.pubtrans.itn.api'
+version '0.0.1-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+
+bootWar.enabled = false
+    war.enabled = true
+
+
+
+asciidoctor {
+    dependsOn test
+}
+
+
+bootJar {
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+    }
+}
+
+
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
+	maven { url 'https://repo.spring.io/snapshot' }
+}
+
+
+dependencies {
+
+	// Spring 
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	
+	// MySQL
+	runtimeOnly 'mysql:mysql-connector-java:5.1.29'
+	
+	// Mybatis
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.0'
+	
+	// lombok
+	compileOnly 'org.projectlombok:lombok:1.18.10'
+	annotationProcessor 'org.projectlombok:lombok:1.18.10'
+	
+	// JWT
+	implementation 'com.auth0:java-jwt:3.9.0'
+
+	// SQL Logging	
+	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+
+
+ 	testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc')
+    
+    providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
+   
+}
+
+test {
+    useJUnitPlatform {
+        includeEngines 'junit-vintage'
+    }
+}
+
+tasks.withType(Test) {
+	systemProperty "file.encoding", "UTF-8"
+}
+
+
+war {
+	archiveName = "pubtrans_itn_api.war"
+	
+	dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+    }
+}
+
+

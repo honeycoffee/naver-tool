@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.pubtrans.itn.api.dao.SampleDao">
+
+ 
+    <select id="getSampleData" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleSearchVo" resultType="com.naver.pubtrans.itn.api.vo.sample.SampleVo">
+    	SELECT
+			id, sample_data, reg_date
+		FROM
+			sample
+		WHERE
+			id = #{id}
+    </select>
+
+    
+    <select id="getSampleSchema" resultType="com.naver.pubtrans.itn.api.vo.common.StructureVo">
+    	show full columns from tb_z_svc_member
+    </select>
+
+
+	<select id="getSampleListCnt" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleSearchVo" resultType="int">
+		SELECT
+			count(*) as cnt
+		FROM
+			sample
+		WHERE
+			1=1
+	</select>
+
+	<select id="getSampleList" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleSearchVo" resultType="com.naver.pubtrans.itn.api.vo.sample.SampleVo">
+		SELECT
+			id, sample_data, reg_date
+		FROM
+			sample
+		WHERE
+			1=1
+			
+		<include refid="whereSampleList" />	
+			
+		ORDER BY
+			id desc
+		LIMIT
+			#{startLimit}, #{endLimit}
+	</select>
+
+
+	<sql id="whereSampleList">
+	
+		
+		<if test="@com.naver.pubtrans.itn.api.common.Util@isNotEmpty(sampleData)">
+			AND sample_data LIKE CONCAT('%', #{sampleData}, '%')
+		</if>
+	
+	</sql>
+	
+	
+	<insert id="insSampleData" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleInputVo">
+		INSERT INTO sample(sample_data, reg_date) VALUES(#{sampleData}, now())
+	</insert>
+	
+	<update id="updSampleData" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleInputVo">
+		UPDATE
+			sample
+		SET
+			sample_data = #{sampleData}
+			, reg_date = now()
+		WHERE
+			id = #{id}
+	</update>
+
+</mapper>
