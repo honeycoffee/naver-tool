@@ -22,6 +22,11 @@ spring:
   messages:
     encoding: UTF-8
     
+
+security:
+  jwt:
+    secret-key: pubtrans-a9163ef3ad71
+    
     
 mybatis:
   config-location: classpath:mybatis-config.xml

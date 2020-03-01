@@ -7,17 +7,23 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.naver.pubtrans.itn.api.common.MemberPasswordEncoder;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
-import com.naver.pubtrans.itn.api.common.PasswordEncoding;
-import com.naver.pubtrans.itn.api.dao.MemberDao;
-import com.naver.pubtrans.itn.api.vo.common.StructureVo;
+import com.naver.pubtrans.itn.api.repository.MemberRepository;
+import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
-import com.naver.pubtrans.itn.api.vo.common.output.CommonStructure;
+import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
 import com.naver.pubtrans.itn.api.vo.member.MemberVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
+import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 네이버 대중교통 내재화 사용자관리 서비스
+ * @author westwind
+ *
+ */
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -26,35 +32,30 @@ public class MemberService {
 	private OutputFmtUtil outputFmtUtil ;
 
 	@Autowired
-	private MemberDao memberDao ; 
+	private MemberRepository memberRepository ; 
 	
 	@Autowired
-	private PasswordEncoding passwordEncoding; 
+	private MemberPasswordEncoder memberPasswordEncoder; 
 	
-	
+
 	/**
-	 * 회원 데이터 입력/수정
-	 * @param memberInputVo
-	 * @param type
+	 * 회원 정보를 등록한다
+	 * @param memberInputVo - 입력값
 	 */
-	public void setMember(MemberInputVo memberInputVo, String type) {
+	public void insertMember(MemberInputVo memberInputVo) {
+		memberInputVo.setUserPw(memberPasswordEncoder.encode(memberInputVo.getUserPw()));
 		
-		if("ins".equals(type)) {
-			memberInputVo.setUserPw(passwordEncoding.encode(memberInputVo.getUserPw()));
-			
-			memberDao.insMember(memberInputVo);
-		}
-		
+		memberRepository.insertMember(memberInputVo);
 	}
 	
 	
 	/**
 	 * ID 중복 체크
-	 * @param memberVo
+	 * @param userId - 체크할 회원 ID
 	 */
 	public CommonResult checkDuplicate(String userId) {
 		
-		int result = memberDao.checkDuplicate(userId);
+		int result = memberRepository.checkDuplicate(userId);
 		HashMap<String, Boolean> resultMap = new HashMap<String, Boolean>(); 
 		
 		if(result>0) {
@@ -63,31 +64,58 @@ public class MemberService {
 			resultMap.put("duplicate", false);
 		}
 		
-		CommonResult cmnRs = new CommonResult(resultMap) ;
+		CommonResult commonResult = new CommonResult(resultMap) ;
 		
-		return cmnRs;
+		return commonResult;
+		
+	}
+	
+	
+	public CommonResult getMemberDataById(String id) {
+		// 검색조건
+		MemberSearchVo searchVo = new MemberSearchVo();
+		searchVo.setUserId(id);
+		
+		return getMemberData(searchVo) ;
+	}
+	
+	
+	/**
+	 * 프로젝트 샘플 데이터 반환
+	 * 
+	 * @return	공통 결과포맷
+	 */
+	public CommonResult getMemberData(MemberSearchVo searchVo) {
+		
+		// 데이터 조회
+		MemberVo memberVo = memberRepository.getMemberData(searchVo) ;
+		
+		// 공통 결과 포맷 출력
+		CommonResult cmnRs = new CommonResult(memberVo) ;
+		
+		return cmnRs ;
 		
 	}
 	
 	
 	/**
-	 * 회원 데이터 구조 가져오기
+	 * 회원 데이터 입/출력 구조를 가져온다
 	 * @return
 	 */
-	public CommonResult getMemberDataStructure() {
+	public CommonResult selectMemberSchema() {
 		
 		ArrayList<String> ignoreColumns = new ArrayList<>();
 		ignoreColumns.add("upd_date") ;
 		ignoreColumns.add("reg_date") ;
 		
-		List<StructureVo> columnList = memberDao.getMemberSchema() ;
+		List<SchemaVo> columnList = memberRepository.selectMemberSchema() ;
 
-		List<CommonStructure> schemaList = outputFmtUtil.setCommonStructure(columnList, ignoreColumns) ; 
+		List<CommonSchema> schemaList = outputFmtUtil.makeCommonSchema(columnList, ignoreColumns) ; 
 		
 		// 문서 공통 포맷으로 포맷
-		CommonResult cmnRs = outputFmtUtil.setCommonDocFmt(schemaList) ;
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(schemaList) ;
 		
-		return cmnRs ;
+		return commonResult ;
 	}
 	
 	

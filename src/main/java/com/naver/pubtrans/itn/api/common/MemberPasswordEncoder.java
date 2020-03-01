@@ -11,18 +11,18 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class PasswordEncoding implements PasswordEncoder {
+public class MemberPasswordEncoder implements PasswordEncoder {
 	
    private final BCryptPasswordEncoder bCryptpasswordEncoder;
    
-   public PasswordEncoding() {
+   public MemberPasswordEncoder() {
       this.bCryptpasswordEncoder = new BCryptPasswordEncoder();
    }
    
    
    /**
     * 비밀번호를 암호화한다.
-	* @param rawPassword
+	* @param rawPassword - 암호화 할 비밀번호
     */
    @Override
    public String encode(CharSequence rawPassword) {
@@ -32,8 +32,8 @@ public class PasswordEncoding implements PasswordEncoder {
 
    /**
     * 로그인 시 입력한 비밀번호와 암호화된 비밀번호를 비교한다. 
-	* @param rawPassword
-	* @param encodedPassword
+	* @param rawPassword - 로그인 시 입력한 비밀번호
+	* @param encodedPassword - 입력한 비밀번호와 비교할 암호화된 비밀번호
 	* @return
     */
    @Override

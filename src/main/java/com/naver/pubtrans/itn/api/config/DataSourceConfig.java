@@ -12,8 +12,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * MyBatis DataSource 연결
+ * @author adtec10
+ *
+ */
 @Configuration
-@MapperScan(value="com.naver.pubtrans.itn.api.dao*", sqlSessionFactoryRef = "MySQLSessionFactory")
+@MapperScan(value="com.naver.pubtrans.itn.api.repository*", sqlSessionFactoryRef = "MySQLSessionFactory")
 public class DataSourceConfig {
 
 	@Value("${mybatis.config-location}")
@@ -22,20 +27,20 @@ public class DataSourceConfig {
     private String mybatisMapperLocaton;
 	@Autowired
 	private DataSource dataSource;
-	
+
 	@Bean(name = "MySQLSessionFactory")
 	public SqlSessionFactory getMySQLSessionFactory(ApplicationContext context) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
         sqlSessionFactoryBean.setConfigLocation(context.getResource(mybatisConfigLocaton));
         sqlSessionFactoryBean.setMapperLocations(context.getResources(mybatisMapperLocaton));
-        
+
         return sqlSessionFactoryBean.getObject();
 	}
-	
+
     @Bean(name = "MySQLSessionTemplate")
     public SqlSessionTemplate getMySQLSessionTemplate(SqlSessionFactory mysqlSessionFactory) throws Exception {
         return new SqlSessionTemplate(mysqlSessionFactory);
     }
-    
+
 }

@@ -66,18 +66,18 @@ public class SampleControllerTests {
 
 	@Autowired
 	MockMvc mockMvc;
-	
+
 	@Autowired
     private ObjectMapper objectMapper;
-	
+
 	@MockBean
 	private SampleService sampleService ;
 
-	
+
 	@Test
 	public void sampleList() throws Exception {
-		
-		
+
+
 		SampleVo vo1 = new SampleVo() ;
 		vo1.setId(1);
 		vo1.setSampleData("개발팀");
@@ -87,38 +87,38 @@ public class SampleControllerTests {
 		vo2.setId(2);
 		vo2.setSampleData("기획팀");
 		vo2.setRegDate("2020-01-20");
-		
+
 		SampleVo vo3 = new SampleVo() ;
 		vo3.setId(3);
 		vo3.setSampleData("디자인팀");
 		vo3.setRegDate("2020-01-21");
-		
-		
+
+
 		List<SampleVo> list = new ArrayList<>();
 		list.add(vo1);
 		list.add(vo2);
 		list.add(vo3);
-		
-		
+
+
 		SampleSearchVo searchVo = new SampleSearchVo();
 		searchVo.setPageNo(1);
 		searchVo.setListSize(20);
-		
-		
+
+
 		PagingVo pagingVo = new PagingVo(list.size(), searchVo.getPageNo(), searchVo.getListSize()) ;
-		
+
 		OutputFmtUtil outputFmtUtil = new OutputFmtUtil() ;
-		
+
 		CommonResult cmnRs = outputFmtUtil.setCommonListFmt(pagingVo, list) ;
-		
-		
-		
+
+
+
 		//given
 		given(sampleService.getSampleList(any(SampleSearchVo.class)))
 				.willReturn(cmnRs) ;
-		
-		
-		
+
+
+
 		//when
 		ResultActions result = this.mockMvc.perform(
                 get("/samples")
@@ -128,7 +128,7 @@ public class SampleControllerTests {
 	                .accept(MediaType.APPLICATION_JSON)
 	                .characterEncoding("UTF-8")
         );
-		
+
 		//then
 		result.andExpect(status().isOk())
 	 		.andDo(document("sampleList",
@@ -143,7 +143,7 @@ public class SampleControllerTests {
 	             		fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"),
 	             		fieldWithPath("result").type(JsonFieldType.OBJECT).description("결과 정보"),
 	             		fieldWithPath("result.meta").type(JsonFieldType.OBJECT).description("페이지 정보"),
-	             		fieldWithPath("result.meta.totalCount").type(JsonFieldType.NUMBER).description("전체 목록 수"),
+	             		fieldWithPath("result.meta.totalListCount").type(JsonFieldType.NUMBER).description("전체 목록 수"),
 	             		fieldWithPath("result.meta.listCountPerPage").type(JsonFieldType.NUMBER).description("페이지당 목록 수"),
 	             		fieldWithPath("result.meta.totalPageCount").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
 	             		fieldWithPath("result.meta.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
@@ -155,26 +155,26 @@ public class SampleControllerTests {
 	             		fieldWithPath("result.data[].regDate").type(JsonFieldType.STRING).description("등록일")
 	             )
  		));
-		
+
 	}
-	
-	
+
+
 	@Test
 	public void sampleDetail() throws Exception {
-		
+
 		SampleVo sampleVo = new SampleVo() ;
 		sampleVo.setId(1);
 		sampleVo.setSampleData("개발팀");
 		sampleVo.setRegDate("2020-01-20");
-		
+
 		CommonResult cmnRs = new CommonResult(sampleVo) ;
-		
-		
-		
+
+
+
 		//given
 		given(sampleService.getSampleDataById(1))
 				.willReturn(cmnRs) ;
-		
+
 		//when
 		ResultActions result = this.mockMvc.perform(
                 get("/samples/{id}", 1)
@@ -182,7 +182,7 @@ public class SampleControllerTests {
 	                .accept(MediaType.APPLICATION_JSON)
 	                .characterEncoding("UTF-8")
         );
-		
+
 		//then
 		result.andExpect(status().isOk())
 	 		.andDo(document("sampleDetail",
@@ -202,15 +202,15 @@ public class SampleControllerTests {
                  )
 	 	));
 	}
-	
-	
-	
+
+
+
 	@Test
 	public void sampleRegister() throws Exception {
 		SampleInputVo inputVo = new SampleInputVo();
 		inputVo.setSampleData("샘플 데이터 입력");
-		
-				
+
+
 		ResultActions result = this.mockMvc.perform(
                 post("/samples/register")
                     .content(objectMapper.writeValueAsString(inputVo))
@@ -218,8 +218,8 @@ public class SampleControllerTests {
                     .accept(MediaType.APPLICATION_JSON)
                     .characterEncoding("UTF-8")
         );
-		
-		
+
+
 		//then
 		result.andExpect(status().isOk())
 	 		.andDo(document("sampleRegister",
@@ -227,7 +227,7 @@ public class SampleControllerTests {
                 getDocumentResponse(),
                 requestFields(
                         fieldWithPath("sampleData").type(JsonFieldType.STRING).description("내용")
-                        
+
                 ),
                 responseFields(
                  		fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
@@ -235,24 +235,24 @@ public class SampleControllerTests {
                 )
 	 	));
 	}
-	
-	
+
+
 	@Test
 	public void sampleEdit() throws Exception {
 		SampleInputVo inputVo = new SampleInputVo();
 		inputVo.setId(2);
 		inputVo.setSampleData("샘플 데이터 수정");
-		
-				
+
+
 		ResultActions result = this.mockMvc.perform(
-                post("/samples/edit")
+                put("/samples/edit")
                     .content(objectMapper.writeValueAsString(inputVo))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .characterEncoding("UTF-8")
         );
-		
-		
+
+
 		//then
 		result.andExpect(status().isOk())
 	 		.andDo(document("sampleEdit",
@@ -261,7 +261,7 @@ public class SampleControllerTests {
                 requestFields(
                 		fieldWithPath("id").type(JsonFieldType.NUMBER).description("아이디"),
                         fieldWithPath("sampleData").type(JsonFieldType.STRING).description("내용")
-                        
+
                 ),
                 responseFields(
                  		fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
@@ -269,5 +269,5 @@ public class SampleControllerTests {
                 )
 	 	));
 	}
-	
+
 }

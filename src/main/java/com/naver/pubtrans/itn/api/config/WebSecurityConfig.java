@@ -7,12 +7,16 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-
+/**
+ * 보안관련 설정
+ * @author adtec10
+ *
+ */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-   
-    
+
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
@@ -20,10 +24,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.csrf().disable()
 		;
 	}
-	
+
 	@Override
     public void configure(WebSecurity web) {
         web.ignoring().antMatchers("/docs/**");
     }
-	
+
 }

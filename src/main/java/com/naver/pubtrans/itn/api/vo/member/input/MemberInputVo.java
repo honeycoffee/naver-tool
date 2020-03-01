@@ -6,6 +6,11 @@ import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 회원 입력 값
+ * @author westwind
+ *
+ */
 @Getter
 @Setter
 public class MemberInputVo {

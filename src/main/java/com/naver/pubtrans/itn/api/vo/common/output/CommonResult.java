@@ -7,6 +7,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 공통 출력중 result 항목 정의
+ *
+ * @author adtec10
+ *
+ */
 @Getter
 @Setter
 public class CommonResult {
@@ -16,33 +22,33 @@ public class CommonResult {
 	 */
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private CommonMeta meta ;
-	
+
 	/**
 	 * 입/출력 스키마
 	 */
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private List<CommonStructure> structure ;
-	
+	private List<CommonSchema> schema ;
+
 	/**
 	 * API 호출 결과 데이터
 	 */
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private Object data ;
-	
-	
+
+
 	public CommonResult() {} ;
-	
+
 	public CommonResult(CommonMeta m) {
 		this.meta = m ;
 	}
-	
+
 	public CommonResult(Object d) {
 		this.data = d ;
 	}
-	
+
 	public CommonResult(CommonMeta m, Object d) {
 		this.meta = m ;
 		this.data = d ;
 	}
-	
+
 }

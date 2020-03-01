@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.naver.pubtrans.itn.api.dao.SampleDao">
+<mapper namespace="com.naver.pubtrans.itn.api.repository.SampleRepository">
 
- 
-    <select id="getSampleData" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleSearchVo" resultType="com.naver.pubtrans.itn.api.vo.sample.SampleVo">
+
+    <select id="selectSampleData" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleSearchVo" resultType="com.naver.pubtrans.itn.api.vo.sample.SampleVo">
     	SELECT
 			id, sample_data, reg_date
 		FROM
@@ -12,13 +12,22 @@
 			id = #{id}
     </select>
 
-    
-    <select id="getSampleSchema" resultType="com.naver.pubtrans.itn.api.vo.common.StructureVo">
-    	show full columns from tb_z_svc_member
+
+    <select id="selectSampleSchema" resultType="com.naver.pubtrans.itn.api.vo.common.SchemaVo">
+    	select
+		     COLUMN_NAME as columnName
+			, COLUMN_COMMENT as columnComment
+			, IS_NULLABLE as isNullable
+			, COLUMN_KEY as columnKey
+			, COLUMN_TYPE as columnType
+		from
+		    information_schema.COLUMNS
+		where
+			TABLE_NAME = 'tb_z_svc_member'
     </select>
 
 
-	<select id="getSampleListCnt" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleSearchVo" resultType="int">
+	<select id="selectSampleListCnt" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleSearchVo" resultType="int">
 		SELECT
 			count(*) as cnt
 		FROM
@@ -27,16 +36,16 @@
 			1=1
 	</select>
 
-	<select id="getSampleList" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleSearchVo" resultType="com.naver.pubtrans.itn.api.vo.sample.SampleVo">
+	<select id="selectSampleList" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleSearchVo" resultType="com.naver.pubtrans.itn.api.vo.sample.SampleVo">
 		SELECT
 			id, sample_data, reg_date
 		FROM
 			sample
 		WHERE
 			1=1
-			
-		<include refid="whereSampleList" />	
-			
+
+		<include refid="whereSampleList" />
+
 		ORDER BY
 			id desc
 		LIMIT
@@ -45,20 +54,20 @@
 
 
 	<sql id="whereSampleList">
-	
-		
-		<if test="@com.naver.pubtrans.itn.api.common.Util@isNotEmpty(sampleData)">
+
+
+		<if test="sampleData != null and sampleData != ''">
 			AND sample_data LIKE CONCAT('%', #{sampleData}, '%')
 		</if>
-	
+
 	</sql>
-	
-	
-	<insert id="insSampleData" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleInputVo">
+
+
+	<insert id="insertSampleData" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleInputVo">
 		INSERT INTO sample(sample_data, reg_date) VALUES(#{sampleData}, now())
 	</insert>
-	
-	<update id="updSampleData" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleInputVo">
+
+	<update id="updateSampleData" parameterType="com.naver.pubtrans.itn.api.vo.sample.input.SampleInputVo">
 		UPDATE
 			sample
 		SET
