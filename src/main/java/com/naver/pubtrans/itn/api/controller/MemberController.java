@@ -5,6 +5,7 @@ package com.naver.pubtrans.itn.api.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,10 @@ public class MemberController {
 	
 	@Autowired
 	private MemberService memberSvc ;    
+	
+	@Value("${security.jwt.secret-key}")
+	private String secretKey;
+	 
     
     /**
      * 회원 데이터 입력
@@ -94,6 +99,8 @@ public class MemberController {
     	
     	// 회원 데이터 상세 구조 조회
     	CommonResult commonResult = memberSvc.selectMemberSchema() ;
+    	
+    	System.out.println(secretKey);
     	
     	return new CommonOutput(commonResult) ;
     }
