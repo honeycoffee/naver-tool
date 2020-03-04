@@ -18,6 +18,7 @@ import com.naver.pubtrans.itn.api.service.MemberService;
 import com.naver.pubtrans.itn.api.vo.auth.LoginVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
+import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,6 +50,10 @@ public class AuthController {
      */
     @PostMapping(value = "/v1/ntool/api/auth/login")
     public CommonOutput login(@RequestBody @Valid LoginVo loginVo) throws Exception {
+    	
+    	MemberSearchVo memberSearchVo = new MemberSearchVo();
+    	
+    	memberSearchVo.setUserId(loginVo.getUserId());
     	
     	System.out.println(jwtAdapter.createToken("test", ChronoUnit.HOURS, 1));
     	

@@ -14,6 +14,8 @@ import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
+import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,6 +52,7 @@ public class MemberService {
 	/**
 	 * ID 중복 체크
 	 * @param userId - 체크할 회원 ID
+	 * @return
 	 */
 	public CommonResult checkDuplicate(String userId) {
 		
@@ -62,9 +65,7 @@ public class MemberService {
 			resultMap.put("duplicate", false);
 		}
 		
-		CommonResult commonResult = new CommonResult(resultMap) ;
-		
-		return commonResult;
+		return outputFmtUtil.setCommonDocFmt(resultMap);
 		
 	}
 	
@@ -78,22 +79,22 @@ public class MemberService {
 //	}
 //	
 	
-//	/**
-//	 * 프로젝트 샘플 데이터 반환
-//	 * 
-//	 * @return	공통 결과포맷
-//	 */
-//	public CommonResult getMemberData(MemberSearchVo searchVo) {
-//		
-//		// 데이터 조회
-//		MemberVo memberVo = memberRepository.selectMemberData(searchVo) ;
-//		
-//		// 공통 결과 포맷 출력
-//		CommonResult cmnRs = new CommonResult(memberVo) ;
-//		
-//		return cmnRs ;
-//		
-//	}
+	/**
+	 * 회원 데이터를 가져온다.
+	 * @param userId - 체크할 회원 ID
+	 * @return
+	 */
+	public CommonResult getMemberData(MemberSearchVo memberSearchVo) {
+		
+		// 데이터 조회
+		MemberOutputVo memberOutputVo = memberRepository.selectMember(memberSearchVo) ;
+		
+		// 공통 결과 포맷 출력
+		CommonResult cmnRs = new CommonResult(memberOutputVo) ;
+		
+		return cmnRs ;
+		
+	}
 	
 	
 	/**
