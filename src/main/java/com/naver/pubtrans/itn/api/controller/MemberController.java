@@ -5,7 +5,6 @@ package com.naver.pubtrans.itn.api.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,14 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberController {
 	
 	@Autowired
-	private MemberService memberSvc ;    
-	
-	@Value("${security.jwt.secret-key}")
-	private String secretKey;
-	 
+	private MemberService memberSvc ;      
     
     /**
-     * 회원 데이터 입력
+     * 회원 정보를 등록한다.
      * <pre>
      * Valid를 이용하여 유효성 검사를 진행한다
      * </pre>
@@ -47,8 +42,8 @@ public class MemberController {
      * @return
      * @throws Exception
      */
-    @PostMapping(value = "/ntool/api/members/register")
-    public CommonOutput memberRegister(@RequestBody @Valid MemberInputVo memberInputVo) throws Exception {
+    @PostMapping(value = "/v1/ntool/api/register/member")
+    public CommonOutput registerMember(@RequestBody @Valid MemberInputVo memberInputVo) throws Exception {
     	
     	// 데이터 저장 서비스
     	memberSvc.insertMember(memberInputVo);
@@ -63,7 +58,7 @@ public class MemberController {
      * @return
      * @throws Exception
      */
-    @GetMapping(value = "/ntool/api/members/duplicate")
+    @GetMapping(value = "/v1/ntool/api/duplicate/member")
     public CommonOutput checkDuplicate(@RequestParam(name = "userId", required = true) String userId) throws Exception {
     	
     	// ID 중복 체크
@@ -72,6 +67,20 @@ public class MemberController {
     	return new CommonOutput(commonResult) ;
     	
     }
+	
+    /**
+     * 회원 데이터 상세 구조를 조회한다
+     * @return
+     * @throws Exception
+     */
+    @GetMapping(value = "/v1/ntool/api/schema/member")
+    public CommonOutput getMemberSchema() throws Exception {
+    	
+    	// 회원 데이터 상세 구조 조회
+    	CommonResult commonResult = memberSvc.getMemberSchema() ;
+    	
+    	return new CommonOutput(commonResult) ;
+    }
     
     /**
 	 * 데이터 조회 샘플
@@ -79,30 +88,14 @@ public class MemberController {
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping(value = "/ntool/api/members/{userId}")
-    public CommonOutput memberDetail(@PathVariable String userId) throws Exception {
-
-		// Get Data
-		CommonResult rs = memberSvc.getMemberDataById(userId) ;
-		log.info("로깅 테스트");
-
-		return new CommonOutput(rs) ;
-    }
-	
-    /**
-     * 회원 데이터 상세 구조를 조회한다
-     * @return
-     * @throws Exception
-     */
-    @GetMapping(value = "/ntool/api/members/schema")
-    public CommonOutput selectMemberSchema() throws Exception {
-    	
-    	// 회원 데이터 상세 구조 조회
-    	CommonResult commonResult = memberSvc.selectMemberSchema() ;
-    	
-    	System.out.println(secretKey);
-    	
-    	return new CommonOutput(commonResult) ;
-    }
+//	@GetMapping(value = "/ntool/api/members/{userId}")
+//    public CommonOutput memberDetail(@PathVariable String userId) throws Exception {
+//
+//		// Get Data
+//		CommonResult rs = memberSvc.getMemberDataById(userId) ;
+//		log.info("로깅 테스트");
+//
+//		return new CommonOutput(rs) ;
+//    }
   
 }

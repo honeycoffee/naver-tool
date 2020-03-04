@@ -13,9 +13,7 @@ import com.naver.pubtrans.itn.api.repository.MemberRepository;
 import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
-import com.naver.pubtrans.itn.api.vo.member.MemberVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
-import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -71,38 +69,38 @@ public class MemberService {
 	}
 	
 	
-	public CommonResult getMemberDataById(String id) {
-		// 검색조건
-		MemberSearchVo searchVo = new MemberSearchVo();
-		searchVo.setUserId(id);
-		
-		return getMemberData(searchVo) ;
-	}
+//	public CommonResult selectMemberDataByUserId(String userId) {
+//		// 검색조건
+//		MemberSearchVo searchVo = new MemberSearchVo();
+//		searchVo.setUserId(userId);
+//		
+//		return getMemberData(searchVo) ;
+//	}
+//	
 	
-	
-	/**
-	 * 프로젝트 샘플 데이터 반환
-	 * 
-	 * @return	공통 결과포맷
-	 */
-	public CommonResult getMemberData(MemberSearchVo searchVo) {
-		
-		// 데이터 조회
-		MemberVo memberVo = memberRepository.getMemberData(searchVo) ;
-		
-		// 공통 결과 포맷 출력
-		CommonResult cmnRs = new CommonResult(memberVo) ;
-		
-		return cmnRs ;
-		
-	}
+//	/**
+//	 * 프로젝트 샘플 데이터 반환
+//	 * 
+//	 * @return	공통 결과포맷
+//	 */
+//	public CommonResult getMemberData(MemberSearchVo searchVo) {
+//		
+//		// 데이터 조회
+//		MemberVo memberVo = memberRepository.selectMemberData(searchVo) ;
+//		
+//		// 공통 결과 포맷 출력
+//		CommonResult cmnRs = new CommonResult(memberVo) ;
+//		
+//		return cmnRs ;
+//		
+//	}
 	
 	
 	/**
 	 * 회원 데이터 입/출력 구조를 가져온다
 	 * @return
 	 */
-	public CommonResult selectMemberSchema() {
+	public CommonResult getMemberSchema() {
 		
 		ArrayList<String> ignoreColumns = new ArrayList<>();
 		ignoreColumns.add("upd_date") ;

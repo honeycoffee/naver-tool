@@ -44,7 +44,8 @@ public class JwtAdapter {
 	 */
 	public Date getDateForExpire(ChronoUnit unit, int add) {
 		LocalDateTime currentDateTime = LocalDateTime.now();
-		currentDateTime.plus(add, unit) ;
+		
+		currentDateTime = currentDateTime.plus(add, unit) ;
 
 		return Util.localDateTimeToDate(currentDateTime) ;
     }

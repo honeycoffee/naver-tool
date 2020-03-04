@@ -59,7 +59,7 @@ public class MemberControllerTests {
 		inputVo.setCompany("test_company");
 				
 		ResultActions result = this.mockMvc.perform(
-                post("/ntool/api/members/register")
+                post("/v1/ntool/api/register/member")
                     .content(objectMapper.writeValueAsString(inputVo))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -98,7 +98,7 @@ public class MemberControllerTests {
 				.willReturn(cmnRs) ;
 				
 		ResultActions result = this.mockMvc.perform(
-                get("/ntool/api/members/duplicate")
+                get("/v1/ntool/api/duplicate/member")
                 	.param("userId", "test_id")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .accept(MediaType.APPLICATION_JSON)
