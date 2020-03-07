@@ -103,8 +103,8 @@ public class SampleService {
 		PagingVo pagingVo = new PagingVo(totalListCnt, searchVo.getPageNo(), searchVo.getListSize()) ;
 
 		// 목록 조회 페이징 정보 set
-		searchVo.setStartLimit(pagingVo.getStartPageLimit());
-		searchVo.setEndLimit(pagingVo.getEndPageLimit());
+		searchVo.setStartPageLimit(pagingVo.getStartPageLimit());
+		searchVo.setEndPageLimit(pagingVo.getEndPageLimit());
 
 		// 목록 조회
 		List<SampleVo> list = sampleRepository.selectSampleList(searchVo) ;
@@ -128,14 +128,17 @@ public class SampleService {
 	public CommonResult getDataSchema() {
 
 
-		ArrayList<String> ignoreColumns = new ArrayList<>();
-		ignoreColumns.add("upd_date") ;
-		ignoreColumns.add("reg_date") ;
+		ArrayList<String> ignoreColumnNameList = new ArrayList<>();
+		ignoreColumnNameList.add("upd_date") ;
+		ignoreColumnNameList.add("reg_date") ;
 
 
 		List<SchemaVo> columnList = sampleRepository.selectSampleSchema() ;
 
-		List<CommonSchema> schemaList = outputFmtUtil.makeCommonSchema(columnList, ignoreColumns) ;
+		// 컬럼목록 재정의
+		columnList = outputFmtUtil.refineSchemaVoIngnoreColumns(columnList, ignoreColumnNameList) ;
+
+		List<CommonSchema> schemaList = outputFmtUtil.makeCommonSchema(columnList) ;
 
 		// 문서 공통 포맷으로 포맷
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(schemaList) ;

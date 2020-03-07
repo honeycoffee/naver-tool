@@ -2,6 +2,8 @@ package com.naver.pubtrans.itn.api.vo.common.output;
 
 import java.util.List;
 
+import com.naver.pubtrans.itn.api.vo.common.FieldValue;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,20 +57,5 @@ public class CommonSchema {
 	 */
 	private String readOnlyYn ;
 
-
-	@Getter
-	@Setter
-	public class FieldValue {
-
-		/**
-		 * 속성 값
-		 */
-		private String value ;
-
-		/**
-		 * 속성 명칭
-		 */
-		private String text ;
-	}
 
 }

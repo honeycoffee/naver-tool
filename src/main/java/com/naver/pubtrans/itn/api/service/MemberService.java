@@ -84,15 +84,12 @@ public class MemberService {
 	 * @param userId - 체크할 회원 ID
 	 * @return
 	 */
-	public CommonResult getMemberData(MemberSearchVo memberSearchVo) {
+	public MemberOutputVo getMemberData(MemberSearchVo memberSearchVo) {
 		
 		// 데이터 조회
 		MemberOutputVo memberOutputVo = memberRepository.selectMember(memberSearchVo) ;
 		
-		// 공통 결과 포맷 출력
-		CommonResult cmnRs = new CommonResult(memberOutputVo) ;
-		
-		return cmnRs ;
+		return memberOutputVo ;
 		
 	}
 	

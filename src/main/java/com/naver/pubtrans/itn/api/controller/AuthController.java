@@ -2,8 +2,6 @@ package com.naver.pubtrans.itn.api.controller;
 
 
 
-import java.time.temporal.ChronoUnit;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
+import com.naver.pubtrans.itn.api.exception.ApiException;
 import com.naver.pubtrans.itn.api.service.MemberService;
 import com.naver.pubtrans.itn.api.vo.auth.LoginVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,16 +55,18 @@ public class AuthController {
     	
     	memberSearchVo.setUserId(loginVo.getUserId());
     	
-    	System.out.println(jwtAdapter.createToken("test", ChronoUnit.HOURS, 1));
+    	MemberOutputVo memberOutputVo = memberSvc.getMemberData(memberSearchVo);
     	
-System.out.println(jwtAdapter.createToken("test1", ChronoUnit.SECONDS, 5));
-    	
-    	CommonResult commonResult = memberSvc.checkDuplicate(loginVo.getUserId());
+//    	if(memberOutputVo==null) {
+//    		throw new ApiException("회원정보가 존재하지 않습니다.");
+//    	}else if(){
+//    		
+//    	}
     	
     	// 데이터 저장 서비스
 //    	memberSvc.insertMember(memberInputVo);
     	
-    	return new CommonOutput(commonResult) ;
+    	return new CommonOutput() ;
     	
     }  
     

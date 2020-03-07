@@ -38,113 +38,13 @@ public class Util {
 		return LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateFormat)) ;
 	}
 
-
-	/**
-	 * Timestamp 형을 문자열로 반환한다
-	 * @param ts
-	 * @return
-	 */
-	public static String timestampToString(Timestamp ts) {
-		return timestampToString(ts, DATE_TIME_FORMAT) ;
-	}
-
-	/**
-	 * Timestamp 형을 문자열로 반환한다
-	 * @param ts
-	 * @param fmt
-	 * @return
-	 */
-	public static String timestampToString(Timestamp ts, String fmt) {
-		Date date = new Date(ts.getTime()) ;
-		return dateToString(date, fmt) ;
-	}
-
-	/**
-	 * Date 형을 문자열로 반환한다
-	 * @param date
-	 * @return
-	 */
-	public static String dateToString(Date date) {
-		return dateToString(date, DATE_TIME_FORMAT) ;
-	}
-
-	/**
-	 * Date 형을 문자열로 반환한다
-	 * @param date
-	 * @param fmt
-	 * @return
-	 */
-	public static String dateToString(Date date, String fmt) {
-
-		LocalDateTime localDateTime = dateToLocalDateTime(date) ;
-
-		return localDateTime.format(DateTimeFormatter.ofPattern(fmt)) ;
-	}
-
-	/**
-	 * 특정포맷의 날짜형식 문자열을 기본 Date 문자열로 반환한다
-	 * @param date
-	 * @param fmt - 문자열 포맷
-	 * @return
-	 */
-	public static String stringTodateFormat(String date, String fmt) {
-		SimpleDateFormat sdf = new SimpleDateFormat(fmt);
-		Date d = null;
-		try {
-			d = sdf.parse(date);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-
-		return dateToString(d, DATE_TIME_FORMAT) ;
-	}
-
-	/**
-	 * 특정포맷을 갖는 날짜형식의 문자열을 원하틑 Date 문자열로 반환한다
-	 * @param date
-	 * @param fmt - 문자열 포맷
-	 * @param cvtFmt - 변경할 문자열 포뱃
-	 * @return
-	 */
-	public static String stringTodateFormat(String date, String fmt, String cvtFmt) {
-		SimpleDateFormat sdf = new SimpleDateFormat(fmt);
-		Date d = null;
-		try {
-			d = sdf.parse(date);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-
-		return dateToString(d, cvtFmt) ;
-	}
-
-
 	/**
      * 클라이언트 IP를 가져온다
      * @param req
      * @return
      */
     public static String getClientIpAddress(HttpServletRequest req) {
-
-    	String ip = req.getHeader("X-Forwarded-For");
-
-    	 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-    	     ip = req.getHeader("Proxy-Client-IP");
-    	 }
-    	 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-    	     ip = req.getHeader("WL-Proxy-Client-IP");
-    	 }
-    	 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-    	     ip = req.getHeader("HTTP_CLIENT_IP");
-    	 }
-    	 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-    	     ip = req.getHeader("HTTP_X_FORWARDED_FOR");
-    	 }
-    	 if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-    	     ip = req.getRemoteAddr();
-    	 }
-
-		return ip;
+		return req.getRemoteAddr();
 	}
 
     /**
@@ -159,13 +59,17 @@ public class Util {
     }
 
     /**
-     * Date형을 LocalDateTime형으로 변경한다
-     * @param date
+     * 카멜케이스 문자열을 스네이크 케이스형태로 변경한다.
+     * <pre>
+     * memberId -> member_id
+     * </pre>
+     * @param str - 변경할 문자열
      * @return
      */
-    public static LocalDateTime dateToLocalDateTime(Date date) {
-    	return Instant
-    			.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault())
-    			.toLocalDateTime();
+    public static String camelCaseToSnakeCase(String str) {
+    	String regex = "([a-z])([A-Z]+)";
+    	String replacement = "$1_$2";
+
+    	return str.replaceAll(regex, replacement).toLowerCase() ;
     }
 }

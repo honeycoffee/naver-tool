@@ -20,11 +20,14 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 프로젝트 사용자 정의 예외 핸들러
  * @author adtec10
  *
  */
+@Slf4j
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
@@ -32,6 +35,10 @@ public class ApiExceptionHandler {
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Throwable.class)
     public CommonOutput CommonInternalServerError(Throwable e, HttpServletRequest request) {
+
+		// 에러 로깅 추가
+		log.error("Exception", e);
+
 		String errorMsg = "예기치 못한 오류가 발생하였습니다(" + e.getMessage() + ")" ;
 		return new CommonOutput(ResultCode.INNER_FAIL.getApiErrorCode(), errorMsg) ;
     }
@@ -139,6 +146,10 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(ApiException.class)
     public CommonOutput apiExceptionHandle(ApiException e) {
+
+    	// 에러 로깅 추가
+    	log.error("ApiException", e);
+
     	return new CommonOutput(ResultCode.INNER_FAIL.getApiErrorCode(), e.getMessage()) ;
     }
 
