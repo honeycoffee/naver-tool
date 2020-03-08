@@ -46,5 +46,35 @@
 		VALUES
 			(#{userId}, #{userName}, #{userPw}, #{company})
 	</insert>
+	
+	<insert id="insertMemberLoginLog" parameterType="com.naver.pubtrans.itn.api.vo.auth.input.AuthInputVo">
+		INSERT INTO 
+			tb_z_svc_member_login_log(user_id, login_success_yn, access_ip) 
+		VALUES
+			(#{userId}, #{loginSuccessYn}, #{accessIp})
+	</insert>
+	
+	<insert id="insertMemberTokenInfo" parameterType="com.naver.pubtrans.itn.api.vo.auth.input.AuthInputVo">
+		INSERT INTO 
+			tb_z_svc_member_token_info(user_id, refresh_token) 
+		VALUES
+			(#{userId}, #{refreshToken})
+	</insert>
+	
+	<select id="selectMemberTokenInfo" parameterType="com.naver.pubtrans.itn.api.vo.auth.input.AuthInputVo" resultType="com.naver.pubtrans.itn.api.vo.auth.output.AuthOutputVo">
+		SELECT
+			refresh_token
+		FROM	
+			tb_z_svc_member_token_info
+		WHERE
+			user_id = #{userId}
+	</select>
+	
+	<delete id="deleteMemberTokenInfo" parameterType="com.naver.pubtrans.itn.api.vo.auth.input.AuthInputVo">
+		DELETE FROM
+			tb_z_svc_member_token_info
+		WHERE
+			user_id = #{userId}
+	</delete>
 
 </mapper>

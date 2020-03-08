@@ -8,7 +8,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MemberSearchVo extends SearchVo {
-
+	
+	/**
+	 * 회원 ID.
+	 */
 	private String userId;
 	
 }

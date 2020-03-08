@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.naver.pubtrans.itn.api.common.MemberPasswordEncoder;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.repository.MemberRepository;
+import com.naver.pubtrans.itn.api.vo.auth.input.AuthInputVo;
+import com.naver.pubtrans.itn.api.vo.auth.output.AuthOutputVo;
 import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
@@ -44,6 +46,8 @@ public class MemberService {
 	 */
 	public void insertMember(MemberInputVo memberInputVo) {
 		memberInputVo.setUserPw(memberPasswordEncoder.encode(memberInputVo.getUserPw()));
+		
+		System.out.println("getUserPw : " + memberInputVo.getUserPw());
 		
 		memberRepository.insertMember(memberInputVo);
 	}
@@ -112,6 +116,46 @@ public class MemberService {
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(schemaList) ;
 		
 		return commonResult ;
+	}
+	
+	/**
+	 * 회원 로그인 기록을 저장한다.
+	 * @param authInputVo - 회원 로그인 인증 입력 Vo
+	 */
+	public void insertMemberLoginLog(AuthInputVo authInputVo) {
+		
+		memberRepository.insertMemberLoginLog(authInputVo);
+	}
+	
+	/**
+	 * 회원 Token 정보를 저장한다.
+	 * @param authInputVo - 회원 로그인 인증 입력 Vo
+	 */
+	public void insertMemberTokenInfo(AuthInputVo authInputVo) {
+		
+
+		memberRepository.insertMemberTokenInfo(authInputVo);
+	}
+
+	/**
+	 * 회원 Token 정보를 가져온다.
+	 * @param authInputVo - 회원 로그인 인증 입력 Vo
+	 * @return
+	 */
+	public AuthOutputVo getMemberTokenInfo(AuthInputVo authInputVo) {
+		
+		AuthOutputVo authOutPutVo = memberRepository.selectMemberTokenInfo(authInputVo);
+		
+		return authOutPutVo;
+	}
+
+	/**
+	 * 회원 Token 정보를 삭제한다.
+	 * @param authInputVo - 회원 로그인 인증 입력 Vo
+	 */
+	public void deleteMemberTokenInfo(AuthInputVo authInputVo) {
+		
+		memberRepository.deleteMemberTokenInfo(authInputVo);
 	}
 	
 	

@@ -16,6 +16,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.naver.pubtrans.itn.api.common.Util;
 import com.naver.pubtrans.itn.api.exception.AccessTokenNotFoundException;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
  * JWT 관련 토큰을 생성하거나 검증한다.
@@ -31,6 +32,9 @@ public class JwtAdapter {
 	// 회원ID Claim value Key
 	public static final String USER_ID = "userId" ;
 
+	// 회원ID Claim value Key
+	public static final String USER_NAME = "userName" ;
+
 	// JWT Secret Key
 	@Value("${security.jwt.secret-key}")
 	private String SECRET_KEY ;
@@ -43,9 +47,15 @@ public class JwtAdapter {
 	 * @return
 	 */
 	public Date getDateForExpire(ChronoUnit unit, int add) {
-		LocalDateTime currentDateTime = LocalDateTime.now();
+		LocalDateTime currentDateTime = LocalDateTime.now() ;
+		
+		System.out.println(currentDateTime);
 		
 		currentDateTime = currentDateTime.plus(add, unit) ;
+		
+		System.out.println(add);
+		System.out.println(unit);
+		System.out.println(currentDateTime);
 
 		return Util.localDateTimeToDate(currentDateTime) ;
     }
@@ -56,19 +66,20 @@ public class JwtAdapter {
 	 *  - 24시간 토큰 생성 예 : createToken(userId, ChronoUnit.HOURS, 24)
 	 *  - 1주일 토큰 생성 예 : createToken(userId, ChronoUnit.WEEKS, 1)
 	 * </pre>
-	 * @param userId - 사용자 ID
+	 * @param MemberOutputVo - 회원 데이터 출력 Vo
 	 * @param unit - ChronoUnit
 	 * @param add - 길이
 	 * @return
 	 */
-	public String createToken(String userId, ChronoUnit unit, int add) {
+	public String createToken(MemberOutputVo memberOutputVo, ChronoUnit unit, int add) {
 
-		Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
+		Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY) ;
 
 		String token = JWT.create()
-		        .withClaim(USER_ID, userId)
+		        .withClaim(USER_ID, memberOutputVo.getUserId())
+		        .withClaim(USER_NAME, memberOutputVo.getUserName())
 		        .withExpiresAt(getDateForExpire(unit, add))
-		        .sign(algorithm);
+		        .sign(algorithm) ;
 
 		return token ;
 	}
@@ -80,10 +91,12 @@ public class JwtAdapter {
 	 * @return
 	 * @throws JWTVerificationException
 	 */
-	public DecodedJWT validateToken(String token) throws JWTVerificationException{
-        DecodedJWT jwt = null;
+	public DecodedJWT validateToken(String token) throws JWTVerificationException, TokenExpiredException{
+        DecodedJWT jwt = null ;
         Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
         jwt = JWT.require(algorithm).build().verify(token);
+        
+        System.out.println(jwt.getExpiresAt());
 
         return jwt;
     }
@@ -98,18 +111,19 @@ public class JwtAdapter {
 	 * @throws JWTDecodeException
 	 * @throws JWTVerificationException
 	 */
-	public String getUserIdByToken(String token) throws AccessTokenNotFoundException, TokenExpiredException, JWTDecodeException, JWTVerificationException {
+	public MemberOutputVo getUserDataByToken(String token) throws AccessTokenNotFoundException, TokenExpiredException, JWTDecodeException, JWTVerificationException {
 
-		String userId = "" ;
+		MemberOutputVo memberOutputVo = new MemberOutputVo() ;
 
 		if(StringUtils.isEmpty(token)) {
 			throw new AccessTokenNotFoundException("AccessToken is empty") ;
 		}else {
 			DecodedJWT jwt = this.validateToken(token) ;
-			userId = jwt.getClaim(USER_ID).asString() ;
+			memberOutputVo.setUserId(jwt.getClaim(USER_ID).asString()) ;
+			memberOutputVo.setUserName(jwt.getClaim(USER_NAME).asString()) ;
 		}
 
-		return userId ;
+		return memberOutputVo ;
 	}
 
 }

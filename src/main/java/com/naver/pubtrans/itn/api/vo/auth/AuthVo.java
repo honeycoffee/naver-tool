@@ -17,8 +17,8 @@ import lombok.Setter;
 @Setter
 public class AuthVo{
 
-	private String userId ;
+	private String refreshToken ;
 	
-	private String userName ;
+	private String accessToken ;
 	
 }
