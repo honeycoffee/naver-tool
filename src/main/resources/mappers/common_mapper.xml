@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.pubtrans.itn.api.repository.CommonRepository">
+
+
+	<select id="selectTableSchema" parameterType="string" resultType="com.naver.pubtrans.itn.api.vo.common.SchemaVo">
+		SELECT
+		     COLUMN_NAME as columnName
+			, COLUMN_COMMENT as columnComment
+			, IS_NULLABLE as isNullable
+			, COLUMN_KEY as columnKey
+			, COLUMN_TYPE as columnType
+		FROM
+		    information_schema.COLUMNS
+		WHERE
+			TABLE_NAME = #{tableName}
+			AND COLUMN_NAME != 'reg_date' AND COLUMN_NAME != 'upd_date'
+			AND COLUMN_NAME != 'createdat' AND COLUMN_NAME != 'modifiedat' ;
+    </select>
+
+	<select id="selectCityCodeList" resultType="com.naver.pubtrans.itn.api.vo.common.CityCodeVo">
+		SELECT
+			citycode
+			, cityname
+			, supercode
+			, exceptcode
+			, navercode
+			, doname
+			, abbrdoname
+			, siname
+			, level
+		FROM
+			tb_city_code
+		ORDER BY
+			cityname asc
+	</select>
+
+	<select id="selectBusProviderList" resultType="com.naver.pubtrans.itn.api.vo.common.BusProviderVo">
+		SELECT
+			provider_id
+			, provider_name
+			, city_code_min
+			, city_code_max
+		FROM
+			tb_bus_provider
+		ORDER BY
+			provider_name asc
+	</select>
+
+
+</mapper>

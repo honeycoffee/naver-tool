@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.pubtrans.itn.api.repository.BusStopRepository">
+
+
+	<select id="selectBusStopListTotalCnt" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopSearchVo" resultType="int">
+		SELECT
+			count(*) as total_list_cnt
+		FROM
+			tb_stops stop, tb_city_code city
+		WHERE
+			stop.citycode = city.citycode
+
+			<include refid="whereBusStopList" />
+
+	</select>
+
+	<select id="selectBusStopList" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopSearchVo" resultType="com.naver.pubtrans.itn.api.vo.bus.stop.output.BusStopListOutputVo">
+		SELECT
+			stop.stop_id
+			, stop.stop_name
+			, stop.x as longitude
+			, stop.y as latitude
+			, stop.citycode
+			, city.cityname
+		FROM
+			tb_stops stop, tb_city_code city
+		WHERE
+			stop.citycode = city.citycode
+
+		<include refid="whereBusStopList" />
+
+		ORDER BY
+			<choose>
+				<when test="@org.apache.commons.lang3.StringUtils@isNotEmpty(sortKey)">
+					<choose>
+						<when test="sortKey.equals('stop_id')">
+							stop.stop_id ${sortType}
+						</when>
+						<when test="sortKey.equals('stop_name')">
+							stop.stop_name ${sortType}
+						</when>
+						<when test="sortKey.equals('citycode')">
+							stop.citycode ${sortType}
+						</when>
+						<otherwise>
+							stop.stop_id desc
+						</otherwise>
+					</choose>
+				</when>
+				<otherwise>
+					stop.stop_id desc
+				</otherwise>
+			</choose>
+
+		LIMIT
+			#{startPageLimit}, #{endPageLimit}
+	</select>
+
+
+	<sql id="whereBusStopList">
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(cityCode)">
+			AND stop.citycode = #{cityCode}
+		</if>
+
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(stopName)">
+			AND stop.stop_name LIKE CONCAT(#{stopName}, '%')
+		</if>
+
+		<if test="stopId > 0">
+			AND stop.stop_id LIKE CONCAT(#{stopId}, '%')
+		</if>
+	</sql>
+
+
+</mapper>
