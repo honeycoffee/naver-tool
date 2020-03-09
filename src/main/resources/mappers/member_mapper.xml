@@ -13,15 +13,15 @@
     </select>	
     
     <select id="selectMemberSchema" resultType="com.naver.pubtrans.itn.api.vo.common.SchemaVo">
-    	SELECT
+    	select
 		     COLUMN_NAME as columnName
 			, COLUMN_COMMENT as columnComment
 			, IS_NULLABLE as isNullable
 			, COLUMN_KEY as columnKey
 			, COLUMN_TYPE as columnType
-		FROM
+		from
 		    information_schema.COLUMNS
-		WHERE
+		where
 			TABLE_NAME = 'tb_z_svc_member'
     </select>
     
@@ -39,7 +39,6 @@
 			user_id = #{userId}
     </select>
     
-	
 	<insert id="insertMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
 		INSERT INTO 
 			tb_z_svc_member(user_id, user_name, user_pw, company) 

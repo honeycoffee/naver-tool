@@ -1,0 +1,88 @@
+[cols="2,^1,4"]
+|===
+| Path | Type | Description
+
+|`+result+`
+|`+Object+`
+|결과 정보
+
+|`+result.schema[]+`
+|`+Array+`
+|데이터 필드 정보
+
+|`+result.schema[].fieldLabel+`
+|`+String+`
+|필드 Label
+
+|`+result.schema[].fieldName+`
+|`+String+`
+|필드 ID
+
+|`+result.schema[].fieldType+`
+|`+String+`
+|필드 타입(string, number, enum)
+
+|`+result.schema[].fieldLength+`
+|`+String+`
+|입력길이
+
+|`+result.schema[].fieldValues[]+`
+|`+Array+`
+|필드 입력 코드목록(enum 인 경우에만)
+
+|`+result.schema[].fieldValues[].value+`
+|`+String+`
+|코드값
+
+|`+result.schema[].fieldValues[].text+`
+|`+String+`
+|코드명
+
+|`+result.schema[].nullable+`
+|`+String+`
+|Null 허용여부(Y/N)
+
+|`+result.schema[].pkYn+`
+|`+String+`
+|PK 여부(Y/N)
+
+|`+result.schema[].readOnlyYn+`
+|`+String+`
+|읽기 전용 필드 여부(Y/N)
+
+|===
+
+[source,options="nowrap"]
+----
+{
+  "code" : 200,
+  "message" : "정상 처리되었습니다",
+  "result" : {
+    "schema" : [ {
+      "fieldLabel" : "정류장ID",
+      "fieldName" : "stopId",
+      "fieldType" : "number",
+      "fieldLength" : "11",
+      "fieldValues" : [ ],
+      "nullable" : "N",
+      "pkYn" : "Y",
+      "readOnlyYn" : "Y"
+    }, {
+      "fieldLabel" : "도시코드",
+      "fieldName" : "citycode",
+      "fieldType" : "enum",
+      "fieldLength" : "",
+      "fieldValues" : [ {
+        "value" : "1000",
+        "text" : "서울"
+      },{
+        "value" : "2000",
+        "text" : "인천"
+      }],
+      "nullable" : "N",
+      "pkYn" : "N",
+      "readOnlyYn" : "N"
+    } ]
+  }
+}
+----

@@ -50,11 +50,28 @@ include::common-code.adoc[]
 
 &#160;
 
+=== 데이터 목록 페이징 정보
+페이징이 필요한 데이터 목록을 제공하는 모든 API에는 페이징 정보를 확인할 수 있는 데이터가 포함된다.
+include::common-meta.adoc[]
+
+&#160;
+
+=== 데이터 스키마 정보
+
+- 조회성 API(목록, 상세정보, 데이터 스키마 조회)에 대해서만 데이터 검색/입력 폼 참고 용도로 제공한다.
+
+- Select Box, Radio Button, CheckBox 등 미리 정의된 코드 목록이 필요한 필드의 경우 코드목록 데이터 정보를 포함하여 제공한다.
+
+include::common-schema.adoc[]
+
+
+&#160;
+
 == [01]회원 API
 
 [[member-register]]
 === 회원 등록
-회원 데이터를 등록한다.
+회원 정보를 등록한다.
 
 ==== Request
 include::{snippets}/memberRegister/request-fields.adoc[]
@@ -87,6 +104,8 @@ include::{snippets}/checkDuplicate/response-fields.adoc[]
 ===== Response HTTP Example
 include::{snippets}/checkDuplicate/http-response.adoc[]
 
+&#160;
+
 
 [[login]]
 === 회원 로그인
@@ -117,5 +136,27 @@ include::{snippets}/refreshToken/response-fields.adoc[]
 
 ===== Response HTTP Example
 include::{snippets}/refreshToken/http-response.adoc[]
+
+&#160;
+
+== [02]버스정류장 API
+
+[[busStop-list]]
+=== 버스정류장 List
+버스정류장 목록을 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/busStop/busStopList/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busStop/busStopList/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busStop/busStopList/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busStop/busStopList/http-response.adoc[]
 
 &#160;

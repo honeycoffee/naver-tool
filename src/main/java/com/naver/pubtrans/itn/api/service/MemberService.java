@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.MemberPasswordEncoder;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.repository.MemberRepository;
@@ -28,19 +27,16 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-	
+
 	@Autowired
 	private OutputFmtUtil outputFmtUtil ;
 
 	@Autowired
-	private MemberRepository memberRepository ;  
-	
+	private MemberRepository memberRepository ;
+
 	@Autowired
-	private JwtAdapter jwtAdapter ;    
-	
-	@Autowired
-	private MemberPasswordEncoder memberPasswordEncoder; 
-	
+	private MemberPasswordEncoder memberPasswordEncoder;
+
 
 	/**
 	 * 회원 정보를 등록한다
@@ -48,40 +44,32 @@ public class MemberService {
 	 */
 	public void insertMember(MemberInputVo memberInputVo) {
 		memberInputVo.setUserPw(memberPasswordEncoder.encode(memberInputVo.getUserPw()));
-		
+
 		memberRepository.insertMember(memberInputVo);
 	}
-	
-	
+
+
 	/**
 	 * ID 중복 체크
 	 * @param userId - 체크할 회원 ID
-	 * @return
 	 */
 	public CommonResult checkDuplicate(String userId) {
-		
+
 		int result = memberRepository.checkDuplicate(userId);
-		HashMap<String, Boolean> resultMap = new HashMap<String, Boolean>(); 
-		
+		HashMap<String, Boolean> resultMap = new HashMap<String, Boolean>();
+
 		if(result>0) {
 			resultMap.put("duplicate", true);
 		} else {
 			resultMap.put("duplicate", false);
 		}
-		
-		return outputFmtUtil.setCommonDocFmt(resultMap);
-		
+
+		CommonResult commonResult = new CommonResult(resultMap) ;
+
+		return commonResult;
+
 	}
 	
-	
-//	public CommonResult selectMemberDataByUserId(String userId) {
-//		// 검색조건
-//		MemberSearchVo searchVo = new MemberSearchVo();
-//		searchVo.setUserId(userId);
-//		
-//		return getMemberData(searchVo) ;
-//	}
-//	
 	
 	/**
 	 * 회원 데이터를 가져온다.
@@ -96,27 +84,30 @@ public class MemberService {
 		return memberOutputVo ;
 		
 	}
-	
-	
+
+
 	/**
 	 * 회원 데이터 입/출력 구조를 가져온다
 	 * @return
 	 */
-	public CommonResult getMemberSchema() {
-		
-		ArrayList<String> ignoreColumns = new ArrayList<>();
-		ignoreColumns.add("upd_date") ;
-		ignoreColumns.add("reg_date") ;
-		
+	public CommonResult selectMemberSchema() {
+
+		ArrayList<String> ignoreColumnNameList = new ArrayList<>();
+		ignoreColumnNameList.add("upd_date") ;
+		ignoreColumnNameList.add("reg_date") ;
+
 		List<SchemaVo> columnList = memberRepository.selectMemberSchema() ;
 
-		List<CommonSchema> schemaList = outputFmtUtil.makeCommonSchema(columnList, ignoreColumns) ; 
-		
+		// 재정의
+		columnList = outputFmtUtil.refineSchemaVoIngnoreColumns(columnList, ignoreColumnNameList) ;
+
+		List<CommonSchema> schemaList = outputFmtUtil.makeCommonSchema(columnList) ;
+
 		// 문서 공통 포맷으로 포맷
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(schemaList) ;
-		
+
 		return commonResult ;
 	}
-	
-	
+
+
 }
