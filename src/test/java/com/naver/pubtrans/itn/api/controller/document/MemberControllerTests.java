@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.naver.pubtrans.itn.api.controller.MemberController;
 import com.naver.pubtrans.itn.api.service.MemberService;
+import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 
@@ -49,6 +50,10 @@ public class MemberControllerTests {
 	@MockBean
 	private MemberService memberService ;
 	
+	/**
+	 * 회원 등록 rest docs 생성
+	 * @throws Exception
+	 */
 	@Test
 	public void memberRegister() throws Exception {
 		MemberInputVo inputVo = new MemberInputVo();
@@ -86,16 +91,20 @@ public class MemberControllerTests {
 	 	));
 	}
 	
+	/**
+	 * ID 중복 확인 rest docs 생성
+	 * @throws Exception
+	 */
 	@Test
 	public void checkDuplicate() throws Exception {
 		HashMap<String, Boolean> resultMap = new HashMap<String, Boolean>();
 		resultMap.put("duplicate", true);
 		
-		CommonResult cmnRs = new CommonResult(resultMap) ;
+		CommonResult commonResult = new CommonResult(resultMap) ;
 		
 		//given
 		given(memberService.checkDuplicate("test_id"))
-				.willReturn(cmnRs) ;
+				.willReturn(commonResult) ;
 				
 		ResultActions result = this.mockMvc.perform(
                 get("/v1/ntool/api/duplicate/member")

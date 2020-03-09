@@ -87,4 +87,35 @@ include::{snippets}/checkDuplicate/response-fields.adoc[]
 ===== Response HTTP Example
 include::{snippets}/checkDuplicate/http-response.adoc[]
 
+
+[[login]]
+=== 회원 로그인
+회원 ID와 비밀번호로 로그인을 한다.
+
+==== Request
+include::{snippets}/login/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/login/http-request.adoc[]
+
+==== Response
+include::{snippets}/login/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/login/http-response.adoc[]
+
+
+[[refresh-token]]
+=== API 호출 토큰 갱신
+refreshToken으로 accessToken을 갱신한다. 
+
+===== Request HTTP Example
+include::{snippets}/refreshToken/http-request.adoc[]
+
+==== Response
+include::{snippets}/refreshToken/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/refreshToken/http-response.adoc[]
+
 &#160;

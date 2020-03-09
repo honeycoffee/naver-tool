@@ -49,14 +49,8 @@ public class JwtAdapter {
 	public Date getDateForExpire(ChronoUnit unit, int add) {
 		LocalDateTime currentDateTime = LocalDateTime.now() ;
 		
-		System.out.println(currentDateTime);
-		
 		currentDateTime = currentDateTime.plus(add, unit) ;
 		
-		System.out.println(add);
-		System.out.println(unit);
-		System.out.println(currentDateTime);
-
 		return Util.localDateTimeToDate(currentDateTime) ;
     }
 
@@ -96,8 +90,6 @@ public class JwtAdapter {
         Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
         jwt = JWT.require(algorithm).build().verify(token);
         
-        System.out.println(jwt.getExpiresAt());
-
         return jwt;
     }
 

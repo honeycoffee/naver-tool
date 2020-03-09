@@ -28,12 +28,4 @@ public interface MemberRepository {
 	
 	public List<SchemaVo> selectMemberSchema() throws DataAccessException ;
 	
-	public void insertMemberLoginLog(AuthInputVo authInputVo) throws DataAccessException ;
-
-	public void insertMemberTokenInfo(AuthInputVo authInputVo) throws DataAccessException ;
-	
-	public AuthOutputVo selectMemberTokenInfo(AuthInputVo authInputVo) throws DataAccessException ;
-	
-	public void deleteMemberTokenInfo(AuthInputVo authInputVo) throws DataAccessException ;
-	
 }
