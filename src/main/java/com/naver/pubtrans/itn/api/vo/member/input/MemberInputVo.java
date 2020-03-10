@@ -23,7 +23,6 @@ public class MemberInputVo {
 	@Size(max=30)
 	private String userName ;
 
-	@NotEmpty
 	@Size(min=8, max=20)
 	private String userPw ;
 

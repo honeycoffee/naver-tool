@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberListOutputVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
@@ -22,8 +23,16 @@ public interface MemberRepository {
 
 	void insertMember(MemberInputVo memberInputVo) throws DataAccessException ;
 	
-	public MemberOutputVo selectMember(MemberSearchVo memberSearchVo) throws DataAccessException ;
-
+	void updateMember(MemberInputVo memberInputVo) throws DataAccessException ;
+	
+	void deleteMember(MemberSearchVo memberSearchVo) throws DataAccessException ; 
+	
+	MemberOutputVo selectMember(MemberSearchVo memberSearchVo) throws DataAccessException ;
+	
+	int selectMemberListTotalCnt(MemberSearchVo memberSearchVo) throws DataAccessException ; 
+	
+	List<MemberListOutputVo> selectMemberList(MemberSearchVo memberSearchVo) throws DataAccessException ; 
+	
 	List<SchemaVo> selectMemberSchema() throws DataAccessException ;
 
 }

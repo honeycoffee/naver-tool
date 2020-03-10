@@ -12,6 +12,108 @@
 			user_id = #{userId}
     </select>	
     
+	<insert id="insertMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
+		INSERT INTO 
+			tb_z_svc_member(user_id, user_name, user_pw, company) 
+		VALUES
+			(#{userId}, #{userName}, #{userPw}, #{company})
+	</insert>
+    
+	<update id="updateMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
+		UPDATE
+			tb_z_svc_member
+		SET
+			user_name = #{userName}
+			, company = #{company}
+			<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(userName)">
+			, user_pw = #{userPw} 
+			</if>
+			, upd_date = now()
+		WHERE
+			user_id = #{userId}
+	</update>
+    
+	<update id="deleteMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo">
+		UPDATE
+			tb_z_svc_member
+		SET
+			delete_yn = 'Y'
+			, upd_date = now()
+		WHERE
+			user_id = #{userId}
+	</update>
+    
+    <select id="selectMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo">
+    	SELECT
+		    member.user_id
+		    , member.user_pw
+		    , member.user_name
+		    , member.company
+		    , date_format(member.reg_date, '%Y-%m-%d %H:%i:%s') as reg_date
+            , date_format(member.upd_date, '%Y-%m-%d %H:%i:%s') as upd_date 
+		FROM
+		    tb_z_svc_member member
+		WHERE
+			member.user_id = #{userId}
+    </select>
+	
+	<select id="selectMemberListTotalCnt" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="int">
+		SELECT
+			count(*) as total_list_cnt
+		FROM
+			tb_z_svc_member member
+
+			<include refid="whereMemberList" />
+
+	</select>
+
+	<select id="selectMemberList" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberListOutputVo">
+		SELECT
+			member.user_id
+			, member.user_name
+			, member.company
+			, date_format(member.reg_date, '%Y-%m-%d %H:%i:%s') as reg_date
+		FROM
+			tb_z_svc_member member
+
+		<include refid="whereMemberList" />
+
+		ORDER BY
+			<choose>
+				<when test="@org.apache.commons.lang3.StringUtils@isNotEmpty(sortKey)">
+					<choose>
+						<when test="sortKey.equals('user_name')">
+							member.user_name ${sortType}
+						</when>
+						<when test="sortKey.equals('company')">
+							member.company ${sortType}
+						</when>
+						<when test="sortKey.equals('reg_date')">
+							member.reg_date ${sortType}
+						</when>
+						<otherwise>
+							member.reg_date desc
+						</otherwise>
+					</choose>
+				</when>
+				<otherwise>
+					member.reg_date desc
+				</otherwise>
+			</choose>
+
+		LIMIT
+			#{startPageLimit}, #{endPageLimit}
+	</select>
+
+
+	<sql id="whereMemberList">
+
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(userName)">
+			WHERE member.userName LIKE CONCAT(#{userName}, '%')
+		</if>
+
+	</sql>
+    
     <select id="selectMemberSchema" resultType="com.naver.pubtrans.itn.api.vo.common.SchemaVo">
     	select
 		     COLUMN_NAME as columnName
@@ -24,26 +126,5 @@
 		where
 			TABLE_NAME = 'tb_z_svc_member'
     </select>
-    
-    <select id="selectMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo">
-    	SELECT
-		    user_id
-		    , user_pw
-		    , user_name
-		    , company
-		    , date_format(reg_date, '%Y-%m-%d %H:%i:%s') as reg_date
-            , date_format(upd_date, '%Y-%m-%d %H:%i:%s') as upd_date 
-		FROM
-		    tb_z_svc_member
-		WHERE
-			user_id = #{userId}
-    </select>
-    
-	<insert id="insertMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
-		INSERT INTO 
-			tb_z_svc_member(user_id, user_name, user_pw, company) 
-		VALUES
-			(#{userId}, #{userName}, #{userPw}, #{company})
-	</insert>
 
 </mapper>

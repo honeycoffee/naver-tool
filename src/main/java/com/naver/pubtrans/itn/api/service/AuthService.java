@@ -104,7 +104,7 @@ public class AuthService {
 		
 		MemberOutputVo memberOutputVo = jwtAdapter.getUserDataByToken(refreshToken);
 		
-		String accessToken = jwtAdapter.createToken(memberOutputVo, ChronoUnit.HOURS, 1);
+		String accessToken = jwtAdapter.createToken(memberOutputVo, ChronoUnit.MONTHS, 3);
 		
 		return accessToken;
 	}

@@ -14,4 +14,9 @@ public class MemberSearchVo extends SearchVo {
 	 */
 	private String userId;
 	
+	/**
+	 * 회원 이름
+	 */
+	private String userName;
+	
 }

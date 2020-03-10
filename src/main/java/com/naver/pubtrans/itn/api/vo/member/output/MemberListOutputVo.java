@@ -1,19 +1,16 @@
 package com.naver.pubtrans.itn.api.vo.member.output;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 회원 데이터 출력 Vo
+ * 회원 목록 결과 Vo
  * @author westwind
  *
  */
 @Getter
 @Setter
-public class MemberOutputVo {
+public class MemberListOutputVo {
 
 	/**
 	 * 회원 ID
@@ -30,21 +27,9 @@ public class MemberOutputVo {
 	 */
 	private String company ;
 
-	@JsonIgnore
-	/**
-	 * 비밀번호
-	 */
-	private String userPw ;
-
 	/**
 	 * 가입일
 	 */
 	private String regDate ;
-
-	@JsonIgnore
-	/**
-	 * 수정일
-	 */
-	private String updDate ;
 	
 }
