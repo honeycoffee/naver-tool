@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
+import com.naver.pubtrans.itn.api.exception.ApiException;
 import com.naver.pubtrans.itn.api.service.MemberService;
+import com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopSearchVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
@@ -41,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberController {
 	
 	@Autowired
-	private MemberService memberSvc ;   
+	private MemberService memberService ;   
 	
 	@Autowired
 	private OutputFmtUtil outputFmtUtil ;
@@ -68,7 +70,7 @@ public class MemberController {
     	}
     	
     	// 데이터 저장 서비스
-    	memberSvc.insertMember(memberInputVo);
+    	memberService.insertMember(memberInputVo);
     	
     	return new CommonOutput() ;
     	
@@ -84,26 +86,47 @@ public class MemberController {
     public CommonOutput checkDuplicate(@RequestParam(name = "userId", required = true) String userId) throws Exception {
     	
     	// ID 중복 체크
-    	CommonResult commonResult = memberSvc.checkDuplicate(userId);
+    	CommonResult commonResult = memberService.checkDuplicate(userId);
     	
     	return new CommonOutput(commonResult) ;
     	
     }
     
     /**
-     * 자신의 정보를 수정한다.
-     * <pre>
-     * Valid를 이용하여 유효성 검사를 진행한다
-     * </pre>
-     * @param memberInputVo - 회원 정보 입력값
+     * 회원 비밀번호 검증
+     * @param userPw - 현재 회원 비밀번호
      * @return
      * @throws Exception
      */
-    @PutMapping(value = "/v1/ntool/api/info/me")
+    @PostMapping(value = "/v1/ntool/api/verify/password")
+    public CommonOutput verifyPassword(@RequestParam(name = "userPw", required = true) String userPw) throws Exception {
+    	
+    	// TODO : Spring Security AccessToken 적용은 Sprint4에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
+    	String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
+    	
+    	MemberOutputVo memberOutputVo = jwtAdapter.getUserDataByToken(accessToken);
+    	
+    	MemberSearchVo memberSearchVo = new MemberSearchVo();
+    	
+    	memberSearchVo.setUserId(memberOutputVo.getUserId());
+    	
+    	// ID 중복 체크
+    	CommonResult commonResult = memberService.verifyPassword(memberSearchVo, userPw);
+    	
+    	return new CommonOutput(commonResult) ;
+    	
+    }
+    
+    /**
+     * 자신의 정보를 조회한다.
+     * @return
+     * @throws Exception
+     */
+    @GetMapping(value = "/v1/ntool/api/info/me")
     public CommonOutput infoMe() throws Exception {
     	
-    	// TODO : Spring Security AccessToken 적용은 Sprint4에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test)
-    	String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RVc2VyMTExIiwiZXhwIjoxNTgzNzI2MzQxLCJ1c2VySWQiOiIzMzMzIn0.7u5nemrRunhZegjk0Y6E9Fu07-nalkIiBmkk-Vikhwg";
+    	// TODO : Spring Security AccessToken 적용은 Sprint4에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
+    	String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
     	
     	MemberOutputVo memberOutputVo = jwtAdapter.getUserDataByToken(accessToken);
     	
@@ -112,7 +135,7 @@ public class MemberController {
     	memberSearchVo.setUserId(memberOutputVo.getUserId());
     	
     	// 데이터 저장 서비스
-    	CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberSvc.getMemberData(memberSearchVo)) ;
+    	CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberService.selectMemberSchema(), memberService.getMemberData(memberSearchVo)) ;
     	
     	return new CommonOutput(commonResult) ;
     	
@@ -130,29 +153,28 @@ public class MemberController {
     @PutMapping(value = "/v1/ntool/api/modify/me")
     public CommonOutput modifyMe(@RequestBody @Valid MemberInputVo memberInputVo) throws Exception {
 
-    	// TODO : Spring Security AccessToken 적용은 Sprint4에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test)
-    	String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RVc2VyMTExIiwiZXhwIjoxNTgzNzI2MzQxLCJ1c2VySWQiOiIzMzMzIn0.7u5nemrRunhZegjk0Y6E9Fu07-nalkIiBmkk-Vikhwg";
+    	// TODO : Spring Security AccessToken 적용은 Sprint4에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
+    	String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
     	
     	MemberOutputVo memberOutputVo = jwtAdapter.getUserDataByToken(accessToken);
     	
-    	if(!memberOutputVo.getUserId().equals(memberInputVo)) {
-    		
+    	if(!memberOutputVo.getUserId().equals(memberInputVo.getUserId())) {
+    		throw new ApiException("accessToken과 내 정보가 일치하지 않습니다.") ;
     	}else {// 데이터 저장 서비스
-//        	memberSvc.modifyMe(memberInputVo);	
+        	memberService.updateMember(memberInputVo);	
     	}
-    	
-    	
     	
     	return new CommonOutput() ;
     	
     }  
 	
     /**
-     * 회원 데이터 정보를 조회한다
+     * 권한관리에서 회원 정보를 조회한다
+     * @param userId - 체크할 회원 ID
      * @return
      * @throws Exception
      */
-    @GetMapping(value = "/v1/ntool/api/info/member/${userId}")
+    @GetMapping(value = "/v1/ntool/api/info/member/{userId}")
     public CommonOutput infoMember(@PathVariable String userId) throws Exception {
     	
     	MemberSearchVo memberSearchVo = new MemberSearchVo();
@@ -160,14 +182,14 @@ public class MemberController {
     	memberSearchVo.setUserId(userId);
     	
     	// 회원 데이터 상세 구조 조회
-    	CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberSvc.getMemberData(memberSearchVo)) ;
+    	CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberService.selectMemberSchema(), memberService.getMemberData(memberSearchVo)) ;
     	
     	return new CommonOutput(commonResult) ;
     	
     }
     
     /**
-     * 회원 정보를 수정한다.
+     * 권한관리에서 회원 정보를 수정한다.
      * <pre>
      * Valid를 이용하여 유효성 검사를 진행한다
      * </pre>
@@ -176,10 +198,10 @@ public class MemberController {
      * @throws Exception
      */
     @PutMapping(value = "/v1/ntool/api/modify/member")
-    public CommonOutput modifyMember(@RequestParam(name = "userId", required = true) String userId) throws Exception {
+    public CommonOutput modifyMember(@RequestBody @Valid MemberInputVo memberInputVo) throws Exception {
     	    	
     	// 데이터 저장 서비스
-//    	memberSvc.insertMember(memberInputVo);
+    	memberService.updateMember(memberInputVo);
     	
     	return new CommonOutput() ;
     	
@@ -192,25 +214,42 @@ public class MemberController {
      * @throws Exception
      */
     @DeleteMapping(value = "/v1/ntool/api/remove/member")
-    public CommonOutput deleteMember(@RequestParam(name = "userId", required = true) String userId) throws Exception {
+    public CommonOutput removeMember(@RequestParam(name = "userId", required = true) String userId) throws Exception {
+    	
+    	MemberSearchVo memberSearchVo = new MemberSearchVo();
+    	
+    	memberSearchVo.setUserId(userId);
     	
     	// ID 중복 체크
-    	CommonResult commonResult = memberSvc.checkDuplicate(userId);
+    	memberService.deleteMember(memberSearchVo);
     	
-    	return new CommonOutput(commonResult) ;
+    	return new CommonOutput() ;
     	
     }
+
+
+	/**
+	 * 회원 목록 조회
+	 * @param memberSearchVo - 검색 조건
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/v1/ntool/api/list/member")
+	public CommonOutput listMember(MemberSearchVo memberSearchVo) throws Exception {
+		CommonResult commonResult = memberService.selectMemberList(memberSearchVo) ;
+		return new CommonOutput(commonResult) ;
+	}
 	
     /**
      * 회원 데이터 상세 구조를 조회한다
      * @return
      * @throws Exception
      */
-    @GetMapping(value = "/v1/ntool/api/members/schema")
+    @GetMapping(value = "/v1/ntool/api/schema/member")
     public CommonOutput selectMemberSchema() throws Exception {
     	
     	// 회원 데이터 상세 구조 조회
-    	CommonResult commonResult = memberSvc.selectMemberSchema() ;
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberService.selectMemberSchema()) ;
     	
     	return new CommonOutput(commonResult) ;
     }

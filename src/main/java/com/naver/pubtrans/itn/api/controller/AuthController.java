@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthController {
 	
 	@Autowired
-	private AuthService authSvc ;   
+	private AuthService authService ;   
 	
     /**
      * 로그인을 처리한다.
@@ -44,7 +44,7 @@ public class AuthController {
     @PostMapping(value = "/v1/ntool/api/auth/login")
     public CommonOutput login(@Valid LoginVo loginVo, HttpServletRequest request) throws Exception {
 
-    	CommonResult commonResult = authSvc.loginMember(loginVo, request);
+    	CommonResult commonResult = authService.loginMember(loginVo, request);
     	
     	return new CommonOutput(commonResult) ;
     	
@@ -58,7 +58,7 @@ public class AuthController {
     @PostMapping(value = "/v1/ntool/api/auth/refresh/token")
     public CommonOutput refresh(HttpServletRequest request) throws Exception {
     	
-    	CommonResult commonResult = authSvc.refreshToken(request);
+    	CommonResult commonResult = authService.refreshToken(request);
     	
     	return new CommonOutput(commonResult) ;
     	
