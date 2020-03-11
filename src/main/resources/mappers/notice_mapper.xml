@@ -2,4 +2,105 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.naver.pubtrans.itn.api.repository.NoticeRepository">
 
+	<insert id="insertNotice" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoticeInputVo">
+		INSERT INTO 
+			tb_z_svc_notice(title, content, important_yn, reg_user_id, reg_user_name) 
+		VALUES
+			(#{title}, #{content}, #{importantYn}, #{regUserId}, #{regUserName})
+	</insert>
+    
+	<update id="updateNotice" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoticeInputVo">
+		UPDATE
+			tb_z_svc_notice
+		SET
+			title = #{userName}
+			, content = #{company}
+			, important_yn = #{company}
+			, upd_date = now()
+		WHERE
+			seq = #{seq}
+	</update>
+    
+	<select id="selectNotice" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoitceSearchVo" resultType="com.naver.pubtrans.itn.api.vo.notice.output.NoitceOutputVo">
+		SELECT
+			notice.seq
+			, notice.title
+			, notice.content
+			, notice.important_yn
+			, notice.reg_user_name
+			, DATE_FORMAT(notice.reg_date, '%Y.%m.%d %H:%i') as reg_date
+		FROM
+			tb_z_svc_notice notice
+		WHERE
+			seq = #{seq}
+	</select>
+    
+	<update id="delteReadCount" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoitceSearchVo">
+		UPDATE
+			tb_z_svc_notice
+		SET
+			delete_yn = 'Y'
+		WHERE
+			seq = #{seq}
+	</update>
+    
+	<update id="plusReadCount" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoitceSearchVo">
+		UPDATE
+			tb_z_svc_notice
+		SET
+			read_cnt = read_cnt + 1
+		WHERE
+			seq = #{seq}
+	</update>
+	
+	<select id="selectNoticeListTotalCnt" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoitceSearchVo" resultType="int">
+		SELECT
+			count(*) as total_list_cnt
+		FROM
+			tb_z_svc_notice notice
+
+			<include refid="whereNoticeList" />
+
+	</select>
+
+	<select id="selectNoticeList" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoitceSearchVo" resultType="com.naver.pubtrans.itn.api.vo.notice.output.NoticeListOutputVo">
+		SELECT
+			notice.seq
+			, notice.title
+			, notice.important_yn
+			, notice.reg_user_name
+			, date_format(member.reg_date, '%Y.%m.%d %H:%i') as reg_date
+		FROM
+			tb_z_svc_notice notice
+
+		<include refid="whereNoticeList" />
+
+		ORDER BY
+			notice.important_yn desc, notice.reg_date desc 
+		LIMIT
+			#{startPageLimit}, #{endPageLimit}
+	</select>
+
+
+	<sql id="whereNoticeList">
+
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(userName)">
+			WHERE member.user_name LIKE CONCAT(#{userName}, '%')
+		</if>
+
+	</sql>
+    
+    <select id="selectMemberSchema" resultType="com.naver.pubtrans.itn.api.vo.common.SchemaVo">
+    	select
+		     COLUMN_NAME as columnName
+			, COLUMN_COMMENT as columnComment
+			, IS_NULLABLE as isNullable
+			, COLUMN_KEY as columnKey
+			, COLUMN_TYPE as columnType
+		from
+		    information_schema.COLUMNS
+		where
+			TABLE_NAME = 'tb_z_svc_member'
+    </select>
+
 </mapper>

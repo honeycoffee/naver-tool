@@ -12,7 +12,7 @@ import com.naver.pubtrans.itn.api.vo.member.output.MemberListOutputVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
- * 네이버 대중교통 내재화 사용자관리 Repository
+ * 네이버 대중교통 내재화 공지사항관리 Repository
  * @author westwind
  *
  */
