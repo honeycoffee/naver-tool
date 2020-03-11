@@ -69,21 +69,21 @@ include::common-schema.adoc[]
 
 == [01]회원 API
 
-[[member-register]]
+[[register-member]]
 === 회원 등록
 회원 정보를 등록한다.
 
 ==== Request
-include::{snippets}/memberRegister/request-fields.adoc[]
+include::{snippets}/member/registerMember/request-fields.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/memberRegister/http-request.adoc[]
+include::{snippets}/member/registerMember/http-request.adoc[]
 
 ==== Response
-include::{snippets}/memberRegister/response-fields.adoc[]
+include::{snippets}/member/registerMember/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/memberRegister/http-response.adoc[]
+include::{snippets}/member/registerMember/http-response.adoc[]
 
 &#160;
 
@@ -93,16 +93,16 @@ include::{snippets}/memberRegister/http-response.adoc[]
 회원 ID를 중복 확인한다.
 
 ==== Request
-include::{snippets}/checkDuplicate/request-parameters.adoc[]
+include::{snippets}/member/checkDuplicate/request-parameters.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/checkDuplicate/http-request.adoc[]
+include::{snippets}/member/checkDuplicate/http-request.adoc[]
 
 ==== Response
-include::{snippets}/checkDuplicate/response-fields.adoc[]
+include::{snippets}/member/checkDuplicate/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/checkDuplicate/http-response.adoc[]
+include::{snippets}/member/checkDuplicate/http-response.adoc[]
 
 &#160;
 
@@ -112,16 +112,18 @@ include::{snippets}/checkDuplicate/http-response.adoc[]
 회원 ID와 비밀번호로 로그인을 한다.
 
 ==== Request
-include::{snippets}/login/request-parameters.adoc[]
+include::{snippets}/member/login/request-parameters.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/login/http-request.adoc[]
+include::{snippets}/member/login/http-request.adoc[]
 
 ==== Response
-include::{snippets}/login/response-fields.adoc[]
+include::{snippets}/member/login/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/login/http-response.adoc[]
+include::{snippets}/member/login/http-response.adoc[]
+
+&#160;
 
 
 [[refresh-token]]
@@ -129,13 +131,142 @@ include::{snippets}/login/http-response.adoc[]
 refreshToken으로 accessToken을 갱신한다. 
 
 ===== Request HTTP Example
-include::{snippets}/refreshToken/http-request.adoc[]
+include::{snippets}/member/refreshToken/http-request.adoc[]
 
 ==== Response
-include::{snippets}/refreshToken/response-fields.adoc[]
+include::{snippets}/member/refreshToken/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/refreshToken/http-response.adoc[]
+include::{snippets}/member/refreshToken/http-response.adoc[]
+
+&#160;
+
+
+[[verify-password]]
+=== 회원 비밀번호 검증
+회원 비밀번호를 검증한다.
+
+==== Request
+include::{snippets}/member/verifyPassword/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/member/verifyPassword/http-request.adoc[]
+
+==== Response
+include::{snippets}/member/verifyPassword/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/member/verifyPassword/http-response.adoc[]
+
+&#160;
+
+
+[[info-me]]
+=== 내 정보 조회
+자신의 정보를 조회한다. 
+
+===== Request HTTP Example
+include::{snippets}/member/infoMe/http-request.adoc[]
+
+==== Response
+include::{snippets}/member/infoMe/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/member/infoMe/http-response.adoc[]
+
+&#160;
+
+
+[[modify-me]]
+=== 내 정보 수정
+자신의 정보를 수정한다.
+
+==== Request
+include::{snippets}/member/modifyMe/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/member/modifyMe/http-request.adoc[]
+
+==== Response
+include::{snippets}/member/modifyMe/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/member/modifyMe/http-response.adoc[]
+
+&#160;
+
+
+[[info-member]]
+=== 회원 정보 조회
+권한관리에서 회원의 정보를 조회한다. 
+
+==== Request
+include::{snippets}/member/infoMember/path-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/member/infoMember/http-request.adoc[]
+
+==== Response
+include::{snippets}/member/infoMember/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/member/infoMember/http-response.adoc[]
+
+
+[[modify-member]]
+=== 회원 정보 수정
+권한관리에서 회원의 정보를 수정한다.
+
+==== Request
+include::{snippets}/member/modifyMember/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/member/modifyMember/http-request.adoc[]
+
+==== Response
+include::{snippets}/member/modifyMember/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/member/modifyMember/http-response.adoc[]
+
+&#160;
+
+
+[[remove-member]]
+=== 회원 정보 삭제
+권한관리에서 회원의 정보를 삭제한다.
+
+==== Request
+include::{snippets}/member/removeMember/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/member/removeMember/http-request.adoc[]
+
+==== Response
+include::{snippets}/member/removeMember/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/member/removeMember/http-response.adoc[]
+
+&#160;
+
+
+=== 회원 List
+회원 목록을 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/member/listMember/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/member/listMember/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/member/listMember/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/member/listMember/http-response.adoc[]
 
 &#160;
 

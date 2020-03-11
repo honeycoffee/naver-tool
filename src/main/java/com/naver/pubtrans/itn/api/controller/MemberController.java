@@ -18,16 +18,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.exception.ApiException;
 import com.naver.pubtrans.itn.api.service.MemberService;
-import com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopSearchVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
-import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,15 +39,16 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class MemberController {
 	
-	@Autowired
-	private MemberService memberService ;   
+	private final MemberService memberService ;   
+	
+	private final OutputFmtUtil outputFmtUtil ;
 	
 	@Autowired
-	private OutputFmtUtil outputFmtUtil ;
+	MemberController(MemberService memberService, OutputFmtUtil outputFmtUtil){
+		this.outputFmtUtil = outputFmtUtil ;
+		this.memberService = memberService ;
+	}
 	
-	@Autowired
-	private JwtAdapter jwtAdapter ;    
-    
     /**
      * 회원 정보를 등록한다.
      * <pre>
@@ -101,16 +99,12 @@ public class MemberController {
     @PostMapping(value = "/v1/ntool/api/verify/password")
     public CommonOutput verifyPassword(@RequestParam(name = "userPw", required = true) String userPw) throws Exception {
     	
-    	// TODO : Spring Security AccessToken 적용은 Sprint4에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
-    	String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
-    	
-    	MemberOutputVo memberOutputVo = jwtAdapter.getUserDataByToken(accessToken);
+    	String userId = memberService.getUserIdByToken();
     	
     	MemberSearchVo memberSearchVo = new MemberSearchVo();
     	
-    	memberSearchVo.setUserId(memberOutputVo.getUserId());
+    	memberSearchVo.setUserId(userId);
     	
-    	// ID 중복 체크
     	CommonResult commonResult = memberService.verifyPassword(memberSearchVo, userPw);
     	
     	return new CommonOutput(commonResult) ;
@@ -125,17 +119,12 @@ public class MemberController {
     @GetMapping(value = "/v1/ntool/api/info/me")
     public CommonOutput infoMe() throws Exception {
     	
-    	// TODO : Spring Security AccessToken 적용은 Sprint4에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
-    	String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
-    	
-    	MemberOutputVo memberOutputVo = jwtAdapter.getUserDataByToken(accessToken);
+    	String userId = memberService.getUserIdByToken();
     	
     	MemberSearchVo memberSearchVo = new MemberSearchVo();
+    	memberSearchVo.setUserId(userId);
     	
-    	memberSearchVo.setUserId(memberOutputVo.getUserId());
-    	
-    	// 데이터 저장 서비스
-    	CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberService.selectMemberSchema(), memberService.getMemberData(memberSearchVo)) ;
+    	CommonResult commonResult = memberService.getMemberDataWithSchema(memberSearchVo) ;
     	
     	return new CommonOutput(commonResult) ;
     	
@@ -153,16 +142,7 @@ public class MemberController {
     @PutMapping(value = "/v1/ntool/api/modify/me")
     public CommonOutput modifyMe(@RequestBody @Valid MemberInputVo memberInputVo) throws Exception {
 
-    	// TODO : Spring Security AccessToken 적용은 Sprint4에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
-    	String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
-    	
-    	MemberOutputVo memberOutputVo = jwtAdapter.getUserDataByToken(accessToken);
-    	
-    	if(!memberOutputVo.getUserId().equals(memberInputVo.getUserId())) {
-    		throw new ApiException("accessToken과 내 정보가 일치하지 않습니다.") ;
-    	}else {// 데이터 저장 서비스
-        	memberService.updateMember(memberInputVo);	
-    	}
+    	memberService.updateMe(memberInputVo);	
     	
     	return new CommonOutput() ;
     	
@@ -181,8 +161,8 @@ public class MemberController {
     	
     	memberSearchVo.setUserId(userId);
     	
-    	// 회원 데이터 상세 구조 조회
-    	CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberService.selectMemberSchema(), memberService.getMemberData(memberSearchVo)) ;
+    	// 회원 데이터 및 테이블 상세 구조 조회
+    	CommonResult commonResult = memberService.getMemberDataWithSchema(memberSearchVo) ;
     	
     	return new CommonOutput(commonResult) ;
     	
@@ -200,7 +180,6 @@ public class MemberController {
     @PutMapping(value = "/v1/ntool/api/modify/member")
     public CommonOutput modifyMember(@RequestBody @Valid MemberInputVo memberInputVo) throws Exception {
     	    	
-    	// 데이터 저장 서비스
     	memberService.updateMember(memberInputVo);
     	
     	return new CommonOutput() ;
@@ -217,16 +196,13 @@ public class MemberController {
     public CommonOutput removeMember(@RequestParam(name = "userId", required = true) String userId) throws Exception {
     	
     	MemberSearchVo memberSearchVo = new MemberSearchVo();
-    	
     	memberSearchVo.setUserId(userId);
     	
-    	// ID 중복 체크
     	memberService.deleteMember(memberSearchVo);
     	
     	return new CommonOutput() ;
     	
     }
-
 
 	/**
 	 * 회원 목록 조회
@@ -247,10 +223,7 @@ public class MemberController {
      */
     @GetMapping(value = "/v1/ntool/api/schema/member")
     public CommonOutput selectMemberSchema() throws Exception {
-    	
-    	// 회원 데이터 상세 구조 조회
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberService.selectMemberSchema()) ;
-    	
     	return new CommonOutput(commonResult) ;
     }
   

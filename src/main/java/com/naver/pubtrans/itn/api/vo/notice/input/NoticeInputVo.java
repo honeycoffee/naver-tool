@@ -1,4 +1,4 @@
-package com.naver.pubtrans.itn.api.vo.member.input;
+package com.naver.pubtrans.itn.api.vo.notice.input;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -13,33 +13,32 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class MemberInputVo {
-	
+public class NoticeInputVo {
+
 	/**
 	 * 회원 ID.
 	 */
 	@NotEmpty
-	@Size(max=30)
-	private String userId ;
-	
+	@Size(max = 30)
+	private String userId;
+
 	/**
 	 * 이름
 	 */
 	@NotEmpty
-	@Size(max=30)
-	private String userName ;
+	@Size(max = 30)
+	private String userName;
 
 	/**
 	 * 비밀번호
 	 */
-	@Size(min=8, max=20)
-	private String userPw ;
+	@Size(min = 8, max = 20)
+	private String userPw;
 
 	/**
 	 * 소속
 	 */
-	@Size(max=50)
-	private String company ;
+	@Size(max = 50)
+	private String company;
 
 }
-

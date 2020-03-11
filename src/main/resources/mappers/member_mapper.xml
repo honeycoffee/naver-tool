@@ -25,7 +25,7 @@
 		SET
 			user_name = #{userName}
 			, company = #{company}
-			<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(userName)">
+			<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(userPw)">
 			, user_pw = #{userPw} 
 			</if>
 			, upd_date = now()
@@ -109,7 +109,7 @@
 	<sql id="whereMemberList">
 
 		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(userName)">
-			WHERE member.userName LIKE CONCAT(#{userName}, '%')
+			WHERE member.user_name LIKE CONCAT(#{userName}, '%')
 		</if>
 
 	</sql>

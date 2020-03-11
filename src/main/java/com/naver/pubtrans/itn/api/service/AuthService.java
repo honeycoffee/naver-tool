@@ -102,7 +102,7 @@ public class AuthService {
 	 */
 	public String createAccessToken(String refreshToken) throws TokenExpiredException, JWTDecodeException, JWTVerificationException, AccessTokenNotFoundException {
 		
-		MemberOutputVo memberOutputVo = jwtAdapter.getUserDataByToken(refreshToken);
+		MemberOutputVo memberOutputVo = jwtAdapter.getUserDataByToken("");
 		
 		String accessToken = jwtAdapter.createToken(memberOutputVo, ChronoUnit.MONTHS, 3);
 		
