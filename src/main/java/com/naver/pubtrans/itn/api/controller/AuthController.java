@@ -48,17 +48,6 @@ public class AuthController {
 
 		CommonResult commonResult = authService.loginMember(loginVo, request);
 
-		CommonOutput commonOutput = new CommonOutput(commonResult);
-
-		System.out.println(commonOutput.getCode());
-		System.out.println(commonOutput.getResult().getData());
-
-		AuthOutputVo auth = (AuthOutputVo)commonOutput.getResult().getData();
-
-		System.out.println(auth.getAccessToken());
-
-		//		System.out.println(new CommonOutput(commonResult).getResult().getData();
-
 		return new CommonOutput(commonResult);
 
 	}
