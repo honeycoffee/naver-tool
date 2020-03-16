@@ -13,13 +13,37 @@ import com.naver.pubtrans.itn.api.vo.auth.output.AuthOutputVo;
  */
 @Repository
 public interface AuthRepository {
-	
-	public void insertMemberLoginLog(AuthInputVo authInputVo) throws DataAccessException ;
 
-	public void insertMemberTokenInfo(AuthInputVo authInputVo) throws DataAccessException ;
-	
-	public AuthOutputVo selectMemberTokenInfo(AuthInputVo authInputVo) throws DataAccessException ;
-	
-	public void deleteMemberTokenInfo(AuthInputVo authInputVo) throws DataAccessException ;
-	
+	/**
+	 * 회원 로그인 기록을 등록한다.
+	 * @param authInputVo - 인증 입력 값
+	 * @return
+	 * @throws DataAccessException
+	 */
+	void insertMemberLoginLog(AuthInputVo authInputVo) throws DataAccessException;
+
+	/**
+	 * 회원 토큰 정보를 등록한다.
+	 * @param authInputVo - 인증 입력 값
+	 * @return
+	 * @throws DataAccessException
+	 */
+	void insertMemberTokenInfo(AuthInputVo authInputVo) throws DataAccessException;
+
+	/**
+	 * 회원 토큰 정보를 가져온다.
+	 * @param authInputVo - 인증 입력 값
+	 * @return
+	 * @throws DataAccessException
+	 */
+	AuthOutputVo getMemberTokenInfo(AuthInputVo authInputVo) throws DataAccessException;
+
+	/**
+	 * 회원 토큰 정보를 삭제한다.
+	 * @param authInputVo - 인증 입력 값
+	 * @return
+	 * @throws DataAccessException
+	 */
+	void deleteMemberTokenInfo(AuthInputVo authInputVo) throws DataAccessException;
+
 }

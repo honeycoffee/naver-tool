@@ -12,10 +12,10 @@ import lombok.Setter;
 @Setter
 public class SampleVo {
 
-	private int id ;
+	private int id;
 
-	private String sampleData ;
+	private String sampleData;
 
-	private String regDate ;
+	private String regDate;
 
 }

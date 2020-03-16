@@ -3,7 +3,7 @@
 <mapper namespace="com.naver.pubtrans.itn.api.repository.BusStopRepository">
 
 
-	<select id="selectBusStopListTotalCnt" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopSearchVo" resultType="int">
+	<select id="getBusStopListTotalCnt" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopSearchVo" resultType="int">
 		SELECT
 			count(*) as total_list_cnt
 		FROM
@@ -72,5 +72,167 @@
 		</if>
 	</sql>
 
+
+	<select id="getBusStop" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.stop.BusStopVo">
+		SELECT
+
+			<include refid="selectCommonBusStop" />
+
+		FROM
+			tb_stops stn
+		    , tb_bus_stops_info sub
+			, tb_city_code city
+		LEFT JOIN
+			tb_bus_stop_mapping mp on mp.stop_id = #{busStopId}
+		WHERE
+		    stn.stop_id = #{busStopId}
+		    and stn.stop_id = sub.stop_id
+			and stn.citycode = city.citycode
+	</select>
+
+
+	<select id="getBusStopTask" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.bus.stop.BusStopTaskVo">
+		SELECT
+
+			<include refid="selectCommonBusStop" />
+
+		FROM
+			tb_stops_task stn
+		    , tb_bus_stops_info_task sub
+			, tb_city_code city
+		LEFT JOIN
+			tb_bus_stop_mapping_task mp on mp.task_id = #{taskId}
+		WHERE
+		    stn.task_id = #{taskId}
+		    and stn.task_id = sub.task_id
+			and stn.citycode = city.citycode
+	</select>
+
+
+	<select id="selectBusRouteList" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.stop.BusRouteVo">
+		SELECT
+			route.route_id
+		    , route.route_name
+			, info.bus_class
+			, class.bus_class_name
+		FROM
+		    tb_routes route
+			, tb_bus_routes_info info
+			, tb_route_stops stop
+			, tb_bus_route_class class
+		WHERE
+			stop.stop_id = #{busStopId}
+		    AND route.route_id = info.route_id
+			AND route.route_id = stop.route_id
+			AND info.bus_class = class.bus_class_id
+	</select>
+
+
+	<sql id="selectCommonBusStop">
+		stn.stop_id
+		, stn.stop_name
+		, stn.transport_id
+		, stn.x as longitude
+		, stn.y as latitude
+		, stn.level
+		, stn.nonstop_yn
+		, stn.citycode
+		, city.cityname
+
+		, sub.virtual_stop_yn
+		, sub.center_stop_yn
+		, sub.do as sido
+		, sub.gu
+		, sub.dong
+		, sub.road_address
+		, sub.road_name
+		, sub.bonbun
+		, sub.boobun
+		, sub.display_id
+		, sub.provider_id
+
+		, mp.local_stop_id
+	</sql>
+
+
+	<select id="getBusStopNewId" resultType="int">
+		SELECT
+			if(a.bus_stop_id > a.pub_trans_id, a.bus_stop_id, a.pub_trans_id) as bus_stop_new_id
+		FROM (
+			     select (select ifnull(max(stop_id), 500000) + 1 from tb_stops)                                         as bus_stop_id,
+			            (select ifnull(max(pub_trans_id), 500000) + 1 from tb_z_svc_task where task_data_type = 'stop') as pub_trans_id
+		     ) a
+	</select>
+
+
+	<insert id="insertBusStopTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo">
+		INSERT INTO tb_stops_task
+			(task_id, stop_id, stop_name, transport_id, x, y, level, nonstop_yn, citycode)
+		VALUES
+			(#{taskId}, #{stopId}, #{stopName}, 1, #{longitude}, #{latitude}, #{level}, #{nonstopYn}, #{cityCode})
+	</insert>
+
+
+	<insert id="insertBusStopSubInfoTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo">
+		INSERT INTO tb_bus_stops_info_task
+			(task_id, stop_id, virtual_stop_yn, center_stop_yn, do, gu, dong, road_address, road_name, bonbun, boobun, display_id, provider_id)
+		VALUES
+			(#{taskId}, #{stopId}, #{virtualStopYn}, #{centerStopYn}, #{sido}, #{gu}, #{dong}, #{roadAddress}, #{roadName}, #{bonbun}, #{boobun}, #{displayId}, #{providerId})
+	</insert>
+
+
+	<insert id="insertBusStopMappingTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo">
+		INSERT INTO
+			tb_bus_stop_mapping_task (task_id, stop_id, local_stop_id, provider_id, display_id)
+		VALUES
+			(#{taskId}, #{stopId}, #{localStopId}, #{providerId}, #{displayId})
+	</insert>
+
+
+	<update id="updateBusStopTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo">
+		UPDATE
+			tb_stops_task
+		SET
+			stop_name = #{stopName}
+			, x = #{longitude}
+			, y = #{latitude}
+			, level = #{level}
+			, nonstop_yn = #{nonstopYn}
+			, citycode = #{cityCode}
+		WHERE
+			task_id = #{taskId} AND stop_id = #{stopId}
+	</update>
+
+
+	<update id="updateBusStopSubInfoTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo">
+		UPDATE
+			tb_bus_stops_info_task
+		SET
+			virtual_stop_yn = #{virtualStopYn}
+			, center_stop_yn = #{centerStopYn}
+			, do = #{sido}
+			, gu = #{gu}
+			, dong = #{dong}
+			, road_address = #{roadAddress}
+			, road_name = #{roadName}
+			, bonbun = #{bonbun}
+			, boobun = #{boobun}
+			, display_id = #{displayId}
+			, provider_id = #{providerId}
+		WHERE
+			task_id = #{taskId} AND stop_id = #{stopId}
+	</update>
+
+
+	<update id="updateBusStopMappingTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo">
+		UPDATE
+			tb_bus_stop_mapping_task
+		SET
+			local_stop_id = #{localStopId}
+			, provider_id = #{providerId}
+			, display_id = #{displayId}
+		WHERE
+			task_id = #{taskId} AND stop_id = #{stopId}
+	</update>
 
 </mapper>

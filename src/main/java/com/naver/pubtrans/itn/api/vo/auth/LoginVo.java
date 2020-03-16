@@ -14,13 +14,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoginVo {
-	
-	@NotEmpty
-	@Size(max=30)
-	private String userId ;
 
 	@NotEmpty
-	@Size(min=8, max=20)
-	private String userPw ;
-	
+	@Size(max = 30)
+	private String userId;
+
+	@NotEmpty
+	@Size(min = 8, max = 20)
+	private String userPw;
+
 }

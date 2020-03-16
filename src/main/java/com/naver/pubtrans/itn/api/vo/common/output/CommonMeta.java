@@ -14,21 +14,21 @@ import lombok.Setter;
 public class CommonMeta {
 
 	// 전체 목록 수
-	private long totalListCount ;
+	private long totalListCount;
 
-	private long listCountPerPage ;
+	private long listCountPerPage;
 
 	// 전체 페이지 수
-	private int totalPageCount ;
+	private int totalPageCount;
 
 	// 현제 페이지 번호
-	private int currentPage ;
+	private int currentPage;
 
 	// 첫번째 페이지 여부
-	private boolean firstPage ;
+	private boolean firstPage;
 
 	// 마지막 페이지 여부
-	private boolean lastPage ;
+	private boolean lastPage;
 
 
 }

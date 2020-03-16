@@ -18,10 +18,10 @@ import lombok.Setter;
 public class SearchVo {
 
 	// 요청 페이지 번호
-	private int pageNo ;
+	private int pageNo;
 
 	// 요청 페이지 목록 수
-	private int listSize ;
+	private int listSize;
 
 	/**
 	 * 정렬 - 사용자 전송 파라미터
@@ -30,16 +30,16 @@ public class SearchVo {
 	 * 예2 : idx - 정렬기준. 정렬방법 미지정시 내림차순
 	 * </pre>
 	 */
-	private String sort ;
+	private String sort;
 
 	// 목록조회 시작 번호
 	private int startPageLimit;
 
 	// 조회 게시글 수(페이지당 게시글 노출 수)
-	private int endPageLimit ;
+	private int endPageLimit;
 
 	// 목록조회 정렬기준
-	private String sortKey ;
+	private String sortKey;
 
 	// 목록조회 정렬방법
 	private String sortType = CommonConstant.DESC;
@@ -51,23 +51,23 @@ public class SearchVo {
 	 */
 	public String getSortKey() {
 
-		String s = this.sort ;
+		String s = this.sort;
 
 		if(StringUtils.isNotEmpty(s)) {
 
 			if(s.indexOf(CommonConstant.COMMA) > -1) {
-				String[] arrTmp = s.split(CommonConstant.COMMA) ;
+				String[] arrTmp = s.split(CommonConstant.COMMA);
 				if(arrTmp.length == 2) {
-					this.sortKey = Util.camelCaseToSnakeCase(arrTmp[0]) ;
-					this.sortType = arrTmp[1] ;
+					this.sortKey = Util.camelCaseToSnakeCase(arrTmp[0]);
+					this.sortType = arrTmp[1];
 				}
 			}else {
-				this.sortKey = s ;
+				this.sortKey = s;
 			}
 		}
 
 
-		return sortKey ;
+		return sortKey;
 	}
 
 	/**
@@ -77,9 +77,9 @@ public class SearchVo {
 	public String getSortType() {
 
 		if(StringUtils.isEmpty(sortKey) || (!CommonConstant.DESC.equals(sortType.toUpperCase()) && !CommonConstant.ASC.equals(sortType.toUpperCase()))) {
-			return CommonConstant.DESC ;
+			return CommonConstant.DESC;
 		}else {
-			return sortType ;
+			return sortType;
 		}
 
 	}

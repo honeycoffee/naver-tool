@@ -16,7 +16,7 @@
 			(#{userId}, #{refreshToken})
 	</insert>
 	
-	<select id="selectMemberTokenInfo" parameterType="com.naver.pubtrans.itn.api.vo.auth.input.AuthInputVo" resultType="com.naver.pubtrans.itn.api.vo.auth.output.AuthOutputVo">
+	<select id="getMemberTokenInfo" parameterType="com.naver.pubtrans.itn.api.vo.auth.input.AuthInputVo" resultType="com.naver.pubtrans.itn.api.vo.auth.output.AuthOutputVo">
 		SELECT
 			refresh_token
 		FROM	

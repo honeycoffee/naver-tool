@@ -2,31 +2,27 @@ package com.naver.pubtrans.itn.api.controller;
 
 import javax.validation.Valid;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
 
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
-import com.naver.pubtrans.itn.api.service.MemberService;
+import com.naver.pubtrans.itn.api.service.NoticeService;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
-import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
-import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
+import com.naver.pubtrans.itn.api.vo.notice.input.NoticeInputVo;
+import com.naver.pubtrans.itn.api.vo.notice.input.NoticeParameterVo;
+import com.naver.pubtrans.itn.api.vo.notice.input.NoticeSearchVo;
 
 /**
- * 네이버 대중교통 DB 내재화 사용자관리 컨트롤러
+ * 네이버 대중교통 DB 내재화 공지사항 컨트롤러
  * 
  * @author westwind
  *
@@ -35,193 +31,113 @@ import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
 @RestController
 public class NoticeController {
 
-	private final MemberService memberService;
+	private final NoticeService noticeService;
 
 	private final OutputFmtUtil outputFmtUtil;
 
 	@Autowired
-	NoticeController(MemberService memberService, OutputFmtUtil outputFmtUtil) {
+	NoticeController(NoticeService noticeService, OutputFmtUtil outputFmtUtil) {
 		this.outputFmtUtil = outputFmtUtil;
-		this.memberService = memberService;
+		this.noticeService = noticeService;
 	}
 
 	/**
-	 * 회원 정보를 등록한다.
+	 * 공지사항을 등록한다.
 	 * <pre>
 	 * Valid를 이용하여 유효성 검사를 진행한다
 	 * </pre>
-	 * @param memberInputVo - 회원 정보 입력값
+	 * @param noticeInputVo - 공지사항 입력값
 	 * @return
 	 * @throws Exception
 	 */
-	@PostMapping(value = "/v1/ntool/api/register/member")
-	public CommonOutput registerMember(@RequestBody @Valid MemberInputVo memberInputVo, BindingResult bindingResult)
+	@PostMapping(value = "/v1/ntool/api/notice")
+	public CommonOutput insertNotice(@RequestBody @Valid NoticeInputVo noticeInputVo)
 		throws Exception {
 
-		// 비밀번호 입력값 체크
-		if (StringUtils.isEmpty(memberInputVo.getUserPw())) {
-			bindingResult
-				.addError(new FieldError("MemberInputVo", "userPw", "반드시 값이 존재하고 최소값 8과 최대값 20 사이의 크기이어야 합니다."));
-			throw new MethodArgumentNotValidException(null, bindingResult);
-		}
+		// 공지사항 등록 서비스
+		CommonResult commonReuslt = noticeService.insertNotice(noticeInputVo);
 
-		// 데이터 저장 서비스
-		memberService.insertMember(memberInputVo);
-
-		return new CommonOutput();
+		return new CommonOutput(commonReuslt);
 
 	}
 
 	/**
-	 * 회원 ID 중복 체크
-	 * @param userId - 체크할 회원 ID
+	 * 공지사항을 가져온다
+	 * @param seq - 공지사항 ID
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping(value = "/v1/ntool/api/duplicate/member")
-	public CommonOutput checkDuplicate(@RequestParam(name = "userId", required = true) String userId) throws Exception {
+	@GetMapping(value = "/v1/ntool/api/notice/{seq}")
+	public CommonOutput getNotice(@PathVariable int seq) throws Exception {
 
-		// ID 중복 체크
-		CommonResult commonResult = memberService.checkDuplicate(userId);
+		NoticeSearchVo noticeSearchVo = new NoticeSearchVo();
+		noticeSearchVo.setSeq(seq);
+
+		// 공지사항 조회 서비스
+		CommonResult commonResult = noticeService.getNotice(noticeSearchVo);
 
 		return new CommonOutput(commonResult);
 
 	}
 
 	/**
-	 * 회원 비밀번호 검증
-	 * @param userPw - 현재 회원 비밀번호
-	 * @return
-	 * @throws Exception
-	 */
-	@PostMapping(value = "/v1/ntool/api/verify/password")
-	public CommonOutput verifyPassword(@RequestParam(name = "userPw", required = true) String userPw) throws Exception {
-
-		String userId = memberService.getUserIdByToken();
-
-		MemberSearchVo memberSearchVo = new MemberSearchVo();
-
-		memberSearchVo.setUserId(userId);
-
-		CommonResult commonResult = memberService.verifyPassword(memberSearchVo, userPw);
-
-		return new CommonOutput(commonResult);
-
-	}
-
-	/**
-	 * 자신의 정보를 조회한다.
-	 * @return
-	 * @throws Exception
-	 */
-	@GetMapping(value = "/v1/ntool/api/info/me")
-	public CommonOutput infoMe() throws Exception {
-
-		String userId = memberService.getUserIdByToken();
-
-		MemberSearchVo memberSearchVo = new MemberSearchVo();
-		memberSearchVo.setUserId(userId);
-
-		CommonResult commonResult = memberService.getMemberDataWithSchema(memberSearchVo);
-
-		return new CommonOutput(commonResult);
-
-	}
-
-	/**
-	 * 자신의 정보를 수정한다.
+	 * 공지사항을 수정한다.
 	 * <pre>
 	 * Valid를 이용하여 유효성 검사를 진행한다
 	 * </pre>
-	 * @param memberInputVo - 회원 정보 입력값
+	 * @param noticeInputVo - 공지사항 입력값
 	 * @return
 	 * @throws Exception
 	 */
-	@PutMapping(value = "/v1/ntool/api/modify/me")
-	public CommonOutput modifyMe(@RequestBody @Valid MemberInputVo memberInputVo) throws Exception {
+	@PutMapping(value = "/v1/ntool/api/notice")
+	public CommonOutput updateNotice(@RequestBody @Valid NoticeInputVo noticeInputVo) throws Exception {
 
-		memberService.updateMe(memberInputVo);
+		// 공지사항 수정 서비스
+		noticeService.updateNotice(noticeInputVo);
 
 		return new CommonOutput();
 
 	}
 
 	/**
-	 * 권한관리에서 회원 정보를 조회한다
-	 * @param userId - 체크할 회원 ID
+	 * 공지사항을 삭제한다.
+	 * @param noticeParameterVo - 공지사항 파라미터 Vo
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping(value = "/v1/ntool/api/info/member/{userId}")
-	public CommonOutput infoMember(@PathVariable String userId) throws Exception {
+	@DeleteMapping(value = "/v1/ntool/api/notice")
+	public CommonOutput deleteNotice(@RequestBody @Valid NoticeParameterVo noticeParameterVo) throws Exception {
 
-		MemberSearchVo memberSearchVo = new MemberSearchVo();
+		NoticeSearchVo noticeSearchVo = new NoticeSearchVo();
+		noticeSearchVo.setSeq(noticeParameterVo.getSeq());
 
-		memberSearchVo.setUserId(userId);
-
-		// 회원 데이터 및 테이블 상세 구조 조회
-		CommonResult commonResult = memberService.getMemberDataWithSchema(memberSearchVo);
-
-		return new CommonOutput(commonResult);
-
-	}
-
-	/**
-	 * 권한관리에서 회원 정보를 수정한다.
-	 * <pre>
-	 * Valid를 이용하여 유효성 검사를 진행한다
-	 * </pre>
-	 * @param memberInputVo - 회원 정보 입력 값
-	 * @return
-	 * @throws Exception
-	 */
-	@PutMapping(value = "/v1/ntool/api/modify/member")
-	public CommonOutput modifyMember(@RequestBody @Valid MemberInputVo memberInputVo) throws Exception {
-
-		memberService.updateMember(memberInputVo);
+		// 공지사항 삭제 서비스
+		noticeService.deleteNotice(noticeSearchVo);
 
 		return new CommonOutput();
 
 	}
 
 	/**
-	 * 회원 정보를 삭제한다.
-	 * @param userId - 회원 ID
+	 * 공지사항 목록 조회
+	 * @param noticeSearchVo - 공지사항 검색 조건
 	 * @return
 	 * @throws Exception
 	 */
-	@DeleteMapping(value = "/v1/ntool/api/remove/member")
-	public CommonOutput removeMember(@RequestParam(name = "userId", required = true) String userId) throws Exception {
-
-		MemberSearchVo memberSearchVo = new MemberSearchVo();
-		memberSearchVo.setUserId(userId);
-
-		memberService.deleteMember(memberSearchVo);
-
-		return new CommonOutput();
-
-	}
-
-	/**
-	 * 회원 목록 조회
-	 * @param memberSearchVo - 검색 조건
-	 * @return
-	 * @throws Exception
-	 */
-	@GetMapping("/v1/ntool/api/list/member")
-	public CommonOutput listMember(MemberSearchVo memberSearchVo) throws Exception {
-		CommonResult commonResult = memberService.selectMemberList(memberSearchVo);
+	@GetMapping("/v1/ntool/api/list/notice")
+	public CommonOutput listNotice(NoticeSearchVo noticeSearchVo) throws Exception {
+		CommonResult commonResult = noticeService.selectNoticeList(noticeSearchVo);
 		return new CommonOutput(commonResult);
 	}
 
 	/**
-	 * 회원 데이터 상세 구조를 조회한다
+	 * 공지사항 데이터 상세 구조를 조회한다
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping(value = "/v1/ntool/api/schema/member")
-	public CommonOutput selectMemberSchema() throws Exception {
-		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberService.selectMemberSchema());
+	@GetMapping(value = "/v1/ntool/api/schema/notice")
+	public CommonOutput selectNoticeSchema() throws Exception {
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(noticeService.selectNoticeSchema());
 		return new CommonOutput(commonResult);
 	}
 

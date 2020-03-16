@@ -14,32 +14,19 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MemberInputVo {
-	
-	/**
-	 * 회원 ID.
-	 */
-	@NotEmpty
-	@Size(max=30)
-	private String userId ;
-	
-	/**
-	 * 이름
-	 */
-	@NotEmpty
-	@Size(max=30)
-	private String userName ;
 
-	/**
-	 * 비밀번호
-	 */
-	@Size(min=8, max=20)
-	private String userPw ;
+	@NotEmpty
+	@Size(max = 30)
+	private String userId;
 
-	/**
-	 * 소속
-	 */
-	@Size(max=50)
-	private String company ;
+	@NotEmpty
+	@Size(max = 30)
+	private String userName;
+
+	@Size(min = 8, max = 20)
+	private String userPw;
+
+	@Size(max = 50)
+	private String company;
 
 }
-

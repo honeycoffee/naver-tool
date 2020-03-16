@@ -2,31 +2,37 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.naver.pubtrans.itn.api.repository.NoticeRepository">
 
-	<insert id="insertNotice" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoticeInputVo">
+	<insert id="insertNotice" useGeneratedKeys="true" 
+		keyProperty="seq" 
+		parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoticeInputVo">
 		INSERT INTO 
 			tb_z_svc_notice(title, content, important_yn, reg_user_id, reg_user_name) 
 		VALUES
 			(#{title}, #{content}, #{importantYn}, #{regUserId}, #{regUserName})
 	</insert>
     
-	<update id="updateNotice" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoticeInputVo">
+	<update id="updateNotice" 
+		parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoticeInputVo">
 		UPDATE
 			tb_z_svc_notice
 		SET
-			title = #{userName}
-			, content = #{company}
-			, important_yn = #{company}
+			title = #{title}
+			, content = #{content}
+			, important_yn = #{importantYn}
 			, upd_date = now()
 		WHERE
 			seq = #{seq}
 	</update>
     
-	<select id="selectNotice" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoitceSearchVo" resultType="com.naver.pubtrans.itn.api.vo.notice.output.NoitceOutputVo">
+	<select id="getNotice" 
+		parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoticeSearchVo" 
+		resultType="com.naver.pubtrans.itn.api.vo.notice.output.NoticeOutputVo">
 		SELECT
 			notice.seq
 			, notice.title
 			, notice.content
 			, notice.important_yn
+			, notice.reg_user_id
 			, notice.reg_user_name
 			, DATE_FORMAT(notice.reg_date, '%Y.%m.%d %H:%i') as reg_date
 		FROM
@@ -35,7 +41,8 @@
 			seq = #{seq}
 	</select>
     
-	<update id="delteReadCount" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoitceSearchVo">
+	<update id="deleteNotice" 
+		parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoticeSearchVo">
 		UPDATE
 			tb_z_svc_notice
 		SET
@@ -44,7 +51,8 @@
 			seq = #{seq}
 	</update>
     
-	<update id="plusReadCount" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoitceSearchVo">
+	<update id="plusReadCnt" 
+		parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoticeSearchVo">
 		UPDATE
 			tb_z_svc_notice
 		SET
@@ -53,7 +61,9 @@
 			seq = #{seq}
 	</update>
 	
-	<select id="selectNoticeListTotalCnt" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoitceSearchVo" resultType="int">
+	<select id="getNoticeListTotalCnt" 
+		parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoticeSearchVo" 
+		resultType="int">
 		SELECT
 			count(*) as total_list_cnt
 		FROM
@@ -63,13 +73,16 @@
 
 	</select>
 
-	<select id="selectNoticeList" parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoitceSearchVo" resultType="com.naver.pubtrans.itn.api.vo.notice.output.NoticeListOutputVo">
+	<select id="selectNoticeList" 
+		parameterType="com.naver.pubtrans.itn.api.vo.notice.input.NoticeSearchVo" 
+		resultType="com.naver.pubtrans.itn.api.vo.notice.output.NoticeOutputVo">
 		SELECT
 			notice.seq
 			, notice.title
 			, notice.important_yn
+			, notice.reg_user_id
 			, notice.reg_user_name
-			, date_format(member.reg_date, '%Y.%m.%d %H:%i') as reg_date
+			, date_format(notice.reg_date, '%Y.%m.%d %H:%i') as reg_date
 		FROM
 			tb_z_svc_notice notice
 
@@ -81,26 +94,27 @@
 			#{startPageLimit}, #{endPageLimit}
 	</select>
 
-
+	<!-- searchKeyword에 띄어쓰기가 있을 시 각각의 단어를 OR로 검색하여 띄어쓰기를 각각의 단어에 +를 추가하도록 replace 하여 모두 포함된 행이 검색 되도록 함 -->
 	<sql id="whereNoticeList">
-
-		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(userName)">
-			WHERE member.user_name LIKE CONCAT(#{userName}, '%')
+		WHERE 
+			delete_yn = 'N' 
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(searchKeyword)">
+			<choose>
+				<when test="searchType.equals('title')">
+					AND 
+						MATCH(notice.title) AGAINST(CONCAT('+', REPLACE(#{searchKeyword}, ' ', ' +'), '*') in boolean mode)
+				</when>
+				<when test="searchType.equals('reg_user_name')">
+					AND 
+						notice.reg_user_name LIKE CONCAT('%', #{searchKeyword})
+				</when>
+				<when test="searchType.equals('content')">
+					AND 
+						MATCH(notice.content) AGAINST(CONCAT('+', REPLACE(#{searchKeyword}, ' ', ' +'), '*') in boolean mode)
+				</when>
+			</choose>
 		</if>
 
 	</sql>
-    
-    <select id="selectMemberSchema" resultType="com.naver.pubtrans.itn.api.vo.common.SchemaVo">
-    	select
-		     COLUMN_NAME as columnName
-			, COLUMN_COMMENT as columnComment
-			, IS_NULLABLE as isNullable
-			, COLUMN_KEY as columnKey
-			, COLUMN_TYPE as columnType
-		from
-		    information_schema.COLUMNS
-		where
-			TABLE_NAME = 'tb_z_svc_member'
-    </select>
 
 </mapper>

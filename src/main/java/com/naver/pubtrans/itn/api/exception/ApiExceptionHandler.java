@@ -39,8 +39,8 @@ public class ApiExceptionHandler {
 		// 에러 로깅 추가
 		log.error("Exception", e);
 
-		String errorMsg = "예기치 못한 오류가 발생하였습니다(" + e.getMessage() + ")" ;
-		return new CommonOutput(ResultCode.INNER_FAIL.getApiErrorCode(), errorMsg) ;
+		String errorMsg = "예기치 못한 오류가 발생하였습니다(" + e.getMessage() + ")";
+		return new CommonOutput(ResultCode.INNER_FAIL.getApiErrorCode(), errorMsg);
     }
 
 	/**
@@ -52,7 +52,7 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public CommonOutput httpStatus400(MissingServletRequestParameterException e) {
-    	return new CommonOutput(ResultCode.PARAMETER_ERROR.getApiErrorCode(), ResultCode.PARAMETER_ERROR.getDisplayMessage()) ;
+    	return new CommonOutput(ResultCode.PARAMETER_ERROR.getApiErrorCode(), ResultCode.PARAMETER_ERROR.getDisplayMessage());
 
     }
 
@@ -64,7 +64,7 @@ public class ApiExceptionHandler {
         BindingResult bindingResult = e.getBindingResult();
 
         StringBuilder builder = new StringBuilder();
-        int i=0 ;
+        int i=0;
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
 
         	if(i > 0) {
@@ -76,10 +76,10 @@ public class ApiExceptionHandler {
             builder.append("](은)는 ");
             builder.append(fieldError.getDefaultMessage());
 
-            i++ ;
+            i++;
         }
 
-        return new CommonOutput(ResultCode.PARAMETER_ERROR.getApiErrorCode(), builder.toString()) ;
+        return new CommonOutput(ResultCode.PARAMETER_ERROR.getApiErrorCode(), builder.toString());
     }
 
 
@@ -91,7 +91,7 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoHandlerFoundException.class)
     public CommonOutput httpStatus404(NoHandlerFoundException e) {
-    	return new CommonOutput(ResultCode.PAGE_NOT_FOUND_ERROR.getApiErrorCode(), ResultCode.PAGE_NOT_FOUND_ERROR.getDisplayMessage()) ;
+    	return new CommonOutput(ResultCode.PAGE_NOT_FOUND_ERROR.getApiErrorCode(), ResultCode.PAGE_NOT_FOUND_ERROR.getDisplayMessage());
     }
 
     /**
@@ -99,10 +99,10 @@ public class ApiExceptionHandler {
      * @param e
      * @return
      */
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(TokenExpiredException.class)
     public CommonOutput authTokenExpireExceptionHandle(TokenExpiredException e) {
-    	return new CommonOutput(ResultCode.AUTH_TOKEN_EXPIRED.getApiErrorCode(), ResultCode.AUTH_TOKEN_EXPIRED.getDisplayMessage()) ;
+    	return new CommonOutput(ResultCode.AUTH_TOKEN_EXPIRED.getApiErrorCode(), ResultCode.AUTH_TOKEN_EXPIRED.getDisplayMessage());
     }
 
     /**
@@ -110,10 +110,10 @@ public class ApiExceptionHandler {
      * @param e
      * @return
      */
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(JWTDecodeException.class)
     public CommonOutput authTokenDecodeExceptionHandle(JWTDecodeException e) {
-    	return new CommonOutput(ResultCode.AUTH_TOKEN_DECODE_ERROR.getApiErrorCode(), ResultCode.AUTH_TOKEN_DECODE_ERROR.getDisplayMessage()) ;
+    	return new CommonOutput(ResultCode.AUTH_TOKEN_DECODE_ERROR.getApiErrorCode(), ResultCode.AUTH_TOKEN_DECODE_ERROR.getDisplayMessage());
     }
 
     /**
@@ -121,10 +121,10 @@ public class ApiExceptionHandler {
      * @param e
      * @return
      */
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(JWTVerificationException.class)
     public CommonOutput authTokenVerificationExceptionHandle(JWTVerificationException e) {
-    	return new CommonOutput(ResultCode.AUTH_TOKEN_VALID_ERROR.getApiErrorCode(), ResultCode.AUTH_TOKEN_VALID_ERROR.getDisplayMessage()) ;
+    	return new CommonOutput(ResultCode.AUTH_TOKEN_VALID_ERROR.getApiErrorCode(), ResultCode.AUTH_TOKEN_VALID_ERROR.getDisplayMessage());
     }
 
     /**
@@ -132,10 +132,10 @@ public class ApiExceptionHandler {
      * @param e
      * @return
      */
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AccessTokenNotFoundException.class)
     public CommonOutput authExceptionhandle(AccessTokenNotFoundException e) {
-    	return new CommonOutput(ResultCode.AUTH_TOKEN_EMPTY.getApiErrorCode(), ResultCode.AUTH_TOKEN_EMPTY.getDisplayMessage()) ;
+    	return new CommonOutput(ResultCode.AUTH_TOKEN_EMPTY.getApiErrorCode(), ResultCode.AUTH_TOKEN_EMPTY.getDisplayMessage());
     }
 
     /**
@@ -150,7 +150,7 @@ public class ApiExceptionHandler {
     	// 에러 로깅 추가
     	log.error("ApiException", e);
 
-    	return new CommonOutput(ResultCode.INNER_FAIL.getApiErrorCode(), e.getMessage()) ;
+    	return new CommonOutput(e.getErrorCode(), e.getMessage());
     }
 
 }

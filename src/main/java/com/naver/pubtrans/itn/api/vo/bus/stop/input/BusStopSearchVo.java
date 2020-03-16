@@ -17,15 +17,15 @@ public class BusStopSearchVo extends SearchVo {
 	/**
 	 * 도시코드
 	 */
-	private String cityCode ;
+	private String cityCode;
 
 	/**
 	 * 정류장명
 	 */
-	private String stopName ;
+	private String stopName;
 
 	/**
 	 * 정류장 ID
 	 */
-	private int stopId ;
+	private int stopId;
 }

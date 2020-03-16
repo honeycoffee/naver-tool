@@ -11,15 +11,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AuthOutputVo {
-	
+
 	/**
 	 * JWT Refresh Token
 	 */
-	private String refreshToken ;
+	private String refreshToken;
 
 	/**
 	 * JWT Access Token
 	 */
-	private String accessToken ;
-	
+	private String accessToken;
+
 }

@@ -5,10 +5,8 @@ import java.util.List;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
-import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
-import com.naver.pubtrans.itn.api.vo.member.output.MemberListOutputVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
@@ -19,20 +17,60 @@ import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 @Repository
 public interface MemberRepository {
 
-	int checkDuplicate(String userId) throws DataAccessException ;
+	/**
+	 * 중복 ID 확인
+	 * @param userId - 회원 ID
+	 * @return
+	 * @throws DataAccessException
+	 */
+	int checkDuplicate(String userId) throws DataAccessException;
 
-	void insertMember(MemberInputVo memberInputVo) throws DataAccessException ;
-	
-	void updateMember(MemberInputVo memberInputVo) throws DataAccessException ;
-	
-	void deleteMember(MemberSearchVo memberSearchVo) throws DataAccessException ; 
-	
-	MemberOutputVo selectMember(MemberSearchVo memberSearchVo) throws DataAccessException ;
-	
-	int selectMemberListTotalCnt(MemberSearchVo memberSearchVo) throws DataAccessException ; 
-	
-	List<MemberListOutputVo> selectMemberList(MemberSearchVo memberSearchVo) throws DataAccessException ; 
-	
-	List<SchemaVo> selectMemberSchema() throws DataAccessException ;
+	/**
+	 * 회원 정보를 등록한다
+	 * @param memberInputVo - 회원 입력 값
+	 * @return
+	 * @throws DataAccessException
+	 */
+	void insertMember(MemberInputVo memberInputVo) throws DataAccessException;
+
+	/**
+	 * 회원 정보를 수정한다
+	 * @param memberInputVo - 회원 입력 값
+	 * @return
+	 * @throws DataAccessException
+	 */
+	int updateMember(MemberInputVo memberInputVo) throws DataAccessException;
+
+	/**
+	 * 회원 정보를 삭제한다
+	 * @param memberSearchVo - 회원 검색 조건
+	 * @return
+	 * @throws DataAccessException
+	 */
+	int deleteMember(MemberSearchVo memberSearchVo) throws DataAccessException;
+
+	/**
+	 * 회원 정보를 가져온다.
+	 * @param memberSearchVo - 회원 검색 조건
+	 * @return
+	 * @throws DataAccessException
+	 */
+	MemberOutputVo getMember(MemberSearchVo memberSearchVo) throws DataAccessException;
+
+	/**
+	 * 회원 목록 수를 가져온다.
+	 * @param memberSearchVo - 회원 검색 조건
+	 * @return
+	 * @throws DataAccessException
+	 */
+	int getMemberListTotalCnt(MemberSearchVo memberSearchVo) throws DataAccessException;
+
+	/**
+	 * 회원 목록을 가져온다.
+	 * @param memberSearchVo - 회원 검색 조건
+	 * @return
+	 * @throws DataAccessException
+	 */
+	List<MemberOutputVo> selectMemberList(MemberSearchVo memberSearchVo) throws DataAccessException;
 
 }

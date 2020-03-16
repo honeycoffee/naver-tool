@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -14,6 +14,7 @@ import com.naver.pubtrans.itn.api.consts.ColumnType;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.vo.common.FieldValue;
 import com.naver.pubtrans.itn.api.vo.common.PagingVo;
+import com.naver.pubtrans.itn.api.vo.common.AliasColumnNameVo;
 import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonMeta;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
@@ -38,7 +39,7 @@ public class OutputFmtUtil {
 	 */
 	private CommonMeta initCommonMeta(PagingVo pagingVo) {
 
-		CommonMeta commonMeta = new CommonMeta() ;
+		CommonMeta commonMeta = new CommonMeta();
 		commonMeta.setTotalListCount(pagingVo.getTotalListCount());
 		commonMeta.setTotalPageCount(pagingVo.getTotalPageCount());
 		commonMeta.setCurrentPage(pagingVo.getCurrentPage());
@@ -46,7 +47,7 @@ public class OutputFmtUtil {
 		commonMeta.setLastPage(pagingVo.isLastPage());
 		commonMeta.setListCountPerPage(pagingVo.getListCntPerPage());
 
-		return commonMeta ;
+		return commonMeta;
 	}
 
 	/**
@@ -58,12 +59,12 @@ public class OutputFmtUtil {
 	 */
 	public <T> CommonResult setCommonListFmt(List<CommonSchema> schema, PagingVo pagingVo, List<T> list) {
 
-		CommonResult result = new CommonResult() ;
+		CommonResult result = new CommonResult();
 		result.setSchema(schema);
 		result.setMeta(initCommonMeta(pagingVo));
 		result.setData(list);
 
-		return result ;
+		return result;
 	}
 
 
@@ -75,11 +76,11 @@ public class OutputFmtUtil {
 	 */
 	public <T> CommonResult setCommonListFmt(PagingVo pagingVo, List<T> list) {
 
-		CommonResult result = new CommonResult() ;
+		CommonResult result = new CommonResult();
 		result.setMeta(initCommonMeta(pagingVo));
 		result.setData(list);
 
-		return result ;
+		return result;
 	}
 
 
@@ -89,10 +90,10 @@ public class OutputFmtUtil {
 	 * @return
 	 */
 	public CommonResult setCommonDocFmt(Object data) {
-		CommonResult result = new CommonResult() ;
+		CommonResult result = new CommonResult();
 		result.setData(data);
 
-		return result ;
+		return result;
 	}
 
 
@@ -102,10 +103,10 @@ public class OutputFmtUtil {
 	 * @return
 	 */
 	public CommonResult setCommonDocFmt(List<CommonSchema> schema) {
-		CommonResult result = new CommonResult() ;
+		CommonResult result = new CommonResult();
 		result.setSchema(schema);
 
-		return result ;
+		return result;
 	}
 
 
@@ -116,11 +117,11 @@ public class OutputFmtUtil {
 	 * @return
 	 */
 	public CommonResult setCommonDocFmt(List<CommonSchema> schema, Object data) {
-		CommonResult result = new CommonResult() ;
+		CommonResult result = new CommonResult();
 		result.setData(data);
 		result.setSchema(schema);
 
-		return result ;
+		return result;
 	}
 
 
@@ -131,7 +132,7 @@ public class OutputFmtUtil {
 	 */
 	public List<CommonSchema> makeCommonSchema(List<SchemaVo> schemaVoList){
 
-		return this.makeCommonSchema(schemaVoList, null, null) ;
+		return this.makeCommonSchema(schemaVoList, null, null);
 	}
 
 
@@ -146,7 +147,7 @@ public class OutputFmtUtil {
 	 * @return
 	 */
 	public List<CommonSchema> makeCommonSchema(List<SchemaVo> schemaVoList, ArrayList<String> readOnlyColumns){
-		return this.makeCommonSchema(schemaVoList, readOnlyColumns, null) ;
+		return this.makeCommonSchema(schemaVoList, readOnlyColumns, null);
 	}
 
 	/**
@@ -167,7 +168,7 @@ public class OutputFmtUtil {
 
 
 		for(SchemaVo schemaVo : schemaVoList) {
-			CommonSchema commonSchema = initCommonSchema(schemaVo) ;
+			CommonSchema commonSchema = initCommonSchema(schemaVo);
 
 
 			// 읽기전용 여부(사용자 지정 컬럼과 Primary Key는 읽기 전용으로 설정)
@@ -180,7 +181,7 @@ public class OutputFmtUtil {
 			// 다중 value 항목(선택, selectbox, radio 등)
 			if(Objects.nonNull(valuesMap) && valuesMap.containsKey(commonSchema.getFieldName())) {
 
-				List<FieldValue> fieldValueList = valuesMap.get(commonSchema.getFieldName()) ;
+				List<FieldValue> fieldValueList = valuesMap.get(commonSchema.getFieldName());
 				commonSchema.setFieldValues(fieldValueList);
 
 				// 데이터 타입을 enum 형식으로 변경
@@ -190,13 +191,16 @@ public class OutputFmtUtil {
 				commonSchema.setFieldValues(new ArrayList<>());
 			}
 
+			// 다중 Value 항목의  Key는 카멜케이스 형태가 아니므로 조건 수행후 필드명을 카멜케이스 형태로 변환한다
+			commonSchema.setFieldName(Util.snakeCaseToCamelCase(commonSchema.getFieldName()));
 
-			commonSchemaList.add(commonSchema) ;
+
+			commonSchemaList.add(commonSchema);
 
 
 		}
 
-		return commonSchemaList ;
+		return commonSchemaList;
 	}
 
 
@@ -207,34 +211,34 @@ public class OutputFmtUtil {
 	 */
 	private CommonSchema initCommonSchema(SchemaVo schemaVo) {
 
-		String name = schemaVo.getColumnName() ;
+		String name = schemaVo.getColumnName();
 		String label = (StringUtils.isEmpty(schemaVo.getColumnComment()))? name : schemaVo.getColumnComment();
-		String type = "" ;
-		String length = "" ;
-		String nullable = (CommonConstant.YES.equals(schemaVo.getIsNullable()))? CommonConstant.Y : CommonConstant.N ;
-		String pkYn = (ColumnKeyType.PK.getCode().equals(schemaVo.getColumnKey()))? CommonConstant.Y : CommonConstant.N ;
+		String type = "";
+		String length = "";
+		String nullable = (CommonConstant.YES.equals(schemaVo.getIsNullable()))? CommonConstant.Y : CommonConstant.N;
+		String pkYn = (ColumnKeyType.PK.getCode().equals(schemaVo.getColumnKey()))? CommonConstant.Y : CommonConstant.N;
 
-		String tmpType = schemaVo.getColumnType() ;
+		String tmpType = schemaVo.getColumnType();
 
 
-		int tmpTypeidxOf = tmpType.indexOf(CommonConstant.BRACKET_START) ;
+		int tmpTypeidxOf = tmpType.indexOf(CommonConstant.BRACKET_START);
 		if(tmpTypeidxOf > -1) {
-			type = tmpType.substring(0, tmpTypeidxOf) ;
-			length = tmpType.substring(tmpTypeidxOf+1, tmpType.indexOf(CommonConstant.BRACKET_END)) ;
+			type = tmpType.substring(0, tmpTypeidxOf);
+			length = tmpType.substring(tmpTypeidxOf+1, tmpType.indexOf(CommonConstant.BRACKET_END));
 		}else {
-			type = tmpType ;
+			type = tmpType;
 		}
 
 
 		CommonSchema commonSchema = new CommonSchema();
 		commonSchema.setFieldLabel(label);
-		commonSchema.setFieldName(JdbcUtils.convertUnderscoreNameToPropertyName(name));	// 카멜케이스 변환
+		commonSchema.setFieldName(name);
 		commonSchema.setFieldType(this.convertFieldType(type));
 		commonSchema.setFieldLength(length);
 		commonSchema.setNullable(nullable);
 		commonSchema.setPkYn(pkYn);
 
-		return commonSchema ;
+		return commonSchema;
 
 	}
 
@@ -255,7 +259,7 @@ public class OutputFmtUtil {
 			case ColumnType.MEDIUMTEXT:
 			case ColumnType.LONGTEXT:
 				type = CommonConstant.STRING;
-				break ;
+				break;
 			case ColumnType.TINYINT:
 			case ColumnType.SMALLINT:
 			case ColumnType.MEDIUMINT:
@@ -265,10 +269,10 @@ public class OutputFmtUtil {
 			case ColumnType.DECIMAL:
 			case ColumnType.DOUBLE:
 				type = CommonConstant.NUMBER;
-				break ;
+				break;
 		}
 
-		return type ;
+		return type;
 	}
 
 
@@ -283,10 +287,10 @@ public class OutputFmtUtil {
 		List<SchemaVo> refineSchemaVoList = new ArrayList<>();
 
 		schemaVoList.stream().filter(o -> usableColumnNameList.contains(o.getColumnName())).forEach(o -> {
-			refineSchemaVoList.add(o) ;
+			refineSchemaVoList.add(o);
 		});
 
-		return refineSchemaVoList ;
+		return refineSchemaVoList;
 
 	}
 
@@ -296,14 +300,39 @@ public class OutputFmtUtil {
 	 * @param ignoreColumnNameList - 제외하고자 하는 컬럼 목록
 	 * @return
 	 */
-	public List<SchemaVo> refineSchemaVoIngnoreColumns(List<SchemaVo> schemaVoList, ArrayList<String> ignoreColumnNameList) {
+	public List<SchemaVo> refineSchemaVoWithIgnoreColumns(List<SchemaVo> schemaVoList, ArrayList<String> ignoreColumnNameList) {
 
-		List<SchemaVo> refineSchemaVoList = new ArrayList<>();
+		List<SchemaVo> refinedSchemaVoList = new ArrayList<>();
 		schemaVoList.stream().filter(o -> !ignoreColumnNameList.contains(o.getColumnName())).forEach(o -> {
-			refineSchemaVoList.add(o) ;
+			refinedSchemaVoList.add(o);
 		});
 
-		return refineSchemaVoList ;
+		return refinedSchemaVoList;
 
 	}
+
+
+	/**
+	 * 테이블 스키마의 컬럼이름을 Alias 하여 사용하는 경우 컬럼 이름을 변경한다
+	 * @param schemaVoList - 데이터 구조 컬럼 목록
+	 * @param aliasColumnNameVoList - Alias 컬럼 목록
+	 * @return
+	 */
+	public List<SchemaVo> refineSchemaVoWithAliasColumns(List<SchemaVo> schemaVoList, List<AliasColumnNameVo> aliasColumnNameVoList) {
+
+		List<SchemaVo> refinedSchemaVoList = new ArrayList<>();
+
+		schemaVoList.stream().forEach(s -> {
+		    aliasColumnNameVoList.stream()
+		        .filter(c -> c.getOriginalColumnName().equals(s.getColumnName())).forEach(c -> {
+		            s.setColumnName(c.getAliasColumnName());
+		        });
+
+		    	refinedSchemaVoList.add(s);
+		});
+
+
+		return refinedSchemaVoList;
+	}
+
 }

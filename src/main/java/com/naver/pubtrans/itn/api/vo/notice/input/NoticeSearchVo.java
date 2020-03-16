@@ -5,18 +5,28 @@ import lombok.Setter;
 
 import com.naver.pubtrans.itn.api.vo.common.input.SearchVo;
 
+/**
+ * 공지사항 검색 조건
+ * 
+ * @author westwind
+ *
+ */
 @Getter
 @Setter
 public class NoticeSearchVo extends SearchVo {
 
 	/**
-	 * 회원 ID.
+	 * 공지사항 ID
 	 */
-	private String userId;
+	private int seq;
 
 	/**
-	 * 회원 이름
+	 * 검색 조건
 	 */
-	private String userName;
+	private String searchType;
 
+	/**
+	 * 검색 키워드
+	 */
+	private String searchKeyword;
 }

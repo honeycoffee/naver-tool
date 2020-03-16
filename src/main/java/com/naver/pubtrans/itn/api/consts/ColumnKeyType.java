@@ -11,17 +11,17 @@ import lombok.Getter;
 public enum ColumnKeyType {
 
 	PK("PRI", "Primary Key"),
-	FK("MUL", "Foreign Key") ;
+	FK("MUL", "Foreign Key");
 
 	// 코드
-	private String code ;
+	private String code;
 
 	// 설명
-	private String descrition ;
+	private String descrition;
 
 	ColumnKeyType(String code, String description){
-		this.code = code ;
-		this.descrition = description ;
+		this.code = code;
+		this.descrition = description;
 	}
 
 }

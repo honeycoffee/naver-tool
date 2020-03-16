@@ -18,11 +18,11 @@ import lombok.Setter;
 public class SampleInputVo {
 
 	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
-	private int id ;
+	private int id;
 
 	@NotEmpty
 	@Size(max=100)
-	private String sampleData ;
+	private String sampleData;
 
 }
 

@@ -1,12 +1,13 @@
 package com.naver.pubtrans.itn.api.vo.notice.output;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 회원 데이터 출력 Vo
+ * 공지사항 출력 Vo
+ * 
  * @author westwind
  *
  */
@@ -15,35 +16,44 @@ import lombok.Setter;
 public class NoticeOutputVo {
 
 	/**
-	 * 회원 ID
+	 * 공지사항 ID
 	 */
-	private String userId;
+	private int seq;
 
 	/**
-	 * 회원 이름
+	 * 제목
 	 */
-	private String userName;
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	private String title;
 
 	/**
-	 * 소속
+	 * 내용
 	 */
-	private String company;
-
-	@JsonIgnore
-	/**
-	 * 비밀번호
-	 */
-	private String userPw;
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	private String content;
 
 	/**
-	 * 가입일
+	 * 중요여부
 	 */
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	private String importantYn;
+
+	/**
+	 * 등록자 ID
+	 */
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	private String regUserId;
+
+	/**
+	 * 등록자 명
+	 */
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	private String regUserName;
+
+	/**
+	 * 등록일
+	 */
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String regDate;
-
-	@JsonIgnore
-	/**
-	 * 수정일
-	 */
-	private String updDate;
 
 }

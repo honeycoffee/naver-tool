@@ -18,7 +18,7 @@ public interface ApiDocumentUtils {
                                 .scheme("http")
                                 .host("localhost")
                                 .removePort(),
-                        
+
                         prettyPrint());
     }
 

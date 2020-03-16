@@ -15,20 +15,20 @@ public class BusProviderVo {
 	/**
 	 * BIS 지역 ID
 	 */
-	private String providerId ;
+	private String providerId;
 
 	/**
 	 * BIS 지역명
 	 */
-	private String providerName ;
+	private String providerName;
 
 	/**
 	 * 도시코드 범위(최소)
 	 */
-	private int cityCodeMin ;
+	private int cityCodeMin;
 
 	/**
 	 * 도시코드 범위(최대)
 	 */
-	private int cityCodeMax ;
+	private int cityCodeMax;
 }

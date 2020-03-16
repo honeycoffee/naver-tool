@@ -1,8 +1,5 @@
 package com.naver.pubtrans.itn.api.vo.auth.input;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,26 +11,25 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AuthInputVo {
-	
+
 	/**
 	 * 회원 ID
 	 */
-	private String userId ;
-	
+	private String userId;
+
 	/**
 	 * JWT Refresh Token
 	 */
-	private String refreshToken ;
+	private String refreshToken;
 
 	/**
 	 * 로그인 성공여부
 	 */
-	private String loginSuccessYn ;
+	private String loginSuccessYn;
 
 	/**
 	 * 접근IP
 	 */
-	private String accessIp ;
+	private String accessIp;
 
 }
-

@@ -74,19 +74,18 @@ include::common-schema.adoc[]
 회원 정보를 등록한다.
 
 ==== Request
-include::{snippets}/member/registerMember/request-fields.adoc[]
+include::{snippets}/member/insertMember/request-fields.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/member/registerMember/http-request.adoc[]
+include::{snippets}/member/insertMember/http-request.adoc[]
 
 ==== Response
-include::{snippets}/member/registerMember/response-fields.adoc[]
+include::{snippets}/member/insertMember/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/member/registerMember/http-response.adoc[]
+include::{snippets}/member/insertMember/http-response.adoc[]
 
 &#160;
-
 
 [[check-duplicate]]
 === ID 중복 확인
@@ -106,48 +105,45 @@ include::{snippets}/member/checkDuplicate/http-response.adoc[]
 
 &#160;
 
-
 [[login]]
 === 회원 로그인
 회원 ID와 비밀번호로 로그인을 한다.
 
 ==== Request
-include::{snippets}/member/login/request-parameters.adoc[]
+include::{snippets}/auth/login/request-fields.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/member/login/http-request.adoc[]
+include::{snippets}/auth/login/http-request.adoc[]
 
 ==== Response
-include::{snippets}/member/login/response-fields.adoc[]
+include::{snippets}/auth/login/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/member/login/http-response.adoc[]
+include::{snippets}/auth/login/http-response.adoc[]
 
 &#160;
-
 
 [[refresh-token]]
 === API 호출 토큰 갱신
 refreshToken으로 accessToken을 갱신한다. 
 
 ===== Request HTTP Example
-include::{snippets}/member/refreshToken/http-request.adoc[]
+include::{snippets}/auth/refreshToken/http-request.adoc[]
 
 ==== Response
-include::{snippets}/member/refreshToken/response-fields.adoc[]
+include::{snippets}/auth/refreshToken/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/member/refreshToken/http-response.adoc[]
+include::{snippets}/auth/refreshToken/http-response.adoc[]
 
 &#160;
-
 
 [[verify-password]]
 === 회원 비밀번호 검증
 회원 비밀번호를 검증한다.
 
 ==== Request
-include::{snippets}/member/verifyPassword/request-parameters.adoc[]
+include::{snippets}/member/verifyPassword/request-fields.adoc[]
 
 ===== Request HTTP Example
 include::{snippets}/member/verifyPassword/http-request.adoc[]
@@ -160,93 +156,90 @@ include::{snippets}/member/verifyPassword/http-response.adoc[]
 
 &#160;
 
-
 [[info-me]]
 === 내 정보 조회
 자신의 정보를 조회한다. 
 
 ===== Request HTTP Example
-include::{snippets}/member/infoMe/http-request.adoc[]
+include::{snippets}/member/getMe/http-request.adoc[]
 
 ==== Response
-include::{snippets}/member/infoMe/response-fields.adoc[]
+include::{snippets}/member/getMe/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/member/infoMe/http-response.adoc[]
+include::{snippets}/member/getMe/http-response.adoc[]
 
 &#160;
-
 
 [[modify-me]]
 === 내 정보 수정
 자신의 정보를 수정한다.
 
 ==== Request
-include::{snippets}/member/modifyMe/request-fields.adoc[]
+include::{snippets}/member/updateMe/request-fields.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/member/modifyMe/http-request.adoc[]
+include::{snippets}/member/updateMe/http-request.adoc[]
 
 ==== Response
-include::{snippets}/member/modifyMe/response-fields.adoc[]
+include::{snippets}/member/updateMe/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/member/modifyMe/http-response.adoc[]
+include::{snippets}/member/updateMe/http-response.adoc[]
 
 &#160;
-
 
 [[info-member]]
 === 회원 정보 조회
 권한관리에서 회원의 정보를 조회한다. 
 
 ==== Request
-include::{snippets}/member/infoMember/path-parameters.adoc[]
+include::{snippets}/member/getMember/path-parameters.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/member/infoMember/http-request.adoc[]
+include::{snippets}/member/getMember/http-request.adoc[]
 
 ==== Response
-include::{snippets}/member/infoMember/response-fields.adoc[]
+include::{snippets}/member/getMember/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/member/infoMember/http-response.adoc[]
+include::{snippets}/member/getMember/http-response.adoc[]
 
+&#160;
 
 [[modify-member]]
 === 회원 정보 수정
 권한관리에서 회원의 정보를 수정한다.
 
 ==== Request
-include::{snippets}/member/modifyMember/request-fields.adoc[]
+include::{snippets}/member/updateMember/request-fields.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/member/modifyMember/http-request.adoc[]
+include::{snippets}/member/updateMember/http-request.adoc[]
 
 ==== Response
-include::{snippets}/member/modifyMember/response-fields.adoc[]
+include::{snippets}/member/updateMember/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/member/modifyMember/http-response.adoc[]
+include::{snippets}/member/updateMember/http-response.adoc[]
 
 &#160;
-
 
 [[remove-member]]
 === 회원 정보 삭제
 권한관리에서 회원의 정보를 삭제한다.
 
 ==== Request
-include::{snippets}/member/removeMember/request-parameters.adoc[]
+include::{snippets}/member/deleteMember/request-fields.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/member/removeMember/http-request.adoc[]
+include::{snippets}/member/deleteMember/http-request.adoc[]
 
 ==== Response
-include::{snippets}/member/removeMember/response-fields.adoc[]
+include::{snippets}/member/deleteMember/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/member/removeMember/http-response.adoc[]
+include::{snippets}/member/deleteMember/http-response.adoc[]
 
 &#160;
 
@@ -291,3 +284,269 @@ include::{snippets}/busStop/busStopList/response-fields.adoc[]
 include::{snippets}/busStop/busStopList/http-response.adoc[]
 
 &#160;
+
+[[busStop-info]]
+=== 버스정류장 상세정보
+버스정류장 상세정보를 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/busStop/busStopInfo/path-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busStop/busStopInfo/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busStop/busStopInfo/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busStop/busStopInfo/http-response.adoc[]
+
+&#160;
+
+[[busStop-task-info]]
+=== 버스정류장 작업 상세정보
+버스정류장 작업 상세정보를 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/busStop/busStopTask/path-parameters.adoc[]
+
+===== Request HTTP Example
+- 작업ID 조회 : /v1/ntool/api/info/busStopTask/1
+- BIS 자동 변경사항이 존재하는 작업ID 조회 : /v1/ntool/api/info/busStopTask/3
+include::{snippets}/busStop/busStopTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busStop/busStopTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busStop/busStopTask/http-response.adoc[]
+
+&#160;
+
+[[busStop-task]]
+=== 버스정류장 작업 List
+버스정류장 작업 목록을 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/busStop/busStopTaskList/path-parameters.adoc[]
+include::{snippets}/busStop/busStopTaskList/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busStop/busStopTaskList/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busStop/busStopTaskList/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busStop/busStopTaskList/http-response.adoc[]
+
+&#160;
+
+[[busStop-schema]]
+=== 버스정류장 기본 스키마
+버스정류장 기본 스키마를 조회한다
+
+==== Request HTTP Example
+include::{snippets}/busStop/busStopSchema/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busStop/busStopSchema/response-fields.adoc[]
+
+&#160;
+
+[[busStop-registerTask]]
+=== 버스정류장 생성 작업등록
+버스정류장 생성 작업을 등록한다
+
+==== Request
+include::{snippets}/busStop/busStopAddTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busStop/busStopAddTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busStop/busStopAddTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busStop/busStopAddTask/http-response.adoc[]
+
+&#160;
+
+[[busStop-modifyTask]]
+=== 버스정류장 수정 작업등록
+* 버스정류장 정보를 수정하는 작업정보를 등록한다
+** 정류장 관리 -> 정류장 목록 -> 정류장 상세 접근시
+
+==== Request
+include::{snippets}/busStop/busStopEditTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busStop/busStopEditTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busStop/busStopEditTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busStop/busStopEditTask/http-response.adoc[]
+
+&#160;
+
+[[busStop-removeTask]]
+=== 버스정류장 삭제 작업등록
+* 버스정류장을 삭제하는 작업을 등록한다
+** 경유 노선이 존재할 경우 정류장 삭제 불가
+
+==== Request
+include::{snippets}/busStop/busStopRemoveTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busStop/busStopRemoveTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busStop/busStopRemoveTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busStop/busStopRemoveTask/http-response.adoc[]
+
+&#160;
+
+[[busStop-modify]]
+=== 버스정류장 작업정보 수정
+* 버스정류장 작업정보를 수정한다
+** 작업 관리 -> 작업 목록 -> 작업 상세 -> 정류장 상세 접근시
+** 작업정보의 진행상태가 "완료", "예외" 인 경우에는 수정 불가능.
+
+==== Request
+include::{snippets}/busStop/busStopModifyTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busStop/busStopModifyTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busStop/busStopModifyTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busStop/busStopModifyTask/http-response.adoc[]
+
+&#160;
+
+== [03]공지사항 API
+
+[[register-notice]]
+=== 공지사항 등록
+공지사항을 등록한다.
+
+==== Request
+include::{snippets}/notice/insertNotice/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/notice/insertNotice/http-request.adoc[]
+
+==== Response
+include::{snippets}/notice/insertNotice/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/notice/insertNotice/http-response.adoc[]
+
+&#160;
+
+
+[[info-notice]]
+=== 공지사항 조회
+공지사항을 조회한다. 
+
+==== Request
+include::{snippets}/notice/getNotice/path-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/notice/getNotice/http-request.adoc[]
+
+==== Response
+include::{snippets}/notice/getNotice/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/notice/getNotice/http-response.adoc[]
+
+
+[[modify-notice]]
+=== 공지사항 수정
+공지사항을 수정한다.
+
+==== Request
+include::{snippets}/notice/updateNotice/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/notice/updateNotice/http-request.adoc[]
+
+==== Response
+include::{snippets}/notice/updateNotice/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/notice/updateNotice/http-response.adoc[]
+
+&#160;
+
+
+[[remove-notice]]
+=== 공지사항 삭제
+공지사항을 삭제한다.
+
+==== Request
+include::{snippets}/notice/deleteNotice/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/notice/deleteNotice/http-request.adoc[]
+
+==== Response
+include::{snippets}/notice/deleteNotice/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/notice/deleteNotice/http-response.adoc[]
+
+&#160;
+
+
+=== 공지사항 List
+공지사항 목록을 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/notice/listNotice/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/notice/listNotice/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/notice/listNotice/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/notice/listNotice/http-response.adoc[]
+
+&#160;
+
+
+[[schema-Notice]]
+=== 공지사항 기본 스키마
+공지사항 기본 스키마를 조회한다
+
+===== Request HTTP Example
+include::{snippets}/notice/schemaNotice/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/notice/schemaNotice/response-fields.adoc[]
+
+&#160;
+

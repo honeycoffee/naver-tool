@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class SampleSearchVo extends SearchVo {
 
-	private int id ;
+	private int id;
 
-	private String sampleData ;
+	private String sampleData;
 }

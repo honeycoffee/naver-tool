@@ -24,7 +24,7 @@ public interface CommonRepository {
 	 * @return
 	 * @throws DataAccessException
 	 */
-	List<SchemaVo> selectTableSchema(String tableName) throws DataAccessException ;
+	List<SchemaVo> selectTableSchema(String tableName) throws DataAccessException;
 
 
 	/**
@@ -32,7 +32,7 @@ public interface CommonRepository {
 	 * @return
 	 * @throws DataAccessException
 	 */
-	List<CityCodeVo> selectCityCodeList() throws DataAccessException ;
+	List<CityCodeVo> selectCityCodeList() throws DataAccessException;
 
 
 	/**
@@ -40,7 +40,7 @@ public interface CommonRepository {
 	 * @return
 	 * @throws DataAccessException
 	 */
-	List<BusProviderVo> selectBusProviderList() throws DataAccessException ;
+	List<BusProviderVo> selectBusProviderList() throws DataAccessException;
 
 
 

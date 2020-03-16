@@ -1,6 +1,5 @@
 package com.naver.pubtrans.itn.api.config;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -21,7 +20,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-
 	@Bean
 	public DispatcherServlet dispatcherServlet() {
 
@@ -31,41 +29,38 @@ public class WebConfig implements WebMvcConfigurer {
 		return dispatcherServlet;
 	}
 
-
 	/**
 	 * Cors
 	 */
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/*/**")
-				.allowedOrigins("*")
-				.allowedMethods("GET", "POST", "PUT", "DELETE")
-				.allowedHeaders("Content-Type")
-				.maxAge(3600);
+			.allowedOrigins("*")
+			.allowedMethods("GET", "POST", "PUT", "DELETE")
+			.allowedHeaders("*")
+			.maxAge(3600);
 	}
 
-
 	@Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		// API document 접근 설정
-        registry.addResourceHandler("/static/docs/**").addResourceLocations("classpath:/static/docs/") ;
-    }
+		registry.addResourceHandler("/static/docs/**").addResourceLocations("classpath:/static/docs/");
+	}
 
 	@Override
-    public void addViewControllers(ViewControllerRegistry registry) {
+	public void addViewControllers(ViewControllerRegistry registry) {
 		// API document 접근 설정
-        registry.addRedirectViewController("/static/docs/", "/static/docs/index.html");
-    }
+		registry.addRedirectViewController("/static/docs/", "/static/docs/index.html");
+	}
 
 	@Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+	public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 
 		configurer
 			.favorPathExtension(false)
 			.defaultContentType(MediaType.APPLICATION_JSON)
 			.mediaType("json", MediaType.APPLICATION_JSON)
-			.ignoreAcceptHeader(true)
-		;
+			.ignoreAcceptHeader(true);
 
 	}
 }

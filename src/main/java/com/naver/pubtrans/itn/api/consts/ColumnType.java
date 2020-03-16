@@ -7,19 +7,19 @@ package com.naver.pubtrans.itn.api.consts;
  */
 public interface ColumnType {
 
-	String VARCHAR = "varchar" ;
-	String CHAR = "char" ;
-	String TINYTEXT = "tinytext" ;
-	String TEXT = "text" ;
-	String MEDIUMTEXT = "mediumtext" ;
-	String LONGTEXT = "longtext" ;
+	String VARCHAR = "varchar";
+	String CHAR = "char";
+	String TINYTEXT = "tinytext";
+	String TEXT = "text";
+	String MEDIUMTEXT = "mediumtext";
+	String LONGTEXT = "longtext";
 
-	String TINYINT = "tinyint" ;
-	String SMALLINT = "smallint" ;
-	String MEDIUMINT = "mediumint" ;
-	String INT = "int" ;
-	String BIGINT = "bigint" ;
-	String FLOAT = "float" ;
-	String DECIMAL = "decimal" ;
-	String DOUBLE = "double" ;
+	String TINYINT = "tinyint";
+	String SMALLINT = "smallint";
+	String MEDIUMINT = "mediumint";
+	String INT = "int";
+	String BIGINT = "bigint";
+	String FLOAT = "float";
+	String DECIMAL = "decimal";
+	String DOUBLE = "double";
 }

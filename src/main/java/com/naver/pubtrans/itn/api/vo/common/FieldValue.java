@@ -17,10 +17,10 @@ public class FieldValue {
 	/**
 	 * 속성 값
 	 */
-	private String value ;
+	private String value;
 
 	/**
 	 * 속성 명칭
 	 */
-	private String text ;
+	private String text;
 }

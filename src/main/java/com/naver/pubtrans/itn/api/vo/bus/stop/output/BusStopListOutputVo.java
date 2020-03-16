@@ -15,30 +15,30 @@ public class BusStopListOutputVo {
 	/**
 	 * 정류장 ID
 	 */
-	private int stopId ;
+	private int stopId;
 
 	/**
 	 * 정류장명
 	 */
-	private String stopName ;
+	private String stopName;
 
 	/**
 	 * 경도
 	 */
-	private Double longitude ;
+	private Double longitude;
 
 	/**
 	 * 위도
 	 */
-	private Double latitude ;
+	private Double latitude;
 
 	/**
 	 * 도시코드
 	 */
-	private String cityCode ;
+	private String cityCode;
 
 	/**
 	 * 도시코드 명칭
 	 */
-	private String cityName ;
+	private String cityName;
 }

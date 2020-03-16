@@ -20,42 +20,42 @@ public class CommonSchema {
 	/**
 	 * 필드 정보
 	 */
-	private String fieldLabel ;
+	private String fieldLabel;
 
 	/**
 	 * 필드 명
 	 */
-	private String fieldName ;
+	private String fieldName;
 
 	/**
 	 * 필드 타입
 	 */
-	private String fieldType ;
+	private String fieldType;
 
 	/**
 	 * 필드 길이
 	 */
-	private String fieldLength ;
+	private String fieldLength;
 
 	/**
 	 * 필드 선택값 목록
 	 */
-	private List<FieldValue> fieldValues ;
+	private List<FieldValue> fieldValues;
 
 	/**
 	 * Null 허용 여부(Y/N)
 	 */
-	private String nullable ;
+	private String nullable;
 
 	/**
 	 * Primary Key 여부 (Y/N)
 	 */
-	private String pkYn ;
+	private String pkYn;
 
 	/**
 	 * 읽기 전용 여부
 	 */
-	private String readOnlyYn ;
+	private String readOnlyYn;
 
 
 }

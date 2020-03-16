@@ -15,7 +15,7 @@
 		WHERE
 			TABLE_NAME = #{tableName}
 			AND COLUMN_NAME != 'reg_date' AND COLUMN_NAME != 'upd_date'
-			AND COLUMN_NAME != 'createdat' AND COLUMN_NAME != 'modifiedat' ;
+			AND COLUMN_NAME != 'createdat' AND COLUMN_NAME != 'modifiedat'
     </select>
 
 	<select id="selectCityCodeList" resultType="com.naver.pubtrans.itn.api.vo.common.CityCodeVo">

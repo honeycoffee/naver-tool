@@ -1,7 +1,6 @@
 package com.naver.pubtrans.itn.api.vo.member.output;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,37 +13,36 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MemberOutputVo {
-
 	/**
 	 * 회원 ID
 	 */
-	private String userId ;
-	
+	private String userId;
+
 	/**
 	 * 회원 이름
 	 */
-	private String userName ;
-	
+	private String userName;
+
 	/**
 	 * 소속
 	 */
-	private String company ;
+	private String company;
 
 	@JsonIgnore
 	/**
 	 * 비밀번호
 	 */
-	private String userPw ;
+	private String userPw;
 
 	/**
 	 * 가입일
 	 */
-	private String regDate ;
+	private String regDate;
 
 	@JsonIgnore
 	/**
 	 * 수정일
 	 */
-	private String updDate ;
-	
+	private String updDate;
+
 }

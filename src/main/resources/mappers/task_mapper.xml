@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.pubtrans.itn.api.repository.TaskRepository">
+
+
+	<select id="getTaskSummaryListTotalCnt" parameterType="com.naver.pubtrans.itn.api.vo.task.input.TaskSearchVo" resultType="int">
+		SELECT
+			count(*) as total_list_cnt
+		FROM
+			tb_z_svc_task
+		WHERE
+
+
+			<include refid="whereTaskSummaryList" />
+
+	</select>
+
+	<select id="selectTaskSummaryList" parameterType="com.naver.pubtrans.itn.api.vo.task.input.TaskSearchVo" resultType="com.naver.pubtrans.itn.api.vo.task.output.TaskSummaryOutputVo">
+		SELECT
+			task_id
+			, task_type
+			, task_status
+			, task_data_type
+			, task_comment
+			, date_format(reg_date, '%Y-%m-%d') as reg_date
+			, work_user_name
+		FROM
+			tb_z_svc_task
+		WHERE
+
+			<include refid="whereTaskSummaryList" />
+
+		ORDER BY
+			task_id desc
+		LIMIT
+			#{startPageLimit}, #{endPageLimit}
+	</select>
+
+
+	<sql id="whereTaskSummaryList">
+		delete_yn = 'N'
+		AND pub_trans_id = #{pubTransId}
+		AND task_data_type = #{taskDataType}
+	</sql>
+
+
+	<select id="getTaskInfo" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.task.output.TaskOutputVo">
+		SELECT
+			task.task_id
+			, task.provider_id
+			, task.task_type
+			, task.task_status
+			, task.pub_trans_id
+			, task.task_data_type
+			, task.task_data_name
+			, task.task_comment
+			, task.bis_auto_change_data
+			, task.task_register_type
+			, task.reg_user_name
+			, task.reg_user_id
+			, date_format(task.reg_date, '%Y-%m-%d %H:%i:%s') as reg_date
+			, task.work_user_name
+			, task.work_user_id
+			, date_format(task.work_assign_date, '%Y-%m-%d %H:%i:%s') as work_assign_date
+			, date_format(task.work_complete_date, '%Y-%m-%d %H:%i:%s') as work_complete_date
+			, task.check_user_name
+			, task.check_user_id
+			, date_format(task.check_assign_date, '%Y-%m-%d %H:%i:%s') as check_assign_date
+			, date_format(task.check_complete_date, '%Y-%m-%d %H:%i:%s') as check_complete_date
+
+			, tbp.provider_name
+		FROM
+			tb_z_svc_task task
+		LEFT JOIN
+			tb_bus_provider tbp on task.provider_id = tbp.provider_id
+		WHERE
+			task.task_id = #{taskId}
+			AND task.delete_yn = 'N'
+
+
+	</select>
+
+	<insert id="insertTaskInfo" parameterType="com.naver.pubtrans.itn.api.vo.task.input.TaskInputVo" useGeneratedKeys="true" keyProperty="taskId">
+		INSERT INTO tb_z_svc_task
+			(
+				provider_id, task_type, task_status, pub_trans_id
+				, task_data_type, task_data_name, task_comment, bis_auto_change_data, delete_yn
+				, task_register_type, reg_user_name, reg_user_id, reg_date, work_user_name
+				, work_user_id, work_assign_date, work_complete_date, check_user_name, check_user_id
+				, check_assign_date
+			)
+		VALUES
+			(
+				#{providerId}, #{taskType}, #{taskStatus}, #{pubTransId}
+				, #{taskDataType}, #{taskDataName}, #{taskComment}, #{bisAutoChangeData}, 'N'
+				, #{taskRegisterType}, #{regUserName}, #{regUserId}, now(), #{workUserName}
+				, #{workUserId}, now(), now(), #{checkUserName}, #{checkUserId}
+				, now()
+			)
+
+
+	</insert>
+
+	<insert id="insertTaskAssignInfo" parameterType="com.naver.pubtrans.itn.api.vo.task.TaskAssignInfoVo">
+		INSERT INTO	tb_z_svc_task_assign_info
+			(task_id, task_assign_type, assignee_user_id, assignee_user_name, reg_date, reg_user_id, reg_user_name)
+		VALUES
+			(#{taskId}, #{taskAssignType}, #{assigneeUserId}, #{assigneeUserName}, now(), #{regUserId}, #{regUserName})
+
+	</insert>
+
+	<insert id="insertTaskStatusInfo" parameterType="com.naver.pubtrans.itn.api.vo.task.TaskStatusInfoVo">
+		INSERT INTO	tb_z_svc_task_status_info
+			(task_id, tast_status, reg_date, reg_user_id, reg_user_name)
+		VALUES
+			(#{taskId}, #{tastStatus}, now(), #{regUserId}, #{regUserName})
+	</insert>
+
+	<update id="updateTaskInfo" parameterType="com.naver.pubtrans.itn.api.vo.task.input.TaskInputVo">
+		UPDATE
+			tb_z_svc_task
+		SET
+			provider_id = #{providerId}
+			, task_status = #{taskStatus}
+			, task_data_name = #{taskDataName}
+			, task_comment = #{taskComment}
+			, work_complete_date = now()
+			, check_user_name = #{checkUserName}
+			, check_user_id = #{checkUserId}
+			, check_assign_date = now()
+		WHERE
+			task_id = #{taskId}
+	</update>
+
+</mapper>

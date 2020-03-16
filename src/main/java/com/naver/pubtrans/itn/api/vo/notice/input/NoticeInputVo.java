@@ -7,7 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 회원 입력 값
+ * 공지사항 입력 값
+ * 
  * @author westwind
  *
  */
@@ -16,29 +17,36 @@ import lombok.Setter;
 public class NoticeInputVo {
 
 	/**
-	 * 회원 ID.
+	 * 공지사항 ID
+	 */
+	private int seq;
+
+	/**
+	 * 제목
 	 */
 	@NotEmpty
-	@Size(max = 30)
-	private String userId;
+	@Size(max = 100)
+	private String title;
 
 	/**
-	 * 이름
+	 * 내용
+	 */
+	private String content;
+
+	/**
+	 * 중요여부
 	 */
 	@NotEmpty
-	@Size(max = 30)
-	private String userName;
+	private String importantYn;
 
 	/**
-	 * 비밀번호
+	 * 등록자 ID
 	 */
-	@Size(min = 8, max = 20)
-	private String userPw;
+	private String regUserId;
 
 	/**
-	 * 소속
+	 * 등록자명
 	 */
-	@Size(max = 50)
-	private String company;
+	private String regUserName;
 
 }
