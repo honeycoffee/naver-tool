@@ -43,7 +43,7 @@ import com.naver.pubtrans.itn.api.vo.notice.output.NoticeOutputVo;
 @RunWith(SpringRunner.class)
 @WebMvcTest(NoticeController.class)
 @AutoConfigureRestDocs
-public class NoticeControllerTests {
+public class NoticeControllerDocumentTest {
 
 	private static final List<JsonFieldType> STRING_OR_NULL = Arrays.asList(JsonFieldType.STRING, JsonFieldType.NULL);
 	private static final List<JsonFieldType> NUMBER_OR_NULL = Arrays.asList(JsonFieldType.NUMBER, JsonFieldType.NULL);

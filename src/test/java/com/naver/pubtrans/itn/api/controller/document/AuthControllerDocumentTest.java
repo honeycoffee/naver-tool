@@ -36,7 +36,7 @@ import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 @RunWith(SpringRunner.class)
 @WebMvcTest(AuthController.class)
 @AutoConfigureRestDocs
-public class AuthControllerTests {
+public class AuthControllerDocumentTest {
 
 	@Autowired
 	MockMvc mockMvc;

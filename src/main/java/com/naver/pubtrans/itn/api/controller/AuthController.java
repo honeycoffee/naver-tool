@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.naver.pubtrans.itn.api.service.AuthService;
 import com.naver.pubtrans.itn.api.vo.auth.LoginVo;
+import com.naver.pubtrans.itn.api.vo.auth.output.AuthOutputVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 
@@ -46,6 +47,17 @@ public class AuthController {
 	public CommonOutput login(@RequestBody @Valid LoginVo loginVo, HttpServletRequest request) throws Exception {
 
 		CommonResult commonResult = authService.loginMember(loginVo, request);
+
+		CommonOutput commonOutput = new CommonOutput(commonResult);
+
+		System.out.println(commonOutput.getCode());
+		System.out.println(commonOutput.getResult().getData());
+
+		AuthOutputVo auth = (AuthOutputVo)commonOutput.getResult().getData();
+
+		System.out.println(auth.getAccessToken());
+
+		//		System.out.println(new CommonOutput(commonResult).getResult().getData();
 
 		return new CommonOutput(commonResult);
 

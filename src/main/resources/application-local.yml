@@ -3,6 +3,6 @@ spring:
   profiles: local  
   datasource:
       driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-      url: jdbc:log4jdbc:mysql://10.113.92.245:13306/PubTransDB
+      url: jdbc:log4jdbc:mysql://218.234.32.198:3306/PubTransDB
       username: pubtran
       password: PubTran12!@

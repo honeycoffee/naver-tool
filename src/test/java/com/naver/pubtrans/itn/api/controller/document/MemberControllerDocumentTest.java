@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
+import com.naver.pubtrans.itn.api.common.MemberUtil;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.controller.MemberController;
 import com.naver.pubtrans.itn.api.service.MemberService;
@@ -43,7 +44,7 @@ import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 @RunWith(SpringRunner.class)
 @WebMvcTest(MemberController.class)
 @AutoConfigureRestDocs
-public class MemberControllerTests {
+public class MemberControllerDocumentTest {
 
 	@Autowired
 	MockMvc mockMvc;
@@ -56,6 +57,9 @@ public class MemberControllerTests {
 
 	@MockBean
 	private MemberService memberService;
+
+	@MockBean
+	private MemberUtil memberUtil;
 
 	/**
 	 * 회원 정보 등록 rest docs 생성

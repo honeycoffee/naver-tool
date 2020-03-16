@@ -61,7 +61,7 @@ import com.naver.pubtrans.itn.api.vo.task.output.TaskSummaryOutputVo;
 @RunWith(SpringRunner.class)
 @WebMvcTest(BusStopController.class)
 @AutoConfigureRestDocs
-public class BusStopControllerTests {
+public class BusStopControllerDocumentTest {
 
 	private static final List<JsonFieldType> STRING_OR_NULL = Arrays.asList(JsonFieldType.STRING, JsonFieldType.NULL) ;
 	private static final List<JsonFieldType> NUMBER_OR_NULL = Arrays.asList(JsonFieldType.NUMBER, JsonFieldType.NULL) ;
