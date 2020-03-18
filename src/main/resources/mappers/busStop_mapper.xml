@@ -9,7 +9,7 @@
 		FROM
 			tb_stops stop, tb_city_code city
 		WHERE
-			stop.citycode = city.citycode
+			stop.city_code = city.city_code
 
 			<include refid="whereBusStopList" />
 
@@ -21,12 +21,12 @@
 			, stop.stop_name
 			, stop.x as longitude
 			, stop.y as latitude
-			, stop.citycode
-			, city.cityname
+			, stop.city_code
+			, city.city_name
 		FROM
 			tb_stops stop, tb_city_code city
 		WHERE
-			stop.citycode = city.citycode
+			stop.city_code = city.city_code
 
 		<include refid="whereBusStopList" />
 
@@ -40,8 +40,8 @@
 						<when test="sortKey.equals('stop_name')">
 							stop.stop_name ${sortType}
 						</when>
-						<when test="sortKey.equals('citycode')">
-							stop.citycode ${sortType}
+						<when test="sortKey.equals('city_code')">
+							stop.city_code ${sortType}
 						</when>
 						<otherwise>
 							stop.stop_id desc
@@ -60,7 +60,7 @@
 
 	<sql id="whereBusStopList">
 		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(cityCode)">
-			AND stop.citycode = #{cityCode}
+			AND stop.city_code = #{cityCode}
 		</if>
 
 		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(stopName)">
@@ -87,7 +87,7 @@
 		WHERE
 		    stn.stop_id = #{busStopId}
 		    and stn.stop_id = sub.stop_id
-			and stn.citycode = city.citycode
+			and stn.city_code = city.city_code
 	</select>
 
 
@@ -105,7 +105,7 @@
 		WHERE
 		    stn.task_id = #{taskId}
 		    and stn.task_id = sub.task_id
-			and stn.citycode = city.citycode
+			and stn.city_code = city.city_code
 	</select>
 
 
@@ -136,8 +136,8 @@
 		, stn.y as latitude
 		, stn.level
 		, stn.nonstop_yn
-		, stn.citycode
-		, city.cityname
+		, stn.city_code
+		, city.city_name
 
 		, sub.virtual_stop_yn
 		, sub.center_stop_yn
@@ -154,20 +154,9 @@
 		, mp.local_stop_id
 	</sql>
 
-
-	<select id="getBusStopNewId" resultType="int">
-		SELECT
-			if(a.bus_stop_id > a.pub_trans_id, a.bus_stop_id, a.pub_trans_id) as bus_stop_new_id
-		FROM (
-			     select (select ifnull(max(stop_id), 500000) + 1 from tb_stops)                                         as bus_stop_id,
-			            (select ifnull(max(pub_trans_id), 500000) + 1 from tb_z_svc_task where task_data_type = 'stop') as pub_trans_id
-		     ) a
-	</select>
-
-
 	<insert id="insertBusStopTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo">
 		INSERT INTO tb_stops_task
-			(task_id, stop_id, stop_name, transport_id, x, y, level, nonstop_yn, citycode)
+			(task_id, stop_id, stop_name, transport_id, x, y, level, nonstop_yn, city_code)
 		VALUES
 			(#{taskId}, #{stopId}, #{stopName}, 1, #{longitude}, #{latitude}, #{level}, #{nonstopYn}, #{cityCode})
 	</insert>
@@ -198,9 +187,9 @@
 			, y = #{latitude}
 			, level = #{level}
 			, nonstop_yn = #{nonstopYn}
-			, citycode = #{cityCode}
+			, city_code = #{cityCode}
 		WHERE
-			task_id = #{taskId} AND stop_id = #{stopId}
+			task_id = #{taskId}
 	</update>
 
 
@@ -220,7 +209,7 @@
 			, display_id = #{displayId}
 			, provider_id = #{providerId}
 		WHERE
-			task_id = #{taskId} AND stop_id = #{stopId}
+			task_id = #{taskId}
 	</update>
 
 
@@ -232,7 +221,7 @@
 			, provider_id = #{providerId}
 			, display_id = #{displayId}
 		WHERE
-			task_id = #{taskId} AND stop_id = #{stopId}
+			task_id = #{taskId}
 	</update>
 
 </mapper>

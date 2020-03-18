@@ -154,7 +154,6 @@ public class CommonService {
 		List<AliasColumnNameVo> aliasColumnNameVoList = new ArrayList<>();
 		aliasColumnNameVoList.add(new AliasColumnNameVo("x", "longitude"));			// tb_stops
 		aliasColumnNameVoList.add(new AliasColumnNameVo("y", "latitude"));				// tb_stops
-		aliasColumnNameVoList.add(new AliasColumnNameVo("citycode", "cityCode"));		// tb_stops
 
 		aliasColumnNameVoList.add(new AliasColumnNameVo("do", "sido"));				// tb_bus_stop_info
 
@@ -175,7 +174,7 @@ public class CommonService {
 		fieldValuesMap.put("nonstop_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
 		fieldValuesMap.put("virtual_stop_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
 		fieldValuesMap.put("center_stop_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
-		fieldValuesMap.put("cityCode", this.selectCommonCode(CodeType.CITYCODE.getCodeName()));
+		fieldValuesMap.put("city_code", this.selectCommonCode(CodeType.CITYCODE.getCodeName()));
 		fieldValuesMap.put("provider_id", this.selectCommonCode(CodeType.BUS_PROVIDER.getCodeName()));
 
 

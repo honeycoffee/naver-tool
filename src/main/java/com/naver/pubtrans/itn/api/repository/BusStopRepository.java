@@ -65,13 +65,6 @@ public interface BusStopRepository {
 	List<BusRouteVo> selectBusRouteList(int busStopId) throws DataAccessException;
 
 	/**
-	 * 버스정류장 신규ID를 가져온다
-	 * @return
-	 * @throws DataAccessException
-	 */
-	int getBusStopNewId() throws DataAccessException;
-
-	/**
 	 * 버스정류장 변경정보 저장
 	 * @param busStopTaskInputVo - 정류장 정보
 	 * @return

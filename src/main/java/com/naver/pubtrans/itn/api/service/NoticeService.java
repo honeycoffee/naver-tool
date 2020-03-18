@@ -86,6 +86,10 @@ public class NoticeService {
 		// 데이터 조회
 		NoticeOutputVo noticeOutputVo = noticeRepository.getNotice(noticeSearchVo);
 
+		if (noticeOutputVo == null) {
+			throw new ApiException(ResultCode.NOT_MATCH.getApiErrorCode(), ResultCode.NOT_MATCH.getDisplayMessage());
+		}
+
 		noticeRepository.plusReadCnt(noticeSearchVo);
 
 		// 데이터 스키마 조회
@@ -117,7 +121,7 @@ public class NoticeService {
 
 		// 저장 오류 처리
 		if (updateNoticeCnt == 0) {
-			throw new ApiException(ResultCode.SAVE_FAIL.getApiErrorCode(), ResultCode.SAVE_FAIL.getDisplayMessage());
+			throw new ApiException(ResultCode.UPDATE_FAIL.getApiErrorCode(), ResultCode.UPDATE_FAIL.getDisplayMessage());
 		}
 
 	}

@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.naver.pubtrans.itn.api.service.AuthService;
 import com.naver.pubtrans.itn.api.vo.auth.LoginVo;
-import com.naver.pubtrans.itn.api.vo.auth.output.AuthOutputVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 

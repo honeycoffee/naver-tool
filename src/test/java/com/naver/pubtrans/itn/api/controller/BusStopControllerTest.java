@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.consts.TaskDataType;
 import com.naver.pubtrans.itn.api.consts.TaskStatus;
 import com.naver.pubtrans.itn.api.repository.BusStopRepository;
@@ -61,7 +62,7 @@ public class BusStopControllerTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void caseExitsBusStopList() throws Exception {
+	public void caseExistsBusStopList() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/list/busStop")
             	.param("stopName", "")
             	.param("cityCode", "1000")
@@ -72,7 +73,7 @@ public class BusStopControllerTest {
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code", is(200)))
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
 				.andExpect(jsonPath("$.result.data", is(not(hasSize(0)))));
 	}
 
@@ -81,7 +82,7 @@ public class BusStopControllerTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void caseNotExitsBusStopList() throws Exception {
+	public void caseNotExistsBusStopList() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/list/busStop")
             	.param("stopName", "정류장명칭")
             	.param("cityCode", "2000")
@@ -92,7 +93,7 @@ public class BusStopControllerTest {
                 .characterEncoding("UTF-8"))
                 .andDo(print())
     			.andExpect(status().isOk())
-    			.andExpect(jsonPath("$.code", is(200)))
+    			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
     			.andExpect(jsonPath("$.result.data", is(hasSize(0))));
 	}
 
@@ -102,12 +103,12 @@ public class BusStopControllerTest {
 	 */
 	@Test
 	public void caseMatchBusStopInfo() throws Exception {
-		mockMvc.perform(get("/v1/ntool/api/info/busStop/{stopId}", 500000)
+		mockMvc.perform(get("/v1/ntool/api/info/busStop/{stopId}", 55000000)
             	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code", is(200)))
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
 				.andExpect(jsonPath("$.result.data", is(notNullValue())));
 	}
 
@@ -122,7 +123,7 @@ public class BusStopControllerTest {
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().is5xxServerError())
-				.andExpect(jsonPath("$.code", is(503)));
+				.andExpect(jsonPath("$.code", is(ResultCode.NOT_MATCH.getApiErrorCode())));
 	}
 
 	/**
@@ -131,12 +132,12 @@ public class BusStopControllerTest {
 	 */
 	@Test
 	public void caseMatchBusStopInfoWithBusRoute() throws Exception {
-		mockMvc.perform(get("/v1/ntool/api/info/busStop/{stopId}", 500000)
+		mockMvc.perform(get("/v1/ntool/api/info/busStop/{stopId}", 55000000)
             	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code", is(200)))
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
 				.andExpect(jsonPath("$.result.data.busRouteInfo", is(notNullValue())));
 	}
 
@@ -146,12 +147,12 @@ public class BusStopControllerTest {
 	 */
 	@Test
 	public void caseNotMatchBusStopInfoWithBusRoute() throws Exception {
-		mockMvc.perform(get("/v1/ntool/api/info/busStop/{stopId}", 500848)
+		mockMvc.perform(get("/v1/ntool/api/info/busStop/{stopId}", 55000848)
             	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code", is(200)))
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
 				.andExpect(jsonPath("$.result.data.busRouteInfo", is(nullValue())));
 	}
 
@@ -166,7 +167,7 @@ public class BusStopControllerTest {
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code", is(200)))
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
 				.andExpect(jsonPath("$.result.data.taskInfo", is(notNullValue())));
 	}
 
@@ -181,7 +182,7 @@ public class BusStopControllerTest {
             .characterEncoding("UTF-8"))
 			.andDo(print())
 			.andExpect(status().is5xxServerError())
-			.andExpect(jsonPath("$.code", is(503)));
+			.andExpect(jsonPath("$.code", is(ResultCode.NOT_MATCH.getApiErrorCode())));
 	}
 
 	/**
@@ -195,7 +196,7 @@ public class BusStopControllerTest {
             .characterEncoding("UTF-8"))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.code", is(200)))
+			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
 			.andExpect(jsonPath("$.result.data.taskInfo.bisChangeDataInfo", is(notNullValue())));
 	}
 
@@ -210,7 +211,7 @@ public class BusStopControllerTest {
             .characterEncoding("UTF-8"))
             .andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.code", is(200)))
+			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
 			.andExpect(jsonPath("$.result.data", is(not(hasSize(0)))));
 	}
 
@@ -225,7 +226,7 @@ public class BusStopControllerTest {
             .characterEncoding("UTF-8"))
             .andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.code", is(200)))
+			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
 			.andExpect(jsonPath("$.result.data", is(hasSize(0))));
 	}
 
@@ -240,7 +241,7 @@ public class BusStopControllerTest {
             .characterEncoding("UTF-8"))
             .andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.code", is(200)))
+			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
 			.andExpect(jsonPath("$.result.schema", is(not(hasSize(0)))));
 	}
 
@@ -280,7 +281,7 @@ public class BusStopControllerTest {
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code", is(200)));
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())));
 
 	}
 
@@ -301,7 +302,7 @@ public class BusStopControllerTest {
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().is4xxClientError())
-				.andExpect(jsonPath("$.code", is(400)));
+				.andExpect(jsonPath("$.code", is(ResultCode.PARAMETER_ERROR.getApiErrorCode())));
 	}
 
 	/**
@@ -341,7 +342,7 @@ public class BusStopControllerTest {
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code", is(200)));
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())));
 
 	}
 
@@ -362,7 +363,7 @@ public class BusStopControllerTest {
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().is4xxClientError())
-				.andExpect(jsonPath("$.code", is(400)));
+				.andExpect(jsonPath("$.code", is(ResultCode.PARAMETER_ERROR.getApiErrorCode())));
 	}
 
 
@@ -404,7 +405,7 @@ public class BusStopControllerTest {
             .characterEncoding("UTF-8"))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.code", is(200)));
+			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())));
 	}
 
 	/**
@@ -445,7 +446,7 @@ public class BusStopControllerTest {
             .characterEncoding("UTF-8"))
 			.andDo(print())
 			.andExpect(status().is5xxServerError())
-			.andExpect(jsonPath("$.code", is(503)));
+			.andExpect(jsonPath("$.code", is(ResultCode.NOT_MATCH.getApiErrorCode())));
 	}
 
 	/**
@@ -460,7 +461,6 @@ public class BusStopControllerTest {
 		busStopInputVo.setStopId(5);
 		busStopInputVo.setStopName("SK v1 정류장");
 		busStopInputVo.setLongitude(126.123456);
-		busStopInputVo.setLatitude(34.5678);
 		busStopInputVo.setCityCode("1000");
 		busStopInputVo.setLevel(1);
 		busStopInputVo.setNonstopYn("N");
@@ -486,7 +486,7 @@ public class BusStopControllerTest {
             .characterEncoding("UTF-8"))
 			.andDo(print())
 			.andExpect(status().is5xxServerError())
-			.andExpect(jsonPath("$.code", is(502)));
+			.andExpect(jsonPath("$.code", is(ResultCode.INNER_FAIL.getApiErrorCode())));
 	}
 
 	/**
@@ -496,7 +496,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseBusStopRemoveTask() throws Exception {
 		BusStopRemoveTaskInputVo busStopRemoveInputVo = new BusStopRemoveTaskInputVo() ;
-		busStopRemoveInputVo.setStopId(500848);
+		busStopRemoveInputVo.setStopId(55000848);
 		busStopRemoveInputVo.setTaskComment("미존재 정류장 - 삭제 처리");
 		busStopRemoveInputVo.setCheckUserId("kr94666");
 
@@ -507,7 +507,7 @@ public class BusStopControllerTest {
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code", is(200)));
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())));
 	}
 
 	/**
@@ -528,7 +528,7 @@ public class BusStopControllerTest {
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().is5xxServerError())
-				.andExpect(jsonPath("$.code", is(503)));
+				.andExpect(jsonPath("$.code", is(ResultCode.NOT_MATCH.getApiErrorCode())));
 	}
 
 	/**
@@ -538,7 +538,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseBusStopRemoveTaskWithRouteError() throws Exception {
 		BusStopRemoveTaskInputVo busStopRemoveInputVo = new BusStopRemoveTaskInputVo() ;
-		busStopRemoveInputVo.setStopId(500000);
+		busStopRemoveInputVo.setStopId(55000000);
 		busStopRemoveInputVo.setTaskComment("미존재 정류장 - 삭제 처리");
 		busStopRemoveInputVo.setCheckUserId("kr94666");
 
@@ -549,7 +549,7 @@ public class BusStopControllerTest {
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().is5xxServerError())
-				.andExpect(jsonPath("$.code", is(504)));
+				.andExpect(jsonPath("$.code", is(ResultCode.STOP_REMOVE_EXISTS_BUS_ROUTE.getApiErrorCode())));
 	}
 
 	/**

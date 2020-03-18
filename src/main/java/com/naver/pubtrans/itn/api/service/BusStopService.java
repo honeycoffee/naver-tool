@@ -328,15 +328,17 @@ public class BusStopService {
 	@Transactional
 	public void registerBusStopTask(String taskType, BusStopTaskInputVo busStopTaskInputVo) throws Exception {
 
-		int stopId = busStopTaskInputVo.getStopId();
-
 
 		// 정류장 신규등록
 		if(taskType.equals(TaskType.REGISTER.getCode())) {
-			// 신규 정류장 ID 가져오기
-			stopId = busStopRepository.getBusStopNewId();
-			// 정류장ID, TaskID set
-			busStopTaskInputVo.setStopId(stopId);
+
+			/**
+			 * 정류장 임시 ID 설정
+			 *
+			 * Task 검수 완료 후 배포시 정류장 테이블의 auto increment값을 사용하여 ID를 부여한다.
+			 *
+			 */
+			busStopTaskInputVo.setStopId(0);
 		}
 
 

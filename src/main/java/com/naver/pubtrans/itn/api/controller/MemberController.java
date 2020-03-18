@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.MemberUtil;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
@@ -112,21 +114,21 @@ public class MemberController {
 
 	/**
 	 * 자신의 정보를 조회한다.
+	 * @param accessToken - 헤더에 저장된 accessToken
 	 * @return
 	 * @throws Exception
 	 */
 	@GetMapping(value = "/v1/ntool/api/me")
-	public CommonOutput getMe() throws Exception {
+	public CommonOutput getMe(@RequestHeader(value = JwtAdapter.HEADER_NAME, required = true) String accessToken)
+		throws Exception {
 
-		// TODO : Spring Security AccessToken 적용은 추후에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
-		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
+		// TODO : Integration Test를 위해 코드 추가. 이번 스프린트 권한 관리 작업 시 수정 예정
+		if (StringUtils.isEmpty(accessToken)) {
+			// TODO : Spring Security AccessToken 적용은 추후에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
+			accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
+		}
 
-		String userId = memberUtil.getUserIdFromToken(accessToken);
-
-		MemberSearchVo memberSearchVo = new MemberSearchVo();
-		memberSearchVo.setUserId(userId);
-
-		CommonResult commonResult = memberService.getMemberDataWithSchema(memberSearchVo);
+		CommonResult commonResult = memberService.getMe(accessToken);
 
 		return new CommonOutput(commonResult);
 
@@ -138,13 +140,22 @@ public class MemberController {
 	 * Valid를 이용하여 유효성 검사를 진행한다
 	 * </pre>
 	 * @param memberInputVo - 회원 정보 입력값
+	 * @param accessToken - 헤더에 저장된 accessToken
 	 * @return
 	 * @throws Exception
 	 */
 	@PutMapping(value = "/v1/ntool/api/me")
-	public CommonOutput updateMe(@RequestBody @Valid MemberInputVo memberInputVo) throws Exception {
+	public CommonOutput updateMe(@RequestBody @Valid MemberInputVo memberInputVo,
+		@RequestHeader(value = JwtAdapter.HEADER_NAME, required = true) String accessToken)
+		throws Exception {
 
-		memberService.updateMe(memberInputVo);
+		// TODO : Integration Test를 위해 코드 추가. 이번 스프린트 권한 관리 작업 시 수정 예정
+		if (StringUtils.isEmpty(accessToken)) {
+			// TODO : Spring Security AccessToken 적용은 추후에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
+			accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
+		}
+
+		memberService.updateMe(memberInputVo, accessToken);
 
 		return new CommonOutput();
 

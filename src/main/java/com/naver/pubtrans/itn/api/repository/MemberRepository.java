@@ -50,6 +50,14 @@ public interface MemberRepository {
 	int deleteMember(MemberSearchVo memberSearchVo) throws DataAccessException;
 
 	/**
+	 * 테스트 회원 정보를 삭제한다
+	 * @param memberSearchVo - 회원 검색 조건
+	 * @return
+	 * @throws DataAccessException
+	 */
+	int deleteTestMember(MemberSearchVo memberSearchVo) throws DataAccessException;
+
+	/**
 	 * 회원 정보를 가져온다.
 	 * @param memberSearchVo - 회원 검색 조건
 	 * @return

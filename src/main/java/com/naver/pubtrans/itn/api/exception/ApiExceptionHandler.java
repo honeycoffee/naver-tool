@@ -74,7 +74,7 @@ public class ApiExceptionHandler {
             builder.append("[");
             builder.append(fieldError.getField());
             builder.append("](은)는 ");
-            builder.append(fieldError.getDefaultMessage());
+            builder.append(ResultCode.PARAMETER_ERROR.getDisplayMessage());
 
             i++;
         }

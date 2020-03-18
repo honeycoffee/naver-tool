@@ -41,6 +41,11 @@ import com.naver.pubtrans.itn.api.vo.member.input.MemberParameterVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
+/**
+ * 회원 관리 Rest Docs 생성 Test Class
+ * @author westwind
+ *
+ */
 @RunWith(SpringRunner.class)
 @WebMvcTest(MemberController.class)
 @AutoConfigureRestDocs
@@ -88,9 +93,9 @@ public class MemberControllerDocumentTest {
 				getDocumentRequest(),
 				getDocumentResponse(),
 				requestFields(
-					fieldWithPath("userId").type(JsonFieldType.STRING).description("회원ID"),
-					fieldWithPath("userName").type(JsonFieldType.STRING).description("이름"),
-					fieldWithPath("userPw").type(JsonFieldType.STRING).description("비밀번호"),
+					fieldWithPath("userId").type(JsonFieldType.STRING).description("[필수]회원ID"),
+					fieldWithPath("userName").type(JsonFieldType.STRING).description("[필수]이름"),
+					fieldWithPath("userPw").type(JsonFieldType.STRING).description("[필수]비밀번호"),
 					fieldWithPath("company").type(JsonFieldType.STRING).description("소속")
 
 				),
@@ -131,7 +136,7 @@ public class MemberControllerDocumentTest {
 				getDocumentRequest(),
 				getDocumentResponse(),
 				requestParameters(
-					parameterWithName("userId").description("회원ID")),
+					parameterWithName("userId").description("[필수]회원ID")),
 				responseFields(
 					fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
 					fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"),
@@ -178,7 +183,7 @@ public class MemberControllerDocumentTest {
 				getDocumentRequest(),
 				getDocumentResponse(),
 				requestFields(
-					fieldWithPath("userPw").type(JsonFieldType.STRING).description("비밀번호")),
+					fieldWithPath("userPw").type(JsonFieldType.STRING).description("[필수]비밀번호")),
 				responseFields(
 					fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
 					fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"),
@@ -234,7 +239,7 @@ public class MemberControllerDocumentTest {
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(commonSchemaList, memberOutputVo);
 
 		//given
-		given(memberService.getMemberDataWithSchema(any(MemberSearchVo.class)))
+		given(memberService.getMe(anyString()))
 			.willReturn(commonResult);
 
 		//when
@@ -296,8 +301,8 @@ public class MemberControllerDocumentTest {
 				getDocumentRequest(),
 				getDocumentResponse(),
 				requestFields(
-					fieldWithPath("userId").type(JsonFieldType.STRING).description("회원ID"),
-					fieldWithPath("userName").type(JsonFieldType.STRING).description("이름"),
+					fieldWithPath("userId").type(JsonFieldType.STRING).description("[필수]회원ID"),
+					fieldWithPath("userName").type(JsonFieldType.STRING).description("[필수]이름"),
 					fieldWithPath("userPw").type(JsonFieldType.STRING).description("비밀번호"),
 					fieldWithPath("company").type(JsonFieldType.STRING).description("소속")
 
@@ -411,8 +416,8 @@ public class MemberControllerDocumentTest {
 				getDocumentRequest(),
 				getDocumentResponse(),
 				requestFields(
-					fieldWithPath("userId").type(JsonFieldType.STRING).description("회원ID"),
-					fieldWithPath("userName").type(JsonFieldType.STRING).description("이름"),
+					fieldWithPath("userId").type(JsonFieldType.STRING).description("[필수]회원ID"),
+					fieldWithPath("userName").type(JsonFieldType.STRING).description("[필수]이름"),
 					fieldWithPath("userPw").type(JsonFieldType.STRING).description("비밀번호"),
 					fieldWithPath("company").type(JsonFieldType.STRING).description("소속")
 

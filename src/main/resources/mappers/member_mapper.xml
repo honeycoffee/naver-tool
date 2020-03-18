@@ -43,6 +43,13 @@
 			user_id = #{userId}
 	</update>
     
+	<delete id="deleteTestMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo">
+		DELETE FROM
+			tb_z_svc_member
+		WHERE
+			user_id = #{userId}
+	</delete>
+    
     <select id="getMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo">
     	SELECT
 		    member.user_id

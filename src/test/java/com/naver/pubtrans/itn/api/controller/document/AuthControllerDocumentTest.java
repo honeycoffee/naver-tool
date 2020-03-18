@@ -33,6 +33,11 @@ import com.naver.pubtrans.itn.api.vo.auth.output.AuthOutputVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
+/**
+ * 사용자 인증 관리 Rest Doc 생성 Test Class
+ * @author westwind
+ *
+ */
 @RunWith(SpringRunner.class)
 @WebMvcTest(AuthController.class)
 @AutoConfigureRestDocs
@@ -100,8 +105,8 @@ public class AuthControllerDocumentTest {
 				getDocumentRequest(),
 				getDocumentResponse(),
 				requestFields(
-					fieldWithPath("userId").type(JsonFieldType.STRING).description("회원ID"),
-					fieldWithPath("userPw").type(JsonFieldType.STRING).description("비밀번호")
+					fieldWithPath("userId").type(JsonFieldType.STRING).description("[필수]회원ID"),
+					fieldWithPath("userPw").type(JsonFieldType.STRING).description("[필수]비밀번호")
 
 				),
 				responseFields(

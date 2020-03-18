@@ -20,19 +20,19 @@
 
 	<select id="selectCityCodeList" resultType="com.naver.pubtrans.itn.api.vo.common.CityCodeVo">
 		SELECT
-			citycode
-			, cityname
-			, supercode
-			, exceptcode
-			, navercode
-			, doname
-			, abbrdoname
-			, siname
+			city_code
+			, city_name
+			, super_code
+			, except_code
+			, naver_code
+			, do_name
+			, abbr_do_name
+			, si_name
 			, level
 		FROM
 			tb_city_code
 		ORDER BY
-			cityname asc
+			city_name asc
 	</select>
 
 	<select id="selectBusProviderList" resultType="com.naver.pubtrans.itn.api.vo.common.BusProviderVo">

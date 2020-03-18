@@ -153,12 +153,6 @@ public class BusStopController {
 	 */
 	@PutMapping("/v1/ntool/api/modify/busStopTask")
 	public CommonOutput modifyBusStopTask(@RequestBody @Valid BusStopTaskInputVo busStopTaskInputVo, BindingResult bindingResult) throws Exception {
-
-		if(busStopTaskInputVo.getStopId() <= 0) {
-    		bindingResult.addError(new FieldError(CommonConstant.BUS_STOP_TASK_INPUT_VO, CommonConstant.KEY_STOP, ResultCode.BINDING_NUMBER_ERROR.getDisplayMessage()));
-    		throw new MethodArgumentNotValidException(null, bindingResult);
-    	}
-
 		busStopService.modifyBusStopTask(busStopTaskInputVo);
 		return new CommonOutput();
 	}

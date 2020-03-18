@@ -26,6 +26,7 @@ public enum ResultCode {
 	PASSWORD_NOT_MATCH(HttpStatus.INTERNAL_SERVER_ERROR, 507, "비밀번호가 일치하지 않습니다"),
 	MEMBER_TOKEN_NOT_MATCH(HttpStatus.INTERNAL_SERVER_ERROR, 508, "accessToken과 내 정보가 일치하지 않습니다"),
 	DELETE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, 509, "데이터 삭제에 실패하였습니다"),
+	UPDATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, 510, "데이터 갱신에 실패하였습니다"),
 	AUTH_TOKEN_EMPTY(HttpStatus.UNAUTHORIZED, 2001, "Token 정보가 없습니다"),
 	AUTH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, 2002, "만료된 Token 입니다"),
 	AUTH_TOKEN_VALID_ERROR(HttpStatus.UNAUTHORIZED, 2003, "Token 검증 오류"),

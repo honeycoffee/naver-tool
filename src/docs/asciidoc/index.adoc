@@ -69,7 +69,7 @@ include::common-schema.adoc[]
 
 == [01]회원 API
 
-[[register-member]]
+[[insert-member]]
 === 회원 등록
 회원 정보를 등록한다.
 
@@ -127,7 +127,7 @@ include::{snippets}/auth/login/http-response.adoc[]
 === API 호출 토큰 갱신
 refreshToken으로 accessToken을 갱신한다. 
 
-===== Request HTTP Example
+==== Request HTTP Example
 include::{snippets}/auth/refreshToken/http-request.adoc[]
 
 ==== Response
@@ -156,11 +156,11 @@ include::{snippets}/member/verifyPassword/http-response.adoc[]
 
 &#160;
 
-[[info-me]]
+[[get-me]]
 === 내 정보 조회
 자신의 정보를 조회한다. 
 
-===== Request HTTP Example
+==== Request HTTP Example
 include::{snippets}/member/getMe/http-request.adoc[]
 
 ==== Response
@@ -171,7 +171,7 @@ include::{snippets}/member/getMe/http-response.adoc[]
 
 &#160;
 
-[[modify-me]]
+[[update-me]]
 === 내 정보 수정
 자신의 정보를 수정한다.
 
@@ -189,7 +189,7 @@ include::{snippets}/member/updateMe/http-response.adoc[]
 
 &#160;
 
-[[info-member]]
+[[get-member]]
 === 회원 정보 조회
 권한관리에서 회원의 정보를 조회한다. 
 
@@ -207,7 +207,7 @@ include::{snippets}/member/getMember/http-response.adoc[]
 
 &#160;
 
-[[modify-member]]
+[[update-member]]
 === 회원 정보 수정
 권한관리에서 회원의 정보를 수정한다.
 
@@ -225,7 +225,7 @@ include::{snippets}/member/updateMember/http-response.adoc[]
 
 &#160;
 
-[[remove-member]]
+[[delete-member]]
 === 회원 정보 삭제
 권한관리에서 회원의 정보를 삭제한다.
 
@@ -443,7 +443,7 @@ include::{snippets}/busStop/busStopModifyTask/http-response.adoc[]
 
 == [03]공지사항 API
 
-[[register-notice]]
+[[insert-notice]]
 === 공지사항 등록
 공지사항을 등록한다.
 
@@ -462,7 +462,7 @@ include::{snippets}/notice/insertNotice/http-response.adoc[]
 &#160;
 
 
-[[info-notice]]
+[[get-notice]]
 === 공지사항 조회
 공지사항을 조회한다. 
 
@@ -479,7 +479,7 @@ include::{snippets}/notice/getNotice/response-fields.adoc[]
 include::{snippets}/notice/getNotice/http-response.adoc[]
 
 
-[[modify-notice]]
+[[update-notice]]
 === 공지사항 수정
 공지사항을 수정한다.
 
@@ -498,7 +498,7 @@ include::{snippets}/notice/updateNotice/http-response.adoc[]
 &#160;
 
 
-[[remove-notice]]
+[[delete-notice]]
 === 공지사항 삭제
 공지사항을 삭제한다.
 
@@ -541,7 +541,7 @@ include::{snippets}/notice/listNotice/http-response.adoc[]
 === 공지사항 기본 스키마
 공지사항 기본 스키마를 조회한다
 
-===== Request HTTP Example
+==== Request HTTP Example
 include::{snippets}/notice/schemaNotice/http-request.adoc[]
 
 ==== Response

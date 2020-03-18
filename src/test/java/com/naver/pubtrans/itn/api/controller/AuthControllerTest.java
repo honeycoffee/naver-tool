@@ -1,42 +1,46 @@
 package com.naver.pubtrans.itn.api.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.LinkedHashMap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
+import com.naver.pubtrans.itn.api.common.ApiUtils;
+import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.vo.auth.LoginVo;
 
-
+/**
+ * 사용자 인증 관리 Test
+ * @author westwind
+ *
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AuthControllerTest {
 
 	@Autowired
-    private MockMvc mockMvc;
+	private MockMvc mockMvc;
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Autowired
+	private ApiUtils apiUtils;
 
 	/**
 	 * 로그인 - 정상적으로 로그인 됐을 때
@@ -54,9 +58,9 @@ public class AuthControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
 			.characterEncoding("UTF-8"))
-			.andDo(print()) 
+			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.code", is(200)))
+			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
 			.andExpect(jsonPath("$.result.data.accessToken", is(notNullValue())))
 			.andExpect(jsonPath("$.result.data.refreshToken", is(notNullValue())));
 	}
@@ -79,11 +83,34 @@ public class AuthControllerTest {
 			.characterEncoding("UTF-8"))
 			.andDo(print())
 			.andExpect(status().is5xxServerError())
-			.andExpect(jsonPath("$.code", is(506)));
+			.andExpect(jsonPath("$.code", is(ResultCode.MEMBER_DATA_NULL.getApiErrorCode())))
+			.andExpect(jsonPath("$.message", is(ResultCode.MEMBER_DATA_NULL.getDisplayMessage())));
 	}
 
 	/**
-	 * AccessToken 갱신 - 정상적으로 토큰이 갱신 됐을 때 
+	 * 로그인 - 비밀번호가 일치 하지 않을 때 
+	 * @throws Exception
+	 */
+	@Test
+	public void caseNotMatchPassword() throws Exception {
+
+		LoginVo loginVo = new LoginVo();
+		loginVo.setUserId("test");
+		loginVo.setUserPw("qwer12345");
+
+		mockMvc.perform(post("/v1/ntool/api/auth/login")
+			.content(objectMapper.writeValueAsString(loginVo))
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON)
+			.characterEncoding("UTF-8"))
+			.andDo(print())
+			.andExpect(status().is5xxServerError())
+			.andExpect(jsonPath("$.code", is(ResultCode.PASSWORD_NOT_MATCH.getApiErrorCode())))
+			.andExpect(jsonPath("$.message", is(ResultCode.PASSWORD_NOT_MATCH.getDisplayMessage())));
+	}
+
+	/**
+	 * AccessToken 갱신 - 정상적으로 토큰이 갱신 됐을 때
 	 * @throws Exception
 	 */
 	@Test
@@ -93,131 +120,62 @@ public class AuthControllerTest {
 		loginVo.setUserId("test");
 		loginVo.setUserPw("qwer1234");
 
+		LinkedHashMap<String, String> tokenMap = apiUtils.getTokenMap();
+
+		String refreshToken = tokenMap.get("refreshToken");
+
 		mockMvc.perform(post("/v1/ntool/api/auth/refresh/token")
-			.header(JwtAdapter.HEADER_NAME, "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU4NDQxNjE4NCwidXNlcklkIjoidGVzdCJ9.waTStr6XBn56fgTP6QKojXfw2u-6MZAfiFoBP-kEnB8")
+			.header(JwtAdapter.HEADER_NAME, refreshToken)
 			.content(objectMapper.writeValueAsString(loginVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
 			.characterEncoding("UTF-8"))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.code", is(200)))
+			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
 			.andExpect(jsonPath("$.result.data.accessToken", is(notNullValue())))
 			.andExpect(jsonPath("$.result.data.refreshToken", is(notNullValue())));
 	}
-	//
-	//	/**
-	//	 * 회원 로그인 rest docs 생성
-	//	 * @throws Exception
-	//	 */
-	//	@Test
-	//	public void login() throws Exception {
-	//
-	//		OutputFmtUtil outputFmtUtil = new OutputFmtUtil();
-	//
-	//		// 회원 정보
-	//		MemberOutputVo memberOutputVo = new MemberOutputVo();
-	//
-	//		memberOutputVo.setUserId("1111");
-	//		memberOutputVo.setUserName("테스트유저");
-	//		memberOutputVo.setUserPw("$2a$10$VtdsXJoEdcw22nI6uMlAA..QjfuAK.kd8WC8U0W0pWBw6xCuLfVly");
-	//		memberOutputVo.setCompany("소속");
-	//		memberOutputVo.setRegDate("2020-02-27 16:35:02");
-	//		memberOutputVo.setUpdDate("2020-02-27 16:35:02");
-	//
-	//		// API 호출 토큰 및 갱신 토큰
-	//		AuthOutputVo authOutputVo = new AuthOutputVo();
-	//
-	//		String refreshToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RVc2VyMTExIiwiZXhwIjoxNTgzNzg1MDgzLCJ1c2VySWQiOiIzMzMzIn0.piLNmfoXMYZIh4_-k3Qut7mwqvkjvzItpVwZXJX5zBw";
-	//		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RVc2VyMTExIiwiZXhwIjoxNTgzNzQ1NDg0LCJ1c2VySWQiOiIzMzMzIn0.ueSpRBHHgi5qPJlJl7AAkj9URMGDE6HK78HKT1rfa10";
-	//
-	//		authOutputVo.setAccessToken(accessToken);
-	//		authOutputVo.setRefreshToken(refreshToken);
-	//
-	//		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(authOutputVo);
-	//
-	//		LoginVo loginVo = new LoginVo();
-	//
-	//		loginVo.setUserId("test");
-	//		loginVo.setUserPw("qwer1234");
-	//
-	//		//given
-	//		given(authService.loginMember(any(LoginVo.class), any(HttpServletRequest.class)))
-	//			.willReturn(commonResult);
-	//
-	//		//when
-	//		ResultActions result = this.mockMvc.perform(
-	//			post("/v1/ntool/api/auth/login")
-	//				.content(objectMapper.writeValueAsString(loginVo))
-	//				.contentType(MediaType.APPLICATION_JSON)
-	//				.accept(MediaType.APPLICATION_JSON)
-	//				.characterEncoding("UTF-8"));
-	//
-	//		//then
-	//		result.andExpect(status().isOk())
-	//			.andDo(document("auth/login",
-	//				getDocumentRequest(),
-	//				getDocumentResponse(),
-	//				requestFields(
-	//					fieldWithPath("userId").type(JsonFieldType.STRING).description("회원ID"),
-	//					fieldWithPath("userPw").type(JsonFieldType.STRING).description("비밀번호")
-	//
-	//				),
-	//				responseFields(
-	//					fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
-	//					fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"),
-	//					fieldWithPath("result").type(JsonFieldType.OBJECT).description("결과 정보"),
-	//					fieldWithPath("result.data").type(JsonFieldType.OBJECT).description("데이터"),
-	//					fieldWithPath("result.data.accessToken").type(JsonFieldType.STRING).description("API 인증 토큰"),
-	//					fieldWithPath("result.data.refreshToken").type(JsonFieldType.STRING)
-	//						.description("API 인증 토큰 갱신 용 토큰"))));
-	//	}
-	//
-	//	/**
-	//	 * API 호출 토큰 갱신 rest docs 생성
-	//	 * @throws Exception
-	//	 */
-	//	@Test
-	//	public void refresh() throws Exception {
-	//
-	//		OutputFmtUtil outputFmtUtil = new OutputFmtUtil();
-	//
-	//		String refreshToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RVc2VyMTExIiwiZXhwIjoxNTgzNzg1MDgzLCJ1c2VySWQiOiIzMzMzIn0.piLNmfoXMYZIh4_-k3Qut7mwqvkjvzItpVwZXJX5zBw";
-	//		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RVc2VyMTExIiwiZXhwIjoxNTgzNzQ1NDg0LCJ1c2VySWQiOiIzMzMzIn0.ueSpRBHHgi5qPJlJl7AAkj9URMGDE6HK78HKT1rfa10";
-	//
-	//		// API 호출 토큰 및 갱신 토큰
-	//		AuthOutputVo authOutputVo = new AuthOutputVo();
-	//
-	//		authOutputVo.setAccessToken(accessToken);
-	//		authOutputVo.setRefreshToken(refreshToken);
-	//
-	//		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(authOutputVo);
-	//
-	//		//given
-	//		given(authService.refreshToken(any(HttpServletRequest.class)))
-	//			.willReturn(commonResult);
-	//
-	//		//when
-	//		ResultActions result = this.mockMvc.perform(
-	//			post("/v1/ntool/api/auth/refresh/token")
-	//				.header(JwtAdapter.HEADER_NAME, refreshToken)
-	//				.contentType(MediaType.APPLICATION_JSON)
-	//				.accept(MediaType.APPLICATION_JSON)
-	//				.characterEncoding("UTF-8"));
-	//
-	//		//then
-	//		result.andExpect(status().isOk())
-	//			.andDo(document("auth/refreshToken",
-	//				getDocumentRequest(),
-	//				getDocumentResponse(),
-	//				responseFields(
-	//					fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
-	//					fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"),
-	//					fieldWithPath("result").type(JsonFieldType.OBJECT).description("결과 정보"),
-	//					fieldWithPath("result.data").type(JsonFieldType.OBJECT).description("데이터"),
-	//					fieldWithPath("result.data.accessToken").type(JsonFieldType.STRING).description("API 인증 토큰"),
-	//					fieldWithPath("result.data.refreshToken").type(JsonFieldType.STRING)
-	//						.description("API 인증 토큰 갱신 용 토큰"))));
-	//	}
+
+	/**
+	 * AccessToken 갱신 - refreshToken 이 만료 됐을 때
+	 * @throws Exception
+	 */
+	@Test
+	public void caseExpiredRefreshToken() throws Exception {
+
+		// DB에 존재하는 테스트용 refreshToken
+		String refreshToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6Iu2FjOyKpO2KuF_snbTrpoQiLCJleHAiOjE1ODM4NDcxMjEsInVzZXJJZCI6Ijg4ODgifQ.-N2WO3xBYBtUGZsn8Vd4c3pTcE4JuU10FNS2C3YHTkc";
+
+		mockMvc.perform(post("/v1/ntool/api/auth/refresh/token")
+			.header(JwtAdapter.HEADER_NAME, refreshToken)
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON)
+			.characterEncoding("UTF-8"))
+			.andDo(print())
+			.andExpect(status().is4xxClientError())
+			.andExpect(jsonPath("$.code", is(ResultCode.AUTH_TOKEN_EXPIRED.getApiErrorCode())))
+			.andExpect(jsonPath("$.message", is(ResultCode.AUTH_TOKEN_EXPIRED.getDisplayMessage())));
+	}
+
+	/**
+	 * AccessToken 갱신 - 일치하는 refreshToken 이 없을 때
+	 * @throws Exception
+	 */
+	@Test
+	public void caseNotMatchRefreshToken() throws Exception {
+
+		String refreshToken = "";
+
+		mockMvc.perform(post("/v1/ntool/api/auth/refresh/token")
+			.header(JwtAdapter.HEADER_NAME, refreshToken)
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON)
+			.characterEncoding("UTF-8"))
+			.andDo(print())
+			.andExpect(status().is4xxClientError())
+			.andExpect(jsonPath("$.code", is(ResultCode.AUTH_TOKEN_EMPTY.getApiErrorCode())))
+			.andExpect(jsonPath("$.message", is(ResultCode.AUTH_TOKEN_EMPTY.getDisplayMessage())));
+	}
 
 }

@@ -108,7 +108,7 @@ public class BusStopControllerDocumentTest {
 
 
 		SchemaVo schemaCityVo = new SchemaVo();
-		schemaCityVo.setColumnName("citycode");
+		schemaCityVo.setColumnName("city_code");
 		schemaCityVo.setColumnComment("도시코드");
 		schemaCityVo.setIsNullable("NO");
 		schemaCityVo.setColumnKey("");
@@ -128,7 +128,7 @@ public class BusStopControllerDocumentTest {
 		FieldValueList.add(fieldValue) ;
 
 		HashMap<String, List<FieldValue>> valuesMap = new HashMap<>() ;
-		valuesMap.put("cityCode", FieldValueList) ;
+		valuesMap.put("city_code", FieldValueList) ;
 
 
 		// 검색 폼 데이터 구조
@@ -164,7 +164,7 @@ public class BusStopControllerDocumentTest {
 		ResultActions result = this.mockMvc.perform(
                 get("/v1/ntool/api/list/busStop")
                 	.param("stopName", "")
-                	.param("citycode", "1000")
+                	.param("cityCode", "1000")
                 	.param("pageNo", "1")
                 	.param("listSize", "20")
                 	.param("sort", "stopId,asc")
@@ -181,7 +181,7 @@ public class BusStopControllerDocumentTest {
 	            requestParameters(
 	            		parameterWithName("stopName").description("[선택]정류장명").optional(),
 	            		parameterWithName("stopId").description("[선택]정류장ID").optional(),
-	            		parameterWithName("citycode").description("[선택]도시코드").optional(),
+	            		parameterWithName("cityCode").description("[선택]도시코드").optional(),
 	            		parameterWithName("pageNo").description("[선택]페이지 번호(기본:1)").optional(),
 	            		parameterWithName("listSize").description("[선택]페이지당 목록 수(기본:20)").optional(),
 	            		parameterWithName("sort").description("[선택]정렬(기본:목록 첫번째 Key 내림차순) - 사용 예:stopName,asc").optional()

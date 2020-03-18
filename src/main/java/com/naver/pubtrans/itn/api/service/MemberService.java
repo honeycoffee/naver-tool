@@ -134,13 +134,27 @@ public class MemberService {
 	}
 
 	/**
+	 * 자신의 정보를 조회한다
+	 * @param accessToken - 입력값
+	 */
+	public CommonResult getMe(String accessToken) throws Exception {
+
+		String userId = memberUtil.getUserIdFromToken(accessToken);
+
+		MemberSearchVo memberSearchVo = new MemberSearchVo();
+		memberSearchVo.setUserId(userId);
+
+		CommonResult commonResult = this.getMemberDataWithSchema(memberSearchVo);
+
+		return commonResult;
+
+	}
+
+	/**
 	 * 자신의 정보를 수정한다
 	 * @param memberInputVo - 입력값
 	 */
-	public void updateMe(MemberInputVo memberInputVo) throws Exception {
-
-		// TODO : Spring Security AccessToken 적용은 추후에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
-		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
+	public void updateMe(MemberInputVo memberInputVo, String accessToken) throws Exception {
 
 		String userId = memberUtil.getUserIdFromToken(accessToken);
 
@@ -168,7 +182,7 @@ public class MemberService {
 
 		// 저장 오류 처리
 		if (updateMemberCnt == 0) {
-			throw new ApiException(ResultCode.SAVE_FAIL.getApiErrorCode(), ResultCode.SAVE_FAIL.getDisplayMessage());
+			throw new ApiException(ResultCode.UPDATE_FAIL.getApiErrorCode(), ResultCode.UPDATE_FAIL.getDisplayMessage());
 		}
 	}
 
@@ -185,6 +199,16 @@ public class MemberService {
 			throw new ApiException(ResultCode.DELETE_FAIL.getApiErrorCode(),
 				ResultCode.DELETE_FAIL.getDisplayMessage());
 		}
+
+	}
+
+	/**
+	 * 테스트 회원 정보를 삭제한다
+	 * @param memberSearchVo - 회원 검색조건
+	 */
+	public void deleteTestMember(MemberSearchVo memberSearchVo) throws Exception {
+
+		memberRepository.deleteTestMember(memberSearchVo);
 
 	}
 

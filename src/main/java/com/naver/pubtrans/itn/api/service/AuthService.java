@@ -128,8 +128,6 @@ public class AuthService {
 
 		memberSearchVo.setUserId(loginVo.getUserId());
 
-		System.out.println(loginVo.getUserId());
-
 		// 로그인 정보로 회원 데이터 조회
 		MemberOutputVo memberOutputVo = memberService.getMember(memberSearchVo);
 
@@ -140,8 +138,6 @@ public class AuthService {
 
 		authInputVo.setUserId(memberOutputVo.getUserId());
 		authInputVo.setAccessIp(Util.getClientIpAddress(request));
-
-		System.out.println(Util.getClientIpAddress(request));
 
 		if (!memberPasswordEncoder.matches(loginVo.getUserPw(), memberOutputVo.getUserPw())) {
 			authInputVo.setLoginSuccessYn(CommonConstant.N);

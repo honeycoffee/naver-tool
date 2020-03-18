@@ -40,6 +40,11 @@ import com.naver.pubtrans.itn.api.vo.notice.input.NoticeParameterVo;
 import com.naver.pubtrans.itn.api.vo.notice.input.NoticeSearchVo;
 import com.naver.pubtrans.itn.api.vo.notice.output.NoticeOutputVo;
 
+/**
+ * 공지사항 Rest Docs 생성 Test Class
+ * @author westwind
+ *
+ */
 @RunWith(SpringRunner.class)
 @WebMvcTest(NoticeController.class)
 @AutoConfigureRestDocs
@@ -100,9 +105,9 @@ public class NoticeControllerDocumentTest {
 				getDocumentRequest(),
 				getDocumentResponse(),
 				requestFields(
-					fieldWithPath("title").type(JsonFieldType.STRING).description("제목"),
+					fieldWithPath("title").type(JsonFieldType.STRING).description("[필수]제목"),
 					fieldWithPath("content").type(JsonFieldType.STRING).description("내용"),
-					fieldWithPath("importantYn").type(JsonFieldType.STRING).description("중요여부(Y/N)")),
+					fieldWithPath("importantYn").type(JsonFieldType.STRING).description("[필수]중요여부(Y/N)")),
 				responseFields(
 					fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
 					fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"),
@@ -227,10 +232,10 @@ public class NoticeControllerDocumentTest {
 				getDocumentRequest(),
 				getDocumentResponse(),
 				requestFields(
-					fieldWithPath("seq").type(JsonFieldType.NUMBER).description("공지사항 ID"),
-					fieldWithPath("title").type(JsonFieldType.STRING).description("제목"),
+					fieldWithPath("seq").type(JsonFieldType.NUMBER).description("[필수]공지사항 ID"),
+					fieldWithPath("title").type(JsonFieldType.STRING).description("[필수]제목"),
 					fieldWithPath("content").type(JsonFieldType.STRING).description("내용"),
-					fieldWithPath("importantYn").type(JsonFieldType.STRING).description("중요여부(Y/N)")),
+					fieldWithPath("importantYn").type(JsonFieldType.STRING).description("[필수]중요여부(Y/N)")),
 				responseFields(
 					fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
 					fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"))));
@@ -260,7 +265,7 @@ public class NoticeControllerDocumentTest {
 				getDocumentRequest(),
 				getDocumentResponse(),
 				requestFields(
-					fieldWithPath("seq").type(JsonFieldType.NUMBER).description("공지사항ID")),
+					fieldWithPath("seq").type(JsonFieldType.NUMBER).description("[필수]공지사항ID")),
 				responseFields(
 					fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
 					fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"))));
