@@ -30,9 +30,9 @@ public class MemberOutputVo {
 
 	@JsonIgnore
 	/**
-	 * 비밀번호
+	 * 인코딩된 비밀번호
 	 */
-	private String userPw;
+	private String encodedUserPw;
 
 	/**
 	 * 가입일

@@ -54,9 +54,19 @@ public class MemberService {
 
 	/**
 	 * 회원 정보를 등록한다
-	 * @param memberInputVo - 입력값
+	 * @param memberInputVo - 회원 입력 Vo
+	 * @throws Exception
 	 */
-	public void insertMember(MemberInputVo memberInputVo) {
+	public void insertMember(MemberInputVo memberInputVo) throws Exception {
+
+		String userPw = memberInputVo.getUserPw();
+
+		// 비밀번호 입력 값 검증
+		if (StringUtils.isEmpty(userPw) || userPw.length() < CommonConstant.PASSWORD_MIN) {
+			throw new ApiException(ResultCode.PASSWORD_NOT_VALID.getApiErrorCode(),
+				ResultCode.PASSWORD_NOT_VALID.getDisplayMessage());
+		}
+
 		memberInputVo.setUserPw(memberPasswordEncoder.encode(memberInputVo.getUserPw()));
 
 		memberRepository.insertMember(memberInputVo);
@@ -85,13 +95,14 @@ public class MemberService {
 
 	/**
 	 * 회원 비밀번호 검증
-	 * @param memberParameterVo - 회원 파라미터 Vo
+	 * @param memberInputVo - 회원 입력 Vo
 	 * return 
+	 * @throws Exception
 	 */
-	public CommonResult verifyPassword(MemberParameterVo memberParameterVo) throws Exception {
+	public void verifyPassword(MemberInputVo memberInputVo) throws Exception {
 
 		MemberSearchVo memberSearchVo = new MemberSearchVo();
-		memberSearchVo.setUserId(memberParameterVo.getUserId());
+		memberSearchVo.setUserId(memberInputVo.getUserId());
 
 		MemberOutputVo memberOutputVo = this.getMember(memberSearchVo);
 
@@ -100,17 +111,12 @@ public class MemberService {
 				ResultCode.MEMBER_DATA_NULL.getDisplayMessage());
 		}
 
-		HashMap<String, Boolean> resultMap = new HashMap<String, Boolean>();
-
-		if (memberPasswordEncoder.matches(memberParameterVo.getUserPw(), memberOutputVo.getUserPw())) {
-			resultMap.put("verify", true);
-		} else {
-			resultMap.put("verify", false);
+		// 현재 비밀번호와 DB에 저장된 인코딩된 비밀번호 검증
+		if (StringUtils.isEmpty(memberInputVo.getCurrentUserPw())
+			|| !memberPasswordEncoder.matches(memberInputVo.getCurrentUserPw(), memberOutputVo.getEncodedUserPw())) {
+			throw new ApiException(ResultCode.PASSWORD_NOT_MATCH.getApiErrorCode(),
+				ResultCode.PASSWORD_NOT_MATCH.getDisplayMessage());
 		}
-
-		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(resultMap);
-
-		return commonResult;
 
 	}
 
@@ -118,6 +124,7 @@ public class MemberService {
 	 * 회원 데이터를 가져온다.
 	 * @param memberSearchVo - 회원 검색조건
 	 * @return
+	 * @throws Exception
 	 */
 	public MemberOutputVo getMember(MemberSearchVo memberSearchVo) throws Exception {
 
@@ -135,7 +142,8 @@ public class MemberService {
 
 	/**
 	 * 자신의 정보를 조회한다
-	 * @param accessToken - 입력값
+	 * @param accessToken - API 호출 accessToken
+	 * @throws Exception
 	 */
 	public CommonResult getMe(String accessToken) throws Exception {
 
@@ -152,7 +160,9 @@ public class MemberService {
 
 	/**
 	 * 자신의 정보를 수정한다
-	 * @param memberInputVo - 입력값
+	 * @param memberInputVo - 회원 입력 Vo
+	 * @param accessToken - API 호출 accessToken
+	 * @throws Exception
 	 */
 	public void updateMe(MemberInputVo memberInputVo, String accessToken) throws Exception {
 
@@ -163,13 +173,15 @@ public class MemberService {
 				ResultCode.MEMBER_TOKEN_NOT_MATCH.getDisplayMessage());
 		}
 
+		this.verifyPassword(memberInputVo);
+
 		this.updateMember(memberInputVo);
 
 	}
 
 	/**
 	 * 회원 정보를 수정한다
-	 * @param memberInputVo - 입력값
+	 * @param memberInputVo - 회원 입력 Vo
 	 * @throws Exception 
 	 */
 	public void updateMember(MemberInputVo memberInputVo) throws Exception {
@@ -182,13 +194,15 @@ public class MemberService {
 
 		// 저장 오류 처리
 		if (updateMemberCnt == 0) {
-			throw new ApiException(ResultCode.UPDATE_FAIL.getApiErrorCode(), ResultCode.UPDATE_FAIL.getDisplayMessage());
+			throw new ApiException(ResultCode.UPDATE_FAIL.getApiErrorCode(),
+				ResultCode.UPDATE_FAIL.getDisplayMessage());
 		}
 	}
 
 	/**
 	 * 회원 정보를 삭제한다
 	 * @param memberSearchVo - 회원 검색조건
+	 * @throws Exception
 	 */
 	public void deleteMember(MemberSearchVo memberSearchVo) throws Exception {
 
@@ -205,6 +219,7 @@ public class MemberService {
 	/**
 	 * 테스트 회원 정보를 삭제한다
 	 * @param memberSearchVo - 회원 검색조건
+	 * @throws Exception
 	 */
 	public void deleteTestMember(MemberSearchVo memberSearchVo) throws Exception {
 

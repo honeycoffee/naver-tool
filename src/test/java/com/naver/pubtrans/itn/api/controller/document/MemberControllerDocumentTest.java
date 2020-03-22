@@ -147,53 +147,6 @@ public class MemberControllerDocumentTest {
 	}
 
 	/**
-	 * 비밀번호 검증 rest docs 생성
-	 * @throws Exception
-	 */
-	@Test
-	public void verifyPassword() throws Exception {
-
-		OutputFmtUtil outputFmtUtil = new OutputFmtUtil();
-
-		HashMap<String, Boolean> resultMap = new HashMap<String, Boolean>();
-		resultMap.put("verify", true);
-
-		String userPw = "qwer1234";
-
-		MemberParameterVo memberParameterVo = new MemberParameterVo();
-		memberParameterVo.setUserPw(userPw);
-
-		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(resultMap);
-
-		//given
-		given(memberService.verifyPassword(any(MemberParameterVo.class)))
-			.willReturn(commonResult);
-
-		//when
-		ResultActions result = this.mockMvc.perform(
-			post("/v1/ntool/api/verify/password")
-				.content(objectMapper.writeValueAsString(memberParameterVo))
-				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON)
-				.characterEncoding("UTF-8"));
-
-		//then
-		result.andExpect(status().isOk())
-			.andDo(document("member/verifyPassword",
-				getDocumentRequest(),
-				getDocumentResponse(),
-				requestFields(
-					fieldWithPath("userPw").type(JsonFieldType.STRING).description("[필수]비밀번호")),
-				responseFields(
-					fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
-					fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"),
-					fieldWithPath("result").type(JsonFieldType.OBJECT).description("결과 정보"),
-					fieldWithPath("result.data").type(JsonFieldType.OBJECT).description("데이터"),
-					fieldWithPath("result.data.verify").type(JsonFieldType.BOOLEAN)
-						.description("비밀번호 일치여부 (true: 일치, false: 불일치)"))));
-	}
-
-	/**
 	 * 내 정보 조회 rest docs 생성
 	 * @throws Exception
 	 */
@@ -284,7 +237,8 @@ public class MemberControllerDocumentTest {
 		memberInputVo.setUserId("test");
 		memberInputVo.setUserName("test_user");
 		memberInputVo.setCompany("test_company");
-		memberInputVo.setUserPw("qwer1234");
+		memberInputVo.setCurrentUserPw("qwer1234");
+		memberInputVo.setUserPw("qwer12345");
 
 		//when
 		ResultActions result = this.mockMvc.perform(
@@ -303,6 +257,7 @@ public class MemberControllerDocumentTest {
 				requestFields(
 					fieldWithPath("userId").type(JsonFieldType.STRING).description("[필수]회원ID"),
 					fieldWithPath("userName").type(JsonFieldType.STRING).description("[필수]이름"),
+					fieldWithPath("currentUserPw").type(JsonFieldType.STRING).description("[필수]현재 비밀번호 (비밀번호 검증용)"),
 					fieldWithPath("userPw").type(JsonFieldType.STRING).description("비밀번호"),
 					fieldWithPath("company").type(JsonFieldType.STRING).description("소속")
 

@@ -74,4 +74,16 @@ public interface CommonConstant {
 	// 버스정류장 Task 입력 정보 VO명
 	String BUS_STOP_TASK_INPUT_VO = "BusStopTaskInputVo" ;
 
+	// geojson Geometry  type - LineString 명칭
+	String GEOJSON_GEOMETRY_TYPE_LINE_STRING = "LineString";
+
+	// geojson feature collection
+	String GEOJSON_TYPE_FEATURE_COLLECTION = "FeatureCollection";
+
+	// geojson feature type
+	String GEOJSON_TYPE_FEATURE_TYPE = "Feature";
+
+	// 비밀번호 최소 값
+	int PASSWORD_MIN = 8;
+
 }

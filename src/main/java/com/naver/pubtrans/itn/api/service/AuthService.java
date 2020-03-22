@@ -139,7 +139,7 @@ public class AuthService {
 		authInputVo.setUserId(memberOutputVo.getUserId());
 		authInputVo.setAccessIp(Util.getClientIpAddress(request));
 
-		if (!memberPasswordEncoder.matches(loginVo.getUserPw(), memberOutputVo.getUserPw())) {
+		if (!memberPasswordEncoder.matches(loginVo.getUserPw(), memberOutputVo.getEncodedUserPw())) {
 			authInputVo.setLoginSuccessYn(CommonConstant.N);
 
 			this.insertMemberLoginLog(authInputVo);

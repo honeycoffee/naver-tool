@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.LinkedHashMap;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +46,13 @@ public class MemberControllerTest {
 	@Autowired
 	private MemberService memberService;
 
-	@Autowired
 	private ApiUtils apiUtils;
+
+	@Before
+	public void setup() throws Exception {
+		//Api Test Utils 초기화
+		apiUtils = new ApiUtils(mockMvc, objectMapper);
+	}
 
 	/**
 	 * 회원등록 - 정상적으로 회원등록 됐을 때
@@ -137,59 +143,6 @@ public class MemberControllerTest {
 	}
 
 	/**
-	 * 회원 비밀번호 검증 - 비밀번호가 일치할 때
-	 * @throws Exception
-	 */
-	@Test
-	public void caseMatchPassword() throws Exception {
-
-		LinkedHashMap<String, String> tokenMap = apiUtils.getTokenMap();
-
-		String accessToken = tokenMap.get("accessToken");
-
-		MemberParameterVo memberParameterVo = new MemberParameterVo();
-		memberParameterVo.setUserPw("qwer1234");
-
-		mockMvc.perform(post("/v1/ntool/api/verify/password")
-			.content(objectMapper.writeValueAsString(memberParameterVo))
-			.header(JwtAdapter.HEADER_NAME, accessToken)
-			.contentType(MediaType.APPLICATION_JSON)
-			.accept(MediaType.APPLICATION_JSON)
-			.characterEncoding("UTF-8"))
-			.andDo(print())
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
-			.andExpect(jsonPath("$.result.data.verify", is(true)));
-
-	}
-
-	/**
-	 * 회원 비밀번호 검증 - 비밀번호가 일치하지 않을 때
-	 * @throws Exception
-	 */
-	@Test
-	public void caseNotMatchPassword() throws Exception {
-
-		LinkedHashMap<String, String> tokenMap = apiUtils.getTokenMap();
-		String accessToken = tokenMap.get("accessToken");
-
-		MemberParameterVo memberParameterVo = new MemberParameterVo();
-		memberParameterVo.setUserPw("qwer12345");
-
-		mockMvc.perform(post("/v1/ntool/api/verify/password")
-			.content(objectMapper.writeValueAsString(memberParameterVo))
-			.header(JwtAdapter.HEADER_NAME, accessToken)
-			.contentType(MediaType.APPLICATION_JSON)
-			.accept(MediaType.APPLICATION_JSON)
-			.characterEncoding("UTF-8"))
-			.andDo(print())
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
-			.andExpect(jsonPath("$.result.data.verify", is(false)));
-
-	}
-
-	/**
 	 * 자신의 정보 조회 - 정상적으로 조회 됐을 때
 	 * @throws Exception
 	 */
@@ -245,6 +198,7 @@ public class MemberControllerTest {
 		MemberInputVo memberInputVo = new MemberInputVo();
 		memberInputVo.setUserId("test");
 		memberInputVo.setUserName("test_name");
+		memberInputVo.setCurrentUserPw("qwer1234");
 		memberInputVo.setUserPw("qwer1234");
 		memberInputVo.setCompany("test_company");
 
@@ -272,6 +226,7 @@ public class MemberControllerTest {
 
 		MemberInputVo memberInputVo = new MemberInputVo();
 		memberInputVo.setUserName("test_name");
+		memberInputVo.setCurrentUserPw("qwer1234");
 		memberInputVo.setUserPw("qwer1234");
 		memberInputVo.setCompany("test_company");
 
@@ -300,6 +255,7 @@ public class MemberControllerTest {
 		MemberInputVo memberInputVo = new MemberInputVo();
 		memberInputVo.setUserId("test");
 		memberInputVo.setUserName("test_name");
+		memberInputVo.setCurrentUserPw("qwer1234");
 		memberInputVo.setUserPw("qwer1234");
 		memberInputVo.setCompany("test_company");
 
@@ -313,6 +269,35 @@ public class MemberControllerTest {
 			.andExpect(status().is4xxClientError())
 			.andExpect(jsonPath("$.code", is(ResultCode.AUTH_TOKEN_EXPIRED.getApiErrorCode())))
 			.andExpect(jsonPath("$.message", is(ResultCode.AUTH_TOKEN_EXPIRED.getDisplayMessage())));
+	}
+	
+	/**
+	 * 자신의 정보 수정 - 현재 비밀번호를 잘 못 입력 했을 때
+	 * @throws Exception
+	 */
+	@Test
+	public void caseNotMatchCurrentPasswordUpdateMe() throws Exception {
+
+
+		LinkedHashMap<String, String> tokenMap = apiUtils.getTokenMap();
+		String accessToken = tokenMap.get("accessToken");
+
+		MemberInputVo memberInputVo = new MemberInputVo();
+		memberInputVo.setUserId("test");
+		memberInputVo.setUserName("test_name");
+		memberInputVo.setUserPw("qwer1234");
+		memberInputVo.setCompany("test_company");
+
+		mockMvc.perform(put("/v1/ntool/api/me")
+			.header(JwtAdapter.HEADER_NAME, accessToken)
+			.content(objectMapper.writeValueAsString(memberInputVo))
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON)
+			.characterEncoding("UTF-8"))
+			.andDo(print())
+			.andExpect(status().is5xxServerError())
+			.andExpect(jsonPath("$.code", is(ResultCode.PASSWORD_NOT_MATCH.getApiErrorCode())))
+			.andExpect(jsonPath("$.message", is(ResultCode.PASSWORD_NOT_MATCH.getDisplayMessage())));
 	}
 
 	/**

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.pubtrans.itn.api.repository.BusRouteRepository">
+
+
+	<select id="getBusRouteListTotalCnt" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteSearchVo" resultType="int">
+		SELECT
+			count(*) as total_list_cnt
+		FROM
+			tb_routes route
+			, tb_bus_routes_info sub
+			, tb_city_code city
+			, tb_bus_route_class rc
+		WHERE
+			<include refid="whereBusRouteList" />
+
+	</select>
+
+	<select id="selectBusRouteList" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteSearchVo" resultType="com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteListOutputVo">
+		SELECT
+		    route.route_id
+		    , route.route_name
+			, sub.bus_class
+		    , rc.bus_class_name
+			, sub.start_point_name
+			, sub.end_point_name
+		    , route.city_code
+			, city.city_name
+			, sub.bypass_yn
+			, (select count(*) from tb_bus_route_bypass_mapping bypass where bypass.parent_route_id = route.route_id) as bypass_route_cnt
+		FROM
+			tb_routes route
+			, tb_bus_routes_info sub
+			, tb_city_code city
+			, tb_bus_route_class rc
+		WHERE
+
+		<include refid="whereBusRouteList" />
+
+		ORDER BY
+			<choose>
+				<when test="@org.apache.commons.lang3.StringUtils@isNotEmpty(sortKey)">
+					<choose>
+						<when test="sortKey.equals('route_id')">
+							route.route_id ${sortType}
+						</when>
+						<when test="sortKey.equals('route_name')">
+							route.route_name ${sortType}
+						</when>
+						<when test="sortKey.equals('city_code')">
+							route.city_code ${sortType}
+						</when>
+						<otherwise>
+							route.route_id desc
+						</otherwise>
+					</choose>
+				</when>
+				<otherwise>
+					route.route_id desc
+				</otherwise>
+			</choose>
+
+		LIMIT
+			#{startPageLimit}, #{endPageLimit}
+	</select>
+
+
+	<sql id="whereBusRouteList">
+		route.route_id = sub.route_id
+		and route.city_code = city.city_code
+		and sub.bus_class = rc.bus_class_id
+
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(cityCode)">
+			AND route.city_code = #{cityCode}
+		</if>
+
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(routeName)">
+			AND route.route_name LIKE CONCAT(#{routeName}, '%')
+		</if>
+
+		<if test="routeId > 0">
+			AND route.route_id LIKE CONCAT(#{routeId}, '%')
+		</if>
+	</sql>
+
+</mapper>

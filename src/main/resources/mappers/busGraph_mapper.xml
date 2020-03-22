@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.pubtrans.itn.api.repository.BusGraphRepository">
+
+
+	<select id="selectBusStopGraphList" parameterType="java.util.List" resultType="com.naver.pubtrans.itn.api.vo.bus.graph.BusStopGraphVo">
+		SELECT
+			<include refid="selectCommonBusStopGraph" />
+		FROM
+			tb_stop_graph graph
+		LEFT JOIN
+			tb_stops startStop on startStop.stop_id = graph.start_stop_id
+		LEFT JOIN
+			tb_stops endStop on endStop.stop_id = graph.end_stop_id
+		WHERE
+			<foreach collection="list" item="item" index="index" separator="or" open="(" close=")" >
+				(graph.start_stop_id = #{item.startStopId} AND graph.end_stop_id = #{item.endStopId})
+	        </foreach>
+	</select>
+
+
+	<sql id="selectCommonBusStopGraph">
+		graph.graph_id
+	    , graph.start_stop_id
+	    , graph.end_stop_id
+	    , startStop.stop_name as start_stop_name
+        , endStop.stop_name as end_stop_name
+	    , ST_AsText(graph.graph_info) as graph_info
+	    , ST_AsGeoJSON((graph.graph_info), 14) as graph_info_to_geo_json
+	</sql>
+
+
+</mapper>

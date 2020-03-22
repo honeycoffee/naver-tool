@@ -416,7 +416,7 @@ public class BusStopControllerTest {
 	public void caseNotMatchBusStopTaskModifyError() throws Exception {
 
 		BusStopTaskInputVo busStopInputVo = new BusStopTaskInputVo();
-		busStopInputVo.setTaskId(100);
+		busStopInputVo.setTaskId(-1);
 		busStopInputVo.setStopId(5);
 		busStopInputVo.setStopName("SK v1 정류장");
 		busStopInputVo.setLongitude(126.123456);

@@ -66,7 +66,7 @@ public class AuthControllerDocumentTest {
 
 		memberOutputVo.setUserId("1111");
 		memberOutputVo.setUserName("테스트유저");
-		memberOutputVo.setUserPw("$2a$10$VtdsXJoEdcw22nI6uMlAA..QjfuAK.kd8WC8U0W0pWBw6xCuLfVly");
+		memberOutputVo.setEncodedUserPw("$2a$10$VtdsXJoEdcw22nI6uMlAA..QjfuAK.kd8WC8U0W0pWBw6xCuLfVly");
 		memberOutputVo.setCompany("소속");
 		memberOutputVo.setRegDate("2020-02-27 16:35:02");
 		memberOutputVo.setUpdDate("2020-02-27 16:35:02");

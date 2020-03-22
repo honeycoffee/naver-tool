@@ -138,24 +138,6 @@ include::{snippets}/auth/refreshToken/http-response.adoc[]
 
 &#160;
 
-[[verify-password]]
-=== 회원 비밀번호 검증
-회원 비밀번호를 검증한다.
-
-==== Request
-include::{snippets}/member/verifyPassword/request-fields.adoc[]
-
-===== Request HTTP Example
-include::{snippets}/member/verifyPassword/http-request.adoc[]
-
-==== Response
-include::{snippets}/member/verifyPassword/response-fields.adoc[]
-
-===== Response HTTP Example
-include::{snippets}/member/verifyPassword/http-response.adoc[]
-
-&#160;
-
 [[get-me]]
 === 내 정보 조회
 자신의 정보를 조회한다. 
@@ -263,7 +245,117 @@ include::{snippets}/member/listMember/http-response.adoc[]
 
 &#160;
 
-== [02]버스정류장 API
+== [02]공지사항 API
+
+[[insert-notice]]
+=== 공지사항 등록
+공지사항을 등록한다.
+
+==== Request
+include::{snippets}/notice/insertNotice/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/notice/insertNotice/http-request.adoc[]
+
+==== Response
+include::{snippets}/notice/insertNotice/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/notice/insertNotice/http-response.adoc[]
+
+&#160;
+
+
+[[get-notice]]
+=== 공지사항 조회
+공지사항을 조회한다.
+
+==== Request
+include::{snippets}/notice/getNotice/path-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/notice/getNotice/http-request.adoc[]
+
+==== Response
+include::{snippets}/notice/getNotice/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/notice/getNotice/http-response.adoc[]
+
+
+[[update-notice]]
+=== 공지사항 수정
+공지사항을 수정한다.
+
+==== Request
+include::{snippets}/notice/updateNotice/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/notice/updateNotice/http-request.adoc[]
+
+==== Response
+include::{snippets}/notice/updateNotice/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/notice/updateNotice/http-response.adoc[]
+
+&#160;
+
+
+[[delete-notice]]
+=== 공지사항 삭제
+공지사항을 삭제한다.
+
+==== Request
+include::{snippets}/notice/deleteNotice/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/notice/deleteNotice/http-request.adoc[]
+
+==== Response
+include::{snippets}/notice/deleteNotice/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/notice/deleteNotice/http-response.adoc[]
+
+&#160;
+
+
+=== 공지사항 List
+공지사항 목록을 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/notice/listNotice/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/notice/listNotice/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/notice/listNotice/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/notice/listNotice/http-response.adoc[]
+
+&#160;
+
+
+[[schema-Notice]]
+=== 공지사항 기본 스키마
+공지사항 기본 스키마를 조회한다
+
+==== Request HTTP Example
+include::{snippets}/notice/schemaNotice/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/notice/schemaNotice/response-fields.adoc[]
+
+&#160;
+
+
+== [03]버스정류장 API
 
 [[busStop-list]]
 === 버스정류장 List
@@ -441,112 +533,72 @@ include::{snippets}/busStop/busStopModifyTask/http-response.adoc[]
 
 &#160;
 
-== [03]공지사항 API
+== [04]버스노선 API
 
-[[insert-notice]]
-=== 공지사항 등록
-공지사항을 등록한다.
-
-==== Request
-include::{snippets}/notice/insertNotice/request-fields.adoc[]
-
-===== Request HTTP Example
-include::{snippets}/notice/insertNotice/http-request.adoc[]
-
-==== Response
-include::{snippets}/notice/insertNotice/response-fields.adoc[]
-
-===== Response HTTP Example
-include::{snippets}/notice/insertNotice/http-response.adoc[]
-
-&#160;
-
-
-[[get-notice]]
-=== 공지사항 조회
-공지사항을 조회한다. 
-
-==== Request
-include::{snippets}/notice/getNotice/path-parameters.adoc[]
-
-===== Request HTTP Example
-include::{snippets}/notice/getNotice/http-request.adoc[]
-
-==== Response
-include::{snippets}/notice/getNotice/response-fields.adoc[]
-
-===== Response HTTP Example
-include::{snippets}/notice/getNotice/http-response.adoc[]
-
-
-[[update-notice]]
-=== 공지사항 수정
-공지사항을 수정한다.
-
-==== Request
-include::{snippets}/notice/updateNotice/request-fields.adoc[]
-
-===== Request HTTP Example
-include::{snippets}/notice/updateNotice/http-request.adoc[]
-
-==== Response
-include::{snippets}/notice/updateNotice/response-fields.adoc[]
-
-===== Response HTTP Example
-include::{snippets}/notice/updateNotice/http-response.adoc[]
-
-&#160;
-
-
-[[delete-notice]]
-=== 공지사항 삭제
-공지사항을 삭제한다.
-
-==== Request
-include::{snippets}/notice/deleteNotice/request-fields.adoc[]
-
-===== Request HTTP Example
-include::{snippets}/notice/deleteNotice/http-request.adoc[]
-
-==== Response
-include::{snippets}/notice/deleteNotice/response-fields.adoc[]
-
-===== Response HTTP Example
-include::{snippets}/notice/deleteNotice/http-response.adoc[]
-
-&#160;
-
-
-=== 공지사항 List
-공지사항 목록을 조회한다
+[[busRoute-list]]
+=== 버스노선 List
+버스노선 목록을 조회한다
 
 ==== Request
 [cols="1,3"]
-include::{snippets}/notice/listNotice/request-parameters.adoc[]
+include::{snippets}/busRoute/busRouteList/request-parameters.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/notice/listNotice/http-request.adoc[]
+include::{snippets}/busRoute/busRouteList/http-request.adoc[]
 
 ==== Response
 [cols="2,^1,4"]
-include::{snippets}/notice/listNotice/response-fields.adoc[]
+include::{snippets}/busRoute/busRouteList/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/notice/listNotice/http-response.adoc[]
+include::{snippets}/busRoute/busRouteList/http-response.adoc[]
 
 &#160;
 
+[[busRoute-task]]
+=== 버스노선 작업 List
+노선 작업 목록을 조회한다
 
-[[schema-Notice]]
-=== 공지사항 기본 스키마
-공지사항 기본 스키마를 조회한다
+==== Request
+[cols="1,3"]
+include::{snippets}/busRoute/busRouteTaskList/path-parameters.adoc[]
+include::{snippets}/busRoute/busRouteTaskList/request-parameters.adoc[]
 
-==== Request HTTP Example
-include::{snippets}/notice/schemaNotice/http-request.adoc[]
+===== Request HTTP Example
+include::{snippets}/busRoute/busRouteTaskList/http-request.adoc[]
 
 ==== Response
 [cols="2,^1,4"]
-include::{snippets}/notice/schemaNotice/response-fields.adoc[]
+include::{snippets}/busRoute/busRouteTaskList/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busRoute/busRouteTaskList/http-response.adoc[]
 
 &#160;
 
+[[busRoute-graphBetweenBusStop]]
+=== 정류장간 그래프 정보 조회
+* 정류장간의 그래프 정보를 조회한다
+** 출발-도착 정류장의 ID를 입력하여 그래프 정보를 조회한다
+** 조회 구간에 대한 정류장 ID는 최소 2개 이상이어야 한다
+** 정류장ID 사이는 콤마(,)로 구분한다
+** 연속된 구간의 정류장 ID를 순서대로 입력하여 그래프 정보를 조회할 수 있다
+*** busStopIds=55000837,55000520,55000529
+**** 55000837 ~ 55000520 그래프 정보, 55000520 ~ 55000529 그래프 정보
+
+
+==== Request
+[cols="1,3"]
+include::{snippets}/busRoute/graphBetweenBusStop/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busRoute/graphBetweenBusStop/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busRoute/graphBetweenBusStop/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busRoute/graphBetweenBusStop/http-response.adoc[]
+
+&#160;

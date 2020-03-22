@@ -14,7 +14,7 @@
     
 	<insert id="insertMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
 		INSERT INTO 
-			tb_z_svc_member(user_id, user_name, user_pw, company) 
+			tb_z_svc_member(user_id, user_name, encoded_user_pw, company) 
 		VALUES
 			(#{userId}, #{userName}, #{userPw}, #{company})
 	</insert>
@@ -26,7 +26,7 @@
 			user_name = #{userName}
 			, company = #{company}
 			<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(userPw)">
-			, user_pw = #{userPw} 
+			, encoded_user_pw = #{userPw} 
 			</if>
 			, upd_date = now()
 		WHERE
@@ -53,7 +53,7 @@
     <select id="getMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo">
     	SELECT
 		    member.user_id
-		    , member.user_pw
+		    , member.encoded_user_pw
 		    , member.user_name
 		    , member.company
 		    , date_format(member.reg_date, '%Y.%m.%d') as reg_date

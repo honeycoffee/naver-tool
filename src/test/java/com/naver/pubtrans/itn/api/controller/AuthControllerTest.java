@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.LinkedHashMap;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,13 @@ public class AuthControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	@Autowired
 	private ApiUtils apiUtils;
+
+	@Before
+	public void setup() throws Exception {
+		//Api Test Utils 초기화
+		apiUtils = new ApiUtils(mockMvc, objectMapper);
+	}
 
 	/**
 	 * 로그인 - 정상적으로 로그인 됐을 때
@@ -88,7 +94,7 @@ public class AuthControllerTest {
 	}
 
 	/**
-	 * 로그인 - 비밀번호가 일치 하지 않을 때 
+	 * 로그인 - 비밀번호가 일치 하지 않을 때
 	 * @throws Exception
 	 */
 	@Test

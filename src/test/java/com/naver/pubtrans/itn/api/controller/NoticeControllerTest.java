@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,13 @@ public class NoticeControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	@Autowired
 	private ApiUtils apiUtils;
+
+	@Before
+	public void setup() throws Exception {
+		//Api Test Utils 초기화
+		apiUtils = new ApiUtils(mockMvc, objectMapper);
+	}
 
 	/**
 	 * 공지사항등록 - 정상적으로 공지사항 등록 됐을 때
@@ -92,7 +98,7 @@ public class NoticeControllerTest {
 	@Test
 	public void caseSuccessGetNotice() throws Exception {
 		int seq = apiUtils.getNoticeSeq();
-		
+
 		mockMvc.perform(get("/v1/ntool/api/notice/{seq}", seq)
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -126,7 +132,7 @@ public class NoticeControllerTest {
 	@Test
 	public void caseSuccessUpdateNotice() throws Exception {
 		int seq = apiUtils.getNoticeSeq();
-		
+
 		NoticeInputVo noticeInputVo = new NoticeInputVo();
 		noticeInputVo.setSeq(seq);
 		noticeInputVo.setTitle("test notice");
@@ -194,7 +200,7 @@ public class NoticeControllerTest {
 	@Test
 	public void caseSuccessDeleteNotice() throws Exception {
 		int seq = apiUtils.getNoticeSeq();
-		
+
 		NoticeParameterVo noticeParameterVo = new NoticeParameterVo();
 		noticeParameterVo.setSeq(seq);
 

@@ -85,33 +85,7 @@ public class MemberController {
 		return new CommonOutput(commonResult);
 
 	}
-
-	/**
-	 * 회원 비밀번호 검증
-	 * @param memberParameterVo - 회원 파라미터 Vo
-	 * @return
-	 * @throws Exception
-	 */
-	@PostMapping(value = "/v1/ntool/api/verify/password")
-	public CommonOutput verifyPassword(@RequestBody @Valid MemberParameterVo memberParameterVo) throws Exception {
-
-		if (StringUtils.isEmpty(memberParameterVo.getUserPw())) {
-			throw new ApiException(ResultCode.PARAMETER_ERROR.getApiErrorCode(),
-				ResultCode.PARAMETER_ERROR.getDisplayMessage());
-		}
-
-		// TODO : Spring Security AccessToken 적용은 추후에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
-		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
-
-		String userId = memberUtil.getUserIdFromToken(accessToken);
-		memberParameterVo.setUserId(userId);
-
-		CommonResult commonResult = memberService.verifyPassword(memberParameterVo);
-
-		return new CommonOutput(commonResult);
-
-	}
-
+	
 	/**
 	 * 자신의 정보를 조회한다.
 	 * @param accessToken - 헤더에 저장된 accessToken

@@ -1,9 +1,13 @@
 package com.naver.pubtrans.itn.api.common;
 
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.LinkedHashMap;
 
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -22,22 +26,20 @@ import com.naver.pubtrans.itn.api.vo.notice.input.NoticeInputVo;
  * @author westwind
  *
  */
-@Component
 public class ApiUtils {
 
-	private final MockMvc mockMvc;
+	private MockMvc mockMvc;
 
-	private final ObjectMapper objectMapper;
+	private ObjectMapper objectMapper;
 
-	@Autowired
-	ApiUtils(MockMvc mockMvc, ObjectMapper objectMapper) {
+	public ApiUtils(MockMvc mockMvc, ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 		this.mockMvc = mockMvc;
 	}
 
 	/**
 	 * accessToken, refreshToken이 필요한 테스트를 위해 로그인 진행 후 TokenMap 전달
-	 * @return 
+	 * @return
 	 * @throws Exception
 	 */
 	public LinkedHashMap<String, String> getTokenMap() throws Exception {
@@ -56,8 +58,8 @@ public class ApiUtils {
 		String jsonString = mvcResult.getResponse().getContentAsString();
 		CommonOutput commonOutput = objectMapper.readValue(jsonString, CommonOutput.class);
 		CommonResult commonReuslt = commonOutput.getResult();
-		
-		@SuppressWarnings("unchecked") 
+
+		@SuppressWarnings("unchecked")
 		LinkedHashMap<String, String> tokenMap = (LinkedHashMap<String, String>)commonReuslt.getData();
 
 		return tokenMap;
@@ -85,14 +87,14 @@ public class ApiUtils {
 		String jsonString = mvcResult.getResponse().getContentAsString();
 		CommonOutput commonOutput = objectMapper.readValue(jsonString, CommonOutput.class);
 		CommonResult commonReuslt = commonOutput.getResult();
-		
-		@SuppressWarnings("unchecked") 
+
+		@SuppressWarnings("unchecked")
 		LinkedHashMap<String, Integer> seqMap = (LinkedHashMap<String, Integer>)commonReuslt.getData();
 		int seq = seqMap.get("seq");
-		
+
 		return seq;
-		
-		
+
+
 	}
-	
+
 }
