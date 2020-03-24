@@ -88,21 +88,14 @@ public class MemberController {
 	
 	/**
 	 * 자신의 정보를 조회한다.
-	 * @param accessToken - 헤더에 저장된 accessToken
 	 * @return
 	 * @throws Exception
 	 */
 	@GetMapping(value = "/v1/ntool/api/me")
-	public CommonOutput getMe(@RequestHeader(value = JwtAdapter.HEADER_NAME, required = true) String accessToken)
+	public CommonOutput getMe()
 		throws Exception {
 
-		// TODO : Integration Test를 위해 코드 추가. 이번 스프린트 권한 관리 작업 시 수정 예정
-		if (StringUtils.isEmpty(accessToken)) {
-			// TODO : Spring Security AccessToken 적용은 추후에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
-			accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
-		}
-
-		CommonResult commonResult = memberService.getMe(accessToken);
+		CommonResult commonResult = memberService.getMe();
 
 		return new CommonOutput(commonResult);
 
@@ -114,22 +107,14 @@ public class MemberController {
 	 * Valid를 이용하여 유효성 검사를 진행한다
 	 * </pre>
 	 * @param memberInputVo - 회원 정보 입력값
-	 * @param accessToken - 헤더에 저장된 accessToken
 	 * @return
 	 * @throws Exception
 	 */
 	@PutMapping(value = "/v1/ntool/api/me")
-	public CommonOutput updateMe(@RequestBody @Valid MemberInputVo memberInputVo,
-		@RequestHeader(value = JwtAdapter.HEADER_NAME, required = true) String accessToken)
+	public CommonOutput updateMe(@RequestBody @Valid MemberInputVo memberInputVo)
 		throws Exception {
 
-		// TODO : Integration Test를 위해 코드 추가. 이번 스프린트 권한 관리 작업 시 수정 예정
-		if (StringUtils.isEmpty(accessToken)) {
-			// TODO : Spring Security AccessToken 적용은 추후에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
-			accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
-		}
-
-		memberService.updateMe(memberInputVo, accessToken);
+		memberService.updateMe(memberInputVo);
 
 		return new CommonOutput();
 

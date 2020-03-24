@@ -5,6 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.LinkedHashMap;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +19,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.ApiUtils;
+import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.vo.notice.input.NoticeInputVo;
 import com.naver.pubtrans.itn.api.vo.notice.input.NoticeParameterVo;
@@ -39,11 +43,15 @@ public class NoticeControllerTest {
 	private ObjectMapper objectMapper;
 
 	private ApiUtils apiUtils;
+	
+	private LinkedHashMap<String, String> tokenMap;
 
 	@Before
 	public void setup() throws Exception {
 		//Api Test Utils 초기화
 		apiUtils = new ApiUtils(mockMvc, objectMapper);
+		
+		tokenMap = apiUtils.getTokenMap();
 	}
 
 	/**
@@ -59,6 +67,7 @@ public class NoticeControllerTest {
 		noticeInputVo.setImportantYn("Y");
 
 		mockMvc.perform(post("/v1/ntool/api/notice")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(noticeInputVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -81,6 +90,7 @@ public class NoticeControllerTest {
 		noticeInputVo.setImportantYn("Y");
 
 		mockMvc.perform(post("/v1/ntool/api/notice")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(noticeInputVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -97,9 +107,11 @@ public class NoticeControllerTest {
 	 */
 	@Test
 	public void caseSuccessGetNotice() throws Exception {
+
 		int seq = apiUtils.getNoticeSeq();
 
 		mockMvc.perform(get("/v1/ntool/api/notice/{seq}", seq)
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
 			.characterEncoding("UTF-8"))
@@ -115,7 +127,9 @@ public class NoticeControllerTest {
 	 */
 	@Test
 	public void caseNotMatchGetNotice() throws Exception {
+
 		mockMvc.perform(get("/v1/ntool/api/notice/{seq}", 0)
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 			.accept(MediaType.APPLICATION_JSON)
 			.characterEncoding("UTF-8"))
@@ -131,6 +145,7 @@ public class NoticeControllerTest {
 	 */
 	@Test
 	public void caseSuccessUpdateNotice() throws Exception {
+
 		int seq = apiUtils.getNoticeSeq();
 
 		NoticeInputVo noticeInputVo = new NoticeInputVo();
@@ -140,6 +155,7 @@ public class NoticeControllerTest {
 		noticeInputVo.setImportantYn("Y");
 
 		mockMvc.perform(put("/v1/ntool/api/notice")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(noticeInputVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -155,11 +171,13 @@ public class NoticeControllerTest {
 	 */
 	@Test
 	public void caseValidErrorUpdateNotice() throws Exception {
+
 		NoticeInputVo noticeInputVo = new NoticeInputVo();
 		noticeInputVo.setContent("test content");
 		noticeInputVo.setImportantYn("Y");
 
 		mockMvc.perform(put("/v1/ntool/api/notice")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(noticeInputVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -176,6 +194,7 @@ public class NoticeControllerTest {
 	 */
 	@Test
 	public void caseNotMatchUpdateNotice() throws Exception {
+
 		NoticeInputVo noticeInputVo = new NoticeInputVo();
 		noticeInputVo.setSeq(0);
 		noticeInputVo.setTitle("test notice");
@@ -183,6 +202,7 @@ public class NoticeControllerTest {
 		noticeInputVo.setImportantYn("Y");
 
 		mockMvc.perform(put("/v1/ntool/api/notice")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(noticeInputVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -199,12 +219,14 @@ public class NoticeControllerTest {
 	 */
 	@Test
 	public void caseSuccessDeleteNotice() throws Exception {
+
 		int seq = apiUtils.getNoticeSeq();
 
 		NoticeParameterVo noticeParameterVo = new NoticeParameterVo();
 		noticeParameterVo.setSeq(seq);
 
 		mockMvc.perform(delete("/v1/ntool/api/notice")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(noticeParameterVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -220,10 +242,12 @@ public class NoticeControllerTest {
 	 */
 	@Test
 	public void caseNotMatchDeleteNotice() throws Exception {
+
 		NoticeParameterVo noticeParameterVo = new NoticeParameterVo();
 		noticeParameterVo.setSeq(0);
 
 		mockMvc.perform(delete("/v1/ntool/api/notice")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(noticeParameterVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -240,7 +264,9 @@ public class NoticeControllerTest {
 	 */
 	@Test
 	public void caseExistsNoticeList() throws Exception {
+
 		mockMvc.perform(get("/v1/ntool/api/list/notice")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.param("pageNo", "1")
 			.param("listSize", "20")
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -257,7 +283,9 @@ public class NoticeControllerTest {
 	 */
 	@Test
 	public void caseNotExistsNoticeList() throws Exception {
+
 		mockMvc.perform(get("/v1/ntool/api/list/notice")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.param("searchType", "title")
 			.param("searchKeyword", "no_match_keyword")
 			.param("pageNo", "1")
@@ -276,7 +304,9 @@ public class NoticeControllerTest {
 	 */
 	@Test
 	public void caseNoticeSchema() throws Exception {
+
 		mockMvc.perform(get("/v1/ntool/api/schema/notice")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 			.characterEncoding("UTF-8"))
 			.andDo(print())

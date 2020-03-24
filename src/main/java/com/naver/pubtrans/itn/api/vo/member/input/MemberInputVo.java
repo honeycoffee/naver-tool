@@ -51,4 +51,9 @@ public class MemberInputVo {
 	@Size(max = 50)
 	private String company;
 
+	/**
+	 * 회원 권한 ID
+	 */
+	private String authid;
+
 }

@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.vo.auth.LoginVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
@@ -31,7 +32,7 @@ public class ApiUtils {
 	private MockMvc mockMvc;
 
 	private ObjectMapper objectMapper;
-
+	
 	public ApiUtils(MockMvc mockMvc, ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 		this.mockMvc = mockMvc;
@@ -71,6 +72,9 @@ public class ApiUtils {
 	 * @throws Exception
 	 */
 	public int getNoticeSeq() throws Exception {
+		
+		LinkedHashMap<String, String> tokenMap = this.getTokenMap();
+		String accessToken = tokenMap.get("accessToken");
 
 		NoticeInputVo noticeInputVo = new NoticeInputVo();
 		noticeInputVo.setTitle("test notice");
@@ -78,6 +82,7 @@ public class ApiUtils {
 		noticeInputVo.setImportantYn("Y");
 
 		MvcResult mvcResult = mockMvc.perform(post("/v1/ntool/api/notice")
+			.header(JwtAdapter.HEADER_NAME, accessToken)
 			.content(objectMapper.writeValueAsString(noticeInputVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)

@@ -192,7 +192,7 @@ public class MemberControllerDocumentTest {
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(commonSchemaList, memberOutputVo);
 
 		//given
-		given(memberService.getMe(anyString()))
+		given(memberService.getMe())
 			.willReturn(commonResult);
 
 		//when

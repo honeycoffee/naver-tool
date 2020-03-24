@@ -119,5 +119,34 @@
 		</if>
 
 	</sql>
+    
+	<insert id="insertMemberAuth" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
+		INSERT INTO 
+			tb_z_svc_member_auth(user_id, auth_id) 
+		VALUES
+			(#{userId}, #{authId})
+	</insert>
+    
+	<update id="updateMemberAuth" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
+		UPDATE
+			tb_z_svc_member_auth
+		SET
+			auth_id = #{authId}
+		WHERE
+			user_id = #{userId}
+	</update>
+	
+	<select id="selectMemberAuthList" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberAuthOutputVo">
+		SELECT
+			info.auth_id
+			, info.auth_name
+		FROM
+			tb_z_svc_member_auth `auth`
+			, tb_z_svc_auth_info `info`
+		WHERE
+			auth.auth_id = info.auth_id
+		AND
+			auth.user_id = #{userId}
+	</select>
 
 </mapper>

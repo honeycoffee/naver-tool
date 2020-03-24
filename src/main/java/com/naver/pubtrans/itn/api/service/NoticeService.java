@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
+import com.naver.pubtrans.itn.api.common.MemberUtil;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.PubTransTable;
@@ -56,10 +57,7 @@ public class NoticeService {
 	 */
 	public CommonResult insertNotice(NoticeInputVo noticeInputVo) throws Exception {
 
-		// TODO : AccessToken 적용은 추후에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
-		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
-
-		MemberOutputVo memberOutputVo = jwtAdapter.extractUserDataFromToken(accessToken);
+		MemberOutputVo memberOutputVo = MemberUtil.getMemberFromToken();
 
 		noticeInputVo.setRegUserId(memberOutputVo.getUserId());
 		noticeInputVo.setRegUserName(memberOutputVo.getUserName());
@@ -108,11 +106,8 @@ public class NoticeService {
 	 * @throws Exception 
 	 */
 	public void updateNotice(NoticeInputVo noticeInputVo) throws Exception {
-
-		// TODO : AccessToken 적용은 추후에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
-		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
-
-		MemberOutputVo memberOutputVo = jwtAdapter.extractUserDataFromToken(accessToken);
+		
+		MemberOutputVo memberOutputVo = MemberUtil.getMemberFromToken();
 
 		noticeInputVo.setRegUserId(memberOutputVo.getUserId());
 		noticeInputVo.setRegUserName(memberOutputVo.getUserName());
@@ -134,10 +129,7 @@ public class NoticeService {
 	 */
 	public void deleteNotice(NoticeSearchVo noticeSearchVo) throws Exception {
 
-		// TODO : AccessToken 적용은 추후에 작업 예정으로 test를 위해 만료기한 3개월의 accessToken 임시 사용 (userId : test, userPw : qwer1234)
-		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
-
-		MemberOutputVo memberOutputVo = jwtAdapter.extractUserDataFromToken(accessToken);
+		MemberOutputVo memberOutputVo = MemberUtil.getMemberFromToken();
 
 		if (StringUtils.isEmpty(memberOutputVo.getUserId())) {
 			throw new ApiException(ResultCode.MEMBER_DATA_NULL.getApiErrorCode(),

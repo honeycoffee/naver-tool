@@ -57,9 +57,9 @@ public class AuthController {
 	 * @throws Exception
 	 */
 	@PostMapping(value = "/v1/ntool/api/auth/refresh/token")
-	public CommonOutput refresh(HttpServletRequest request) throws Exception {
-
-		CommonResult commonResult = authService.refreshToken(request);
+	public CommonOutput refresh() throws Exception {
+		
+		CommonResult commonResult = authService.refreshToken();
 
 		return new CommonOutput(commonResult);
 
