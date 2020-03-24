@@ -77,6 +77,7 @@ public class MemberControllerTest {
 		memberInputVo.setUserName("test_name");
 		memberInputVo.setUserPw("qwer1234");
 		memberInputVo.setCompany("test_company");
+		memberInputVo.setAuthId(CommonConstant.ROLE_ADMIN);
 
 		mockMvc.perform(post("/v1/ntool/api/member")
 			.content(objectMapper.writeValueAsString(memberInputVo))

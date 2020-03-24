@@ -58,9 +58,13 @@
 		    , member.company
 		    , date_format(member.reg_date, '%Y.%m.%d') as reg_date
             , date_format(member.upd_date, '%Y.%m.%d') as upd_date 
+            , auth.auth_id
 		FROM
-		    tb_z_svc_member `member`
+			tb_z_svc_member `member`
+			, tb_z_svc_member_auth `auth`
 		WHERE
+			member.user_id = auth.user_id
+		AND
 			member.user_id = #{userId}
     </select>
 	
@@ -69,6 +73,12 @@
 			count(*) as total_list_cnt
 		FROM
 			tb_z_svc_member `member`
+			, tb_z_svc_member_auth `auth`
+			, tb_z_svc_auth_info `info`
+		WHERE
+			member.user_id = auth.user_id
+		AND
+			auth.auth_id = info.auth_id
 
 		<include refid="whereMemberList" />
 	</select>
@@ -79,8 +89,16 @@
 			, member.user_name
 			, member.company
 			, date_format(member.reg_date, '%Y.%m.%d') as reg_date
+			, auth.auth_id
+			, info.auth_name
 		FROM
 			tb_z_svc_member `member`
+			, tb_z_svc_member_auth `auth`
+			, tb_z_svc_auth_info `info`
+		WHERE
+			member.user_id = auth.user_id
+		AND
+			auth.auth_id = info.auth_id
 
 		<include refid="whereMemberList" />
 
@@ -115,7 +133,11 @@
 	<sql id="whereMemberList">
 
 		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(userName)">
-			WHERE member.user_name LIKE CONCAT(#{userName}, '%')
+			AND member.user_name LIKE CONCAT(#{userName}, '%')
+		</if>
+		
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(authId)">
+			AND auth.auth_id LIKE CONCAT(#{authId}, '%')
 		</if>
 
 	</sql>

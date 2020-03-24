@@ -56,12 +56,8 @@ public class JwtAdapter {
 	@Value("${security.jwt.secret-key}")
 	private String SECRET_KEY;
 
-	private MemberService memberService;
-
 	@Autowired
-	public JwtAdapter(MemberService memberService) {
-		this.memberService = memberService;
-	}
+	private MemberService memberService;
 
 	/**
 	 * 현재시간 기준에서 특정 시/일/월 만큼 더한다

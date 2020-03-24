@@ -16,7 +16,8 @@ public enum CodeType {
 	TASK_ASSIGN_TYPE("task_assign_type", "Task 할당 구분"),
 	TASK_DATA_TYPE("task_data_type", "Task 데이터 구분"),
 	CITYCODE("citycode", "도시코드"),
-	BUS_PROVIDER("provider_id", "BIS 데이터 공급지역");
+	BUS_PROVIDER("provider_id", "BIS 데이터 공급지역"),
+	AUTH_ID("auth_id", "권한 ID");
 
 	// 코드 타입
 	private String codeName;

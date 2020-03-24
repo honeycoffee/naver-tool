@@ -98,7 +98,9 @@ public interface CommonConstant {
 	// Test에 쓰이는 tokenMap Refresh Token Key 
 	String REFRESH_TOKEN = "refreshToken";
 	
-	// 회원가입 시 기본 적으로 부여하는 사용자 권한
+	// 회원가입 시 기본 적으로 부여하는 일반 사용자 권한
 	String ROLE_USER = "ROLE_USER";
 
+	// 회원가입 시 기본 적으로 부여하는 관리자 권한
+	String ROLE_ADMIN = "ROLE_ADMIN";
 }

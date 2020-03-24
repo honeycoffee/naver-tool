@@ -46,6 +46,15 @@
 		ORDER BY
 			provider_name asc
 	</select>
+	
+	<select id="selectAuthInfoList" resultType="com.naver.pubtrans.itn.api.vo.member.AuthInfoVo">
+		SELECT
+			info.auth_id
+			, info.auth_name
+			, info.auth_memo
+		FROM
+			tb_z_svc_auth_info `info`
+	</select>
 
 
 </mapper>

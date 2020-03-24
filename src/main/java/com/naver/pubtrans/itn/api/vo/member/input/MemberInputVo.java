@@ -54,6 +54,7 @@ public class MemberInputVo {
 	/**
 	 * 회원 권한 ID
 	 */
-	private String authid;
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	private String authId;
 
 }

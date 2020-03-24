@@ -22,20 +22,15 @@ import com.naver.pubtrans.itn.api.filter.JwtAuthenticationFilter;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	
-	private final JwtAdapter jwtAdapter;
+	private JwtAdapter jwtAdapter;
 	
 	@Autowired
 	WebSecurityConfig(JwtAdapter jwtAdapter){
 		this.jwtAdapter = jwtAdapter;
 	}
 	
-	
-
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		
-//		JwtAdapter jwtAdapter = new JwtAdapter();
 		
 		http
 			.httpBasic().disable()

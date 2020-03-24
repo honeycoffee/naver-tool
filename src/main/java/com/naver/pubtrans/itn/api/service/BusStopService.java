@@ -238,9 +238,9 @@ public class BusStopService {
 		List<CommonSchema> commonSchemaList = new ArrayList<>();
 
 		commonSchemaList.addAll(this.selectBusStopSchema());
-		commonSchemaList.addAll(this.selectBusStopInfoSchema());
-		commonSchemaList.addAll(this.selectBusStopMappingSchema());
-		commonSchemaList.addAll(taskService.selectTaskSchemaMinimal());
+//		commonSchemaList.addAll(this.selectBusStopInfoSchema());
+//		commonSchemaList.addAll(this.selectBusStopMappingSchema());
+//		commonSchemaList.addAll(taskService.selectTaskSchemaMinimal());
 
 		// 동일 컬럼에 대해 중복을 제거
 		List<CommonSchema> distinctCommonSchemaVoList = commonSchemaList.stream()

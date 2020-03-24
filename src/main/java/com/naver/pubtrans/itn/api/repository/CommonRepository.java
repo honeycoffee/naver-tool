@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.naver.pubtrans.itn.api.vo.common.BusProviderVo;
 import com.naver.pubtrans.itn.api.vo.common.CityCodeVo;
 import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
+import com.naver.pubtrans.itn.api.vo.member.AuthInfoVo;
 
 /**
  * 공통 Repository
@@ -41,6 +42,13 @@ public interface CommonRepository {
 	 * @throws DataAccessException
 	 */
 	List<BusProviderVo> selectBusProviderList() throws DataAccessException;
+
+	/**
+	 * 모든 권한 목록을 가져온다.
+	 * @return
+	 * @throws DataAccessException
+	 */
+	List<AuthInfoVo> selectAuthInfoList() throws DataAccessException;
 
 
 

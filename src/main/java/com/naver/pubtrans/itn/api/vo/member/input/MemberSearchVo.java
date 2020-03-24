@@ -24,4 +24,9 @@ public class MemberSearchVo extends SearchVo {
 	 */
 	private String userName;
 
+	/**
+	 * 회원 권한 ID
+	 */
+	private String authId;
+
 }

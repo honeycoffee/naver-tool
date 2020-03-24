@@ -8,12 +8,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.extern.slf4j.Slf4j;
-
+import com.naver.pubtrans.itn.api.common.MemberUtil;
 import com.naver.pubtrans.itn.api.service.AuthService;
 import com.naver.pubtrans.itn.api.vo.auth.LoginVo;
+import com.naver.pubtrans.itn.api.vo.auth.input.AuthInputVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 네이버 대중교통 DB 내재화 인증관리 컨트롤러
@@ -48,6 +50,23 @@ public class AuthController {
 		CommonResult commonResult = authService.loginMember(loginVo, request);
 
 		return new CommonOutput(commonResult);
+
+	}
+
+	/**
+	 * 로그아웃을 처리한다.
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping(value = "/v1/ntool/api/auth/logout")
+	public CommonOutput logout() throws Exception {
+
+		AuthInputVo authInputVo = new AuthInputVo();
+		authInputVo.setUserId(MemberUtil.getMemberFromToken().getUserId());
+		
+		authService.deleteMemberTokenInfo(authInputVo);
+
+		return new CommonOutput();
 
 	}
 

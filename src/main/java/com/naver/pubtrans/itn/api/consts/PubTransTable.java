@@ -32,6 +32,7 @@ public enum PubTransTable {
 	TB_TRIPS("tb_trips", "각 경로에 대한 이동 정보"),
 
 	TB_Z_SVC_MEMBER("tb_z_svc_member", "회원정보"),
+	TB_Z_SVC_AUTH_INFO("tb_z_svc_auth_info", "권한정보"),
 	TB_Z_SVC_NOTICE("tb_z_svc_notice", "공지사항"),
 	TB_Z_SVC_TASK("tb_z_svc_task", "작업정보");
 

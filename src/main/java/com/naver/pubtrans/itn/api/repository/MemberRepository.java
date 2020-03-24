@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
+import com.naver.pubtrans.itn.api.vo.member.AuthInfoVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthOutputVo;
@@ -83,7 +84,7 @@ public interface MemberRepository {
 	List<MemberOutputVo> selectMemberList(MemberSearchVo memberSearchVo) throws DataAccessException;
 
 	/**
-	 * 회원 권한 목록을 가져온다.
+	 * 회원의 권한 목록을 가져온다.
 	 * @param memberSearchVo - 회원 검색 조건
 	 * @return
 	 * @throws DataAccessException

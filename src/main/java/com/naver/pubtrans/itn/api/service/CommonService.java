@@ -22,6 +22,7 @@ import com.naver.pubtrans.itn.api.vo.common.CityCodeVo;
 import com.naver.pubtrans.itn.api.vo.common.FieldValue;
 import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
+import com.naver.pubtrans.itn.api.vo.member.AuthInfoVo;
 
 /**
  * 공통 서비스
@@ -79,6 +80,22 @@ public class CommonService {
 		List<FieldValue> fieldValueList = new ArrayList<>();
 		for(BusProviderVo vo : busProviderVoList) {
 			fieldValueList.add(new FieldValue(String.valueOf(vo.getProviderId()), vo.getProviderName()));
+		}
+
+		return fieldValueList;
+	}
+
+
+	/**
+	 * 회원 권한 목록 가져오기
+	 * @return
+	 */
+	public List<FieldValue> selectAuthInfoListAll(){
+		List<AuthInfoVo> AuthInfoVoList = commonRepository.selectAuthInfoList();
+
+		List<FieldValue> fieldValueList = new ArrayList<>();
+		for(AuthInfoVo vo : AuthInfoVoList) {
+			fieldValueList.add(new FieldValue(String.valueOf(vo.getAuthId()), vo.getAuthName()));
 		}
 
 		return fieldValueList;
@@ -176,6 +193,7 @@ public class CommonService {
 		fieldValuesMap.put("center_stop_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
 		fieldValuesMap.put("city_code", this.selectCommonCode(CodeType.CITYCODE.getCodeName()));
 		fieldValuesMap.put("provider_id", this.selectCommonCode(CodeType.BUS_PROVIDER.getCodeName()));
+		fieldValuesMap.put("auth_id", this.selectCommonCode(CodeType.AUTH_ID.getCodeName()));
 
 
 		return fieldValuesMap;
@@ -196,6 +214,8 @@ public class CommonService {
 				fieldValueList = this.selectCityCodeAll();
 			}else if(codeType.getCodeName().equals(CodeType.BUS_PROVIDER.getCodeName())) {		// BIS 공급지역
 				fieldValueList = this.selectBusProviderListAll();
+			}else if(codeType.getCodeName().equals(CodeType.AUTH_ID.getCodeName())) {		// 회원 권한 ID
+				fieldValueList = this.selectAuthInfoListAll();
 			}else if(codeType.getCodeName().equals(CodeType.Y_N.getCodeName())) {					// Y/N 선택
 				FieldValue fY = new FieldValue(CommonConstant.Y, CommonConstant.Y);
 				FieldValue fN = new FieldValue(CommonConstant.N, CommonConstant.N);
