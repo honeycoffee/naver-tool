@@ -6,6 +6,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.naver.pubtrans.itn.api.common.MemberPasswordEncoder;
@@ -20,8 +25,8 @@ import com.naver.pubtrans.itn.api.vo.common.PagingVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
-import com.naver.pubtrans.itn.api.vo.member.input.MemberParameterVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthOutputVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
@@ -30,24 +35,22 @@ import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
  *
  */
 @Service
-public class MemberService {
+public class MemberService implements UserDetailsService {
 
 	private final OutputFmtUtil outputFmtUtil;
 
 	private final CommonService commonService;
-
-	private final MemberUtil memberUtil;
 
 	private final MemberRepository memberRepository;
 
 	private final MemberPasswordEncoder memberPasswordEncoder;
 
 	@Autowired
-	MemberService(OutputFmtUtil outputFmtUtil, CommonService commonService, MemberUtil memberUtil,
-		MemberRepository memberRepository, MemberPasswordEncoder memberPasswordEncoder) {
+	MemberService(OutputFmtUtil outputFmtUtil, CommonService commonService, 
+		MemberRepository memberRepository,
+		MemberPasswordEncoder memberPasswordEncoder) {
 		this.outputFmtUtil = outputFmtUtil;
 		this.commonService = commonService;
-		this.memberUtil = memberUtil;
 		this.memberRepository = memberRepository;
 		this.memberPasswordEncoder = memberPasswordEncoder;
 	}
@@ -68,6 +71,7 @@ public class MemberService {
 		}
 
 		memberInputVo.setUserPw(memberPasswordEncoder.encode(memberInputVo.getUserPw()));
+		memberInputVo.setAuthid(CommonConstant.ROLE_USER);
 
 		memberRepository.insertMember(memberInputVo);
 	}
@@ -145,9 +149,9 @@ public class MemberService {
 	 * @param accessToken - API 호출 accessToken
 	 * @throws Exception
 	 */
-	public CommonResult getMe(String accessToken) throws Exception {
+	public CommonResult getMe() throws Exception {
 
-		String userId = memberUtil.getUserIdFromToken(accessToken);
+		String userId = MemberUtil.getUserIdFromToken();
 
 		MemberSearchVo memberSearchVo = new MemberSearchVo();
 		memberSearchVo.setUserId(userId);
@@ -164,10 +168,10 @@ public class MemberService {
 	 * @param accessToken - API 호출 accessToken
 	 * @throws Exception
 	 */
-	public void updateMe(MemberInputVo memberInputVo, String accessToken) throws Exception {
+	public void updateMe(MemberInputVo memberInputVo) throws Exception {
 
-		String userId = memberUtil.getUserIdFromToken(accessToken);
-
+		String userId = MemberUtil.getUserIdFromToken();
+		
 		if (!memberInputVo.getUserId().equals(userId)) {
 			throw new ApiException(ResultCode.MEMBER_TOKEN_NOT_MATCH.getApiErrorCode(),
 				ResultCode.MEMBER_TOKEN_NOT_MATCH.getDisplayMessage());
@@ -301,6 +305,69 @@ public class MemberService {
 			this.getMember(memberSearchVo));
 
 		return commonResult;
+	}
+
+	/**
+	 * 회원 권한 목록을 가져온다.
+	 * @param memberSearchVo - 회원 검색조건
+	 * @return
+	 */
+	public List<MemberAuthOutputVo> selectMemberAuthList(MemberSearchVo memberSearchVo) {
+
+		List<MemberAuthOutputVo> memberAuthOutputVoList = memberRepository.selectMemberAuthList(memberSearchVo);
+
+		return memberAuthOutputVoList;
+
+	}
+
+	/**
+	 * 권한 ID만 있는 배열을 생성한다..
+	 * @param memberSearchVo - 회원 검색조건
+	 * @return
+	 */
+	public String[] getMemberAuthArray(MemberSearchVo memberSearchVo) {
+
+		List<MemberAuthOutputVo> memberAuthOutputVoList = this.selectMemberAuthList(memberSearchVo);
+		
+		int cnt = 0;
+		String[] memberAuthArray = new String[memberAuthOutputVoList.size()];
+		
+		for(MemberAuthOutputVo memberAuthOutputVo : memberAuthOutputVoList) {
+			memberAuthArray[cnt++] = memberAuthOutputVo.getAuthId();
+		}
+
+		return memberAuthArray;
+
+	}
+
+	/**
+	 * Spring Security 에서 권한 검증을 위한 정보를 가져온다.
+	 * @param userId - 회원 ID
+	 * @return
+	 */
+	@Override
+	public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+
+		MemberSearchVo memberSearchVo = new MemberSearchVo();
+		memberSearchVo.setUserId(userId);
+
+		MemberOutputVo memberOutputVo = memberRepository.getMember(memberSearchVo);
+		MemberAuthOutputVo returnMemberAuthOutputVo = new MemberAuthOutputVo();
+
+		returnMemberAuthOutputVo.setUserId(memberOutputVo.getUserId());
+		returnMemberAuthOutputVo.setUsername(memberOutputVo.getUserName());
+
+		List<MemberAuthOutputVo> memberAuthOutputVoList = this.selectMemberAuthList(memberSearchVo);
+		List<GrantedAuthority> grantedAuthorityList = new ArrayList<GrantedAuthority>();
+
+		for (MemberAuthOutputVo memberAuthOutputVo : memberAuthOutputVoList) {
+			grantedAuthorityList.add(new SimpleGrantedAuthority(memberAuthOutputVo.getAuthId()));
+		}
+
+		returnMemberAuthOutputVo.setAuthorities(grantedAuthorityList);
+
+		return returnMemberAuthOutputVo;
+
 	}
 
 }

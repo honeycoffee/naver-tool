@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.ApiUtils;
+import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.vo.auth.LoginVo;
 
@@ -41,11 +42,16 @@ public class AuthControllerTest {
 	private ObjectMapper objectMapper;
 
 	private ApiUtils apiUtils;
+	
+	// 테스트 header에 전달 될 Token Map
+	private LinkedHashMap<String, String> tokenMap;
 
 	@Before
 	public void setup() throws Exception {
 		//Api Test Utils 초기화
 		apiUtils = new ApiUtils(mockMvc, objectMapper);
+		
+		tokenMap = apiUtils.getTokenMap();
 	}
 
 	/**
@@ -126,12 +132,8 @@ public class AuthControllerTest {
 		loginVo.setUserId("test");
 		loginVo.setUserPw("qwer1234");
 
-		LinkedHashMap<String, String> tokenMap = apiUtils.getTokenMap();
-
-		String refreshToken = tokenMap.get("refreshToken");
-
 		mockMvc.perform(post("/v1/ntool/api/auth/refresh/token")
-			.header(JwtAdapter.HEADER_NAME, refreshToken)
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.REFRESH_TOKEN))
 			.content(objectMapper.writeValueAsString(loginVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)

@@ -47,7 +47,7 @@ dependencies {
 
 
 	// MySQL
-	runtimeOnly 'mysql:mysql-connector-java:5.1.29'
+	runtimeOnly 'mysql:mysql-connector-java'
 
 	// Mybatis
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.0'

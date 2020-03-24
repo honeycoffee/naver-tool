@@ -4,8 +4,14 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
@@ -15,9 +21,12 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
+import com.naver.pubtrans.itn.api.common.MemberUtil;
+import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.common.Util;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.exception.AccessTokenNotFoundException;
+import com.naver.pubtrans.itn.api.service.MemberService;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
@@ -34,12 +43,25 @@ public class JwtAdapter {
 	// 회원ID Claim value Key
 	public static final String USER_ID = "userId";
 
-	// 회원ID Claim value Key
+	// 회원이름 Claim value Key
 	public static final String USER_NAME = "userName";
+
+	// 회원권한 Claim value Key
+	public static final String ROLES = "roles";
+
+	// API 호출 시 Header에 있는 token
+	public static String TOKEN = "";
 
 	// JWT Secret Key
 	@Value("${security.jwt.secret-key}")
 	private String SECRET_KEY;
+
+	private MemberService memberService;
+
+	@Autowired
+	public JwtAdapter(MemberService memberService) {
+		this.memberService = memberService;
+	}
 
 	/**
 	 * 현재시간 기준에서 특정 시/일/월 만큼 더한다
@@ -66,16 +88,17 @@ public class JwtAdapter {
 	 * @param add - 단위에 더할 기간
 	 * @return
 	 */
-	public String createToken(MemberOutputVo memberOutputVo, ChronoUnit chronoUnit, int add) {
+	public String createToken(MemberOutputVo memberOutputVo, String[] memberAuthArray, ChronoUnit chronoUnit, int add) {
 
 		Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
-
+		
 		String token = JWT.create()
 			.withClaim(USER_ID, memberOutputVo.getUserId())
 			.withClaim(USER_NAME, memberOutputVo.getUserName())
+			.withArrayClaim(ROLES, memberAuthArray)
 			.withExpiresAt(getDateForExpire(chronoUnit, add))
 			.sign(algorithm);
-
+		
 		return token;
 	}
 
@@ -117,6 +140,41 @@ public class JwtAdapter {
 		}
 
 		return memberOutputVo;
+	}
+
+	/**
+	 * AccessToken 으로 회원 ID를 가져온다.
+	 * accessToken : 회원정보를 추출할 토큰
+	 * @return
+	 */
+	public String getUserIdFromToken(String accessToken) throws Exception {
+
+		MemberOutputVo memberOutputVo = this.extractUserDataFromToken(accessToken);
+		return memberOutputVo.getUserId();
+
+	}
+
+	/**
+	 * 토큰에서 회원 정보를 추출한다
+	 * request - HttpServletRequest Interface
+	 * return
+	 */
+	public String getTokenFromHeader(HttpServletRequest request) {
+		return request.getHeader(HEADER_NAME);
+	}
+
+	/**
+	 * 토큰 내 회원의 권한을 가져온다. 
+	 * @param token
+	 * @return
+	 * @throws AccessTokenNotFoundException 
+	 */
+
+	public Authentication getAuthentication(String token) throws AccessTokenNotFoundException {
+		MemberOutputVo memberOutputVo = this.extractUserDataFromToken(token);
+
+		UserDetails userDetails = memberService.loadUserByUsername(memberOutputVo.getUserId());
+		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 	}
 
 }

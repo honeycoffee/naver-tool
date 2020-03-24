@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.ApiUtils;
+import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.service.MemberService;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
@@ -47,11 +48,15 @@ public class MemberControllerTest {
 	private MemberService memberService;
 
 	private ApiUtils apiUtils;
+	
+	private LinkedHashMap<String, String> tokenMap;
 
 	@Before
 	public void setup() throws Exception {
 		//Api Test Utils 초기화
 		apiUtils = new ApiUtils(mockMvc, objectMapper);
+		
+		tokenMap = apiUtils.getTokenMap();
 	}
 
 	/**
@@ -149,11 +154,8 @@ public class MemberControllerTest {
 	@Test
 	public void caseSuccessGetMe() throws Exception {
 
-		LinkedHashMap<String, String> tokenMap = apiUtils.getTokenMap();
-		String accessToken = tokenMap.get("accessToken");
-
 		mockMvc.perform(get("/v1/ntool/api/me")
-			.header(JwtAdapter.HEADER_NAME, accessToken)
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 			.accept(MediaType.APPLICATION_JSON)
 			.characterEncoding("UTF-8"))
@@ -165,35 +167,11 @@ public class MemberControllerTest {
 	}
 
 	/**
-	 * 자신의 정보 조회 - 만료된 토큰으로 조회 했을 때
-	 * @throws Exception
-	 */
-	@Test
-	public void caseExpiredAccessTokenGetMe() throws Exception {
-
-		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RVc2VyMTExIiwiZXhwIjoxNTgzNzg1MDgzLCJ1c2VySWQiOiIzMzMzIn0.piLNmfoXMYZIh4_-k3Qut7mwqvkjvzItpVwZXJX5zBw";
-
-		mockMvc.perform(get("/v1/ntool/api/me")
-			.header(JwtAdapter.HEADER_NAME, accessToken)
-			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-			.accept(MediaType.APPLICATION_JSON)
-			.characterEncoding("UTF-8"))
-			.andDo(print())
-			.andExpect(status().is4xxClientError())
-			.andExpect(jsonPath("$.code", is(ResultCode.AUTH_TOKEN_EXPIRED.getApiErrorCode())))
-			.andExpect(jsonPath("$.message", is(ResultCode.AUTH_TOKEN_EXPIRED.getDisplayMessage())));
-
-	}
-
-	/**
 	 * 자신의 정보 수정 - 정상적으로 수정 됐을 때
 	 * @throws Exception
 	 */
 	@Test
 	public void caseSuccessUpdateMe() throws Exception {
-
-		LinkedHashMap<String, String> tokenMap = apiUtils.getTokenMap();
-		String accessToken = tokenMap.get("accessToken");
 
 		MemberInputVo memberInputVo = new MemberInputVo();
 		memberInputVo.setUserId("test");
@@ -203,7 +181,7 @@ public class MemberControllerTest {
 		memberInputVo.setCompany("test_company");
 
 		mockMvc.perform(put("/v1/ntool/api/me")
-			.header(JwtAdapter.HEADER_NAME, accessToken)
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(memberInputVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -221,9 +199,6 @@ public class MemberControllerTest {
 	@Test
 	public void caseValidErrorUpdateMe() throws Exception {
 
-		LinkedHashMap<String, String> tokenMap = apiUtils.getTokenMap();
-		String accessToken = tokenMap.get("accessToken");
-
 		MemberInputVo memberInputVo = new MemberInputVo();
 		memberInputVo.setUserName("test_name");
 		memberInputVo.setCurrentUserPw("qwer1234");
@@ -231,7 +206,7 @@ public class MemberControllerTest {
 		memberInputVo.setCompany("test_company");
 
 		mockMvc.perform(put("/v1/ntool/api/me")
-			.header(JwtAdapter.HEADER_NAME, accessToken)
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(memberInputVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -242,34 +217,6 @@ public class MemberControllerTest {
 			.andExpect(jsonPath("$.message", is("[userId](은)는 " + ResultCode.PARAMETER_ERROR.getDisplayMessage())));
 
 	}
-
-	/**
-	 * 자신의 정보 수정 - 만료된 토큰으로 수정 했을 때
-	 * @throws Exception
-	 */
-	@Test
-	public void caseExpiredAccessTokenUpdateMe() throws Exception {
-
-		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RVc2VyMTExIiwiZXhwIjoxNTgzNzg1MDgzLCJ1c2VySWQiOiIzMzMzIn0.piLNmfoXMYZIh4_-k3Qut7mwqvkjvzItpVwZXJX5zBw";
-
-		MemberInputVo memberInputVo = new MemberInputVo();
-		memberInputVo.setUserId("test");
-		memberInputVo.setUserName("test_name");
-		memberInputVo.setCurrentUserPw("qwer1234");
-		memberInputVo.setUserPw("qwer1234");
-		memberInputVo.setCompany("test_company");
-
-		mockMvc.perform(put("/v1/ntool/api/me")
-			.header(JwtAdapter.HEADER_NAME, accessToken)
-			.content(objectMapper.writeValueAsString(memberInputVo))
-			.contentType(MediaType.APPLICATION_JSON)
-			.accept(MediaType.APPLICATION_JSON)
-			.characterEncoding("UTF-8"))
-			.andDo(print())
-			.andExpect(status().is4xxClientError())
-			.andExpect(jsonPath("$.code", is(ResultCode.AUTH_TOKEN_EXPIRED.getApiErrorCode())))
-			.andExpect(jsonPath("$.message", is(ResultCode.AUTH_TOKEN_EXPIRED.getDisplayMessage())));
-	}
 	
 	/**
 	 * 자신의 정보 수정 - 현재 비밀번호를 잘 못 입력 했을 때
@@ -278,10 +225,6 @@ public class MemberControllerTest {
 	@Test
 	public void caseNotMatchCurrentPasswordUpdateMe() throws Exception {
 
-
-		LinkedHashMap<String, String> tokenMap = apiUtils.getTokenMap();
-		String accessToken = tokenMap.get("accessToken");
-
 		MemberInputVo memberInputVo = new MemberInputVo();
 		memberInputVo.setUserId("test");
 		memberInputVo.setUserName("test_name");
@@ -289,7 +232,7 @@ public class MemberControllerTest {
 		memberInputVo.setCompany("test_company");
 
 		mockMvc.perform(put("/v1/ntool/api/me")
-			.header(JwtAdapter.HEADER_NAME, accessToken)
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(memberInputVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -306,7 +249,9 @@ public class MemberControllerTest {
 	 */
 	@Test
 	public void caseSuccessGetMember() throws Exception {
+
 		mockMvc.perform(get("/v1/ntool/api/member/{userId}", "test")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 			.accept(MediaType.APPLICATION_JSON)
 			.characterEncoding("UTF-8"))
@@ -322,7 +267,9 @@ public class MemberControllerTest {
 	 */
 	@Test
 	public void caseNotMatchGetMember() throws Exception {
+
 		mockMvc.perform(get("/v1/ntool/api/member/{userId}", "no_match_user")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 			.accept(MediaType.APPLICATION_JSON)
 			.characterEncoding("UTF-8"))
@@ -338,12 +285,14 @@ public class MemberControllerTest {
 	 */
 	@Test
 	public void caseSuccessUpdateMember() throws Exception {
+
 		MemberInputVo memberInputVo = new MemberInputVo();
 		memberInputVo.setUserId("test");
 		memberInputVo.setUserName("test_name");
 		memberInputVo.setCompany("test_company");
 
 		mockMvc.perform(put("/v1/ntool/api/member")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(memberInputVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -359,12 +308,14 @@ public class MemberControllerTest {
 	 */
 	@Test
 	public void caseValidErrorUpdateMember() throws Exception {
+
 		MemberInputVo memberInputVo = new MemberInputVo();
 		memberInputVo.setUserName("test_name");
 		memberInputVo.setUserPw("qwer1234");
 		memberInputVo.setCompany("test_company");
 
 		mockMvc.perform(put("/v1/ntool/api/member")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(memberInputVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -389,6 +340,7 @@ public class MemberControllerTest {
 		memberInputVo.setCompany("test_company");
 
 		mockMvc.perform(put("/v1/ntool/api/member")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(memberInputVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -405,10 +357,12 @@ public class MemberControllerTest {
 	 */
 	@Test
 	public void caseSuccessDeleteMember() throws Exception {
+
 		MemberParameterVo memberParameterVo = new MemberParameterVo();
 		memberParameterVo.setUserId("test");
 
 		mockMvc.perform(delete("/v1/ntool/api/member")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(memberParameterVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -424,10 +378,12 @@ public class MemberControllerTest {
 	 */
 	@Test
 	public void caseNotMatchDeleteMember() throws Exception {
+
 		MemberParameterVo memberParameterVo = new MemberParameterVo();
 		memberParameterVo.setUserId("no_match_user");
 
 		mockMvc.perform(delete("/v1/ntool/api/member")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.content(objectMapper.writeValueAsString(memberParameterVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -444,7 +400,9 @@ public class MemberControllerTest {
 	 */
 	@Test
 	public void caseExistsMemberList() throws Exception {
+
 		mockMvc.perform(get("/v1/ntool/api/list/member")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.param("pageNo", "1")
 			.param("listSize", "20")
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -461,7 +419,9 @@ public class MemberControllerTest {
 	 */
 	@Test
 	public void caseNotExistsMemberList() throws Exception {
+
 		mockMvc.perform(get("/v1/ntool/api/list/member")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.param("userName", "no_match_user")
 			.param("pageNo", "1")
 			.param("listSize", "20")
@@ -479,7 +439,9 @@ public class MemberControllerTest {
 	 */
 	@Test
 	public void caseMemberSchema() throws Exception {
+
 		mockMvc.perform(get("/v1/ntool/api/schema/member")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 			.characterEncoding("UTF-8"))
 			.andDo(print())

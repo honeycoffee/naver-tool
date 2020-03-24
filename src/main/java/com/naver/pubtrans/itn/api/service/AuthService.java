@@ -1,6 +1,7 @@
 package com.naver.pubtrans.itn.api.service;
 
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,6 +14,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.MemberPasswordEncoder;
+import com.naver.pubtrans.itn.api.common.MemberUtil;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.common.Util;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
@@ -25,6 +27,7 @@ import com.naver.pubtrans.itn.api.vo.auth.input.AuthInputVo;
 import com.naver.pubtrans.itn.api.vo.auth.output.AuthOutputVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthOutputVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
@@ -108,7 +111,13 @@ public class AuthService {
 
 		MemberOutputVo memberOutputVo = jwtAdapter.extractUserDataFromToken(refreshToken);
 
-		String accessToken = jwtAdapter.createToken(memberOutputVo, ChronoUnit.HOURS, 1);
+		MemberSearchVo memberSearchVo = new MemberSearchVo();
+		memberSearchVo.setUserId(memberOutputVo.getUserId());
+
+		String[] memberAuthArray = memberService.getMemberAuthArray(memberSearchVo);
+
+		String accessToken = jwtAdapter.createToken(memberOutputVo, memberAuthArray, ChronoUnit.HOURS,
+			CommonConstant.ACCESS_TOKEN_EXPIRE_TIME);
 
 		return accessToken;
 	}
@@ -130,6 +139,7 @@ public class AuthService {
 
 		// 로그인 정보로 회원 데이터 조회
 		MemberOutputVo memberOutputVo = memberService.getMember(memberSearchVo);
+		String[] memberAuthArray = memberService.getMemberAuthArray(memberSearchVo);
 
 		if (memberOutputVo == null) {
 			throw new ApiException(ResultCode.MEMBER_DATA_NULL.getApiErrorCode(),
@@ -150,7 +160,8 @@ public class AuthService {
 
 		authInputVo.setLoginSuccessYn(CommonConstant.Y);
 
-		String refreshToken = jwtAdapter.createToken(memberOutputVo, ChronoUnit.HOURS, 12);
+		String refreshToken = jwtAdapter.createToken(memberOutputVo, memberAuthArray, ChronoUnit.HOURS,
+			CommonConstant.REFRESH_TOKEN_EXPIRE_TIME);
 		String accessToken = this.createAccessToken(refreshToken);
 
 		authInputVo.setRefreshToken(refreshToken);
@@ -169,15 +180,14 @@ public class AuthService {
 
 	/**
 	 * JWT refresh_token으로 access_token을 갱신한다.
-	 * @param request - HttpServletRequest Interface
 	 * @return
 	 * @throws Exception 
 	 */
-	public CommonResult refreshToken(HttpServletRequest request) throws Exception {
+	public CommonResult refreshToken() throws Exception {
 
 		AuthInputVo authInputVo = new AuthInputVo();
 
-		String refreshToken = request.getHeader(JwtAdapter.HEADER_NAME);
+		String refreshToken = MemberUtil.TOKEN;
 
 		authInputVo.setRefreshToken(refreshToken);
 
