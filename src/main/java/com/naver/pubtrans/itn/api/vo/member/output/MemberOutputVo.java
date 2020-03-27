@@ -1,6 +1,7 @@
 package com.naver.pubtrans.itn.api.vo.member.output;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -44,5 +45,16 @@ public class MemberOutputVo {
 	 * 수정일
 	 */
 	private String updDate;
+
+	/**
+	 * 권한 ID 
+	 */
+	private String authorityId;
+
+	/**
+	 * 권한 이름 
+	 */
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	private String authorityName;
 
 }

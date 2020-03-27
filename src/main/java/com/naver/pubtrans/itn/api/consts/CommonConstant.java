@@ -12,7 +12,6 @@ public interface CommonConstant {
 	String YES = "YES";
 	String NO = "NO";
 
-
 	// 문자형
 	String STRING = "string";
 
@@ -72,7 +71,7 @@ public interface CommonConstant {
 	String KEY_TASK = "taskId";
 
 	// 버스정류장 Task 입력 정보 VO명
-	String BUS_STOP_TASK_INPUT_VO = "BusStopTaskInputVo" ;
+	String BUS_STOP_TASK_INPUT_VO = "BusStopTaskInputVo";
 
 	// geojson Geometry  type - LineString 명칭
 	String GEOJSON_GEOMETRY_TYPE_LINE_STRING = "LineString";
@@ -85,20 +84,38 @@ public interface CommonConstant {
 
 	// 비밀번호 최소 값
 	int PASSWORD_MIN = 8;
-	
-	// access_token 만료 시간
-	int ACCESS_TOKEN_EXPIRE_TIME = 1;
-	
-	// refresh_token 만료 시간
-	int REFRESH_TOKEN_EXPIRE_TIME = 24;
-	
+
+	// 버스 정류장 매핑 정보에 존재하지 않는 BIS 정류장 메시지
+	String NONEXISTENT_BIS_BUS_STOP_IN_BUS_STOP_MAPPING = "BIS 경유 정류장이 변경되었으나, 일부 버스 정류장이 버스 정류장 매핑 정보에 존재하지 않습니다. 정류장 매핑 정보에 존재하지 않는 BIS 정류장 ID-";
+
+	// 개행문자
+	String NEWLINE = "\n";
+
+	// 날짜 시간 포맷
+	String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+	// access_token 만료 초단위 (3600 = 1시간)
+	int ACCESS_TOKEN_EXPIRE_TIME_SEC = 3600;
+
+	// refresh_token 만료 초 단위 (86400 = 24시간)
+	int REFRESH_TOKEN_EXPIRE_TIME_SEC = 86400;
+
 	// Test에 쓰이는 tokenMap Access Token Key 
-	String ACCESS_TOKEN = "accessToken";
-	
+	String TOKEN_MAP_ACCESS_TOKEN_KEY_FOR_TEST_CASE = "accessToken";
+
 	// Test에 쓰이는 tokenMap Refresh Token Key 
-	String REFRESH_TOKEN = "refreshToken";
+	String TOKEN_MAP_REFRESH_TOKEN_KEY_FOR_TEST_CASE = "refreshToken";
+
+	// Spring Security Config에서 접근 제어에 사용되는 관리자 권한 명
+	String ADMIN = "ADMIN";
 	
-	// 회원가입 시 기본 적으로 부여하는 사용자 권한
-	String ROLE_USER = "ROLE_USER";
+	// Spring Security Config에서 접근 제어에 사용되는 사용자 권한 명
+	String USER = "USER";
+	
+	// Spring Security Config에서 접근 제어에 사용되는 익명 사용자 권한 명
+	String ANONYMOUS = "ANONYMOUS";
+	
+	// 토큰 갱신 API URI
+	String REFRESH_TOKEN_API_URI = "/refresh/token";
 
 }

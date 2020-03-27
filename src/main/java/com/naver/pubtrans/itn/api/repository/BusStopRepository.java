@@ -6,6 +6,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
 import com.naver.pubtrans.itn.api.vo.bus.stop.BusRouteVo;
+import com.naver.pubtrans.itn.api.vo.bus.stop.BusStopMappingVo;
 import com.naver.pubtrans.itn.api.vo.bus.stop.BusStopTaskVo;
 import com.naver.pubtrans.itn.api.vo.bus.stop.BusStopVo;
 import com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo;
@@ -109,5 +110,13 @@ public interface BusStopRepository {
 	 * @throws DataAccessException
 	 */
 	void updateBusStopMappingTask(BusStopTaskInputVo busStopTaskInputVo) throws DataAccessException;
+
+	/**
+	 * 버스 정류장 매핑 정보에서 BIS 정류장 ID에 매핑된 네이버 버스 정류장 ID를 가져온다.매핑된 네이버 버스 정류장 ID가 없는경우 null 값이 리턴된다.
+	 * @param busStopMappingVo - BIS 정류장 정보
+	 * @return
+	 * @throws DataAccessException
+	 */
+	Integer getBusStopIdMappedToBisStopId(BusStopMappingVo busStopMappingVo) throws DataAccessException;
 
 }

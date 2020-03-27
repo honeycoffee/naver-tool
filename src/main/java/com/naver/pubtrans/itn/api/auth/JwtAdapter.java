@@ -47,19 +47,16 @@ public class JwtAdapter {
 	public static final String USER_NAME = "userName";
 
 	// 회원권한 Claim value Key
-	public static final String ROLES = "roles";
-
-	// API 호출 시 Header에 있는 token
-	public static String TOKEN = "";
+	public static final String AUTHORITIES = "authorities";
 
 	// JWT Secret Key
 	@Value("${security.jwt.secret-key}")
 	private String SECRET_KEY;
 
-	private MemberService memberService;
-
+	private final MemberService memberService;
+	
 	@Autowired
-	public JwtAdapter(MemberService memberService) {
+	JwtAdapter(MemberService memberService) {
 		this.memberService = memberService;
 	}
 
@@ -80,22 +77,23 @@ public class JwtAdapter {
 	/**
 	 * 엑세스 토큰을 생성한다
 	 * <pre>
-	 *  - 24시간 토큰 생성 예 : createToken(userId, ChronoUnit.HOURS, 24)
-	 *  - 1주일 토큰 생성 예 : createToken(userId, ChronoUnit.WEEKS, 1)
+	 *  - 24시간 토큰 생성 예 : createToken(memberOutputVo, memberAuthorityIdArray, ChronoUnit.HOURS, 24)
+	 *  - 1주일 토큰 생성 예 : createToken(memberOutputVo, memberAuthorityIdArray, ChronoUnit.WEEKS, 1)
 	 * </pre>
 	 * @param memberOutputVo - 회원 데이터 출력 Vo
+	 * @param memberAuthorityIdArray - 회원 권한 ID array
 	 * @param chronoUnit - 토큰 만료 기간 단위
 	 * @param add - 단위에 더할 기간
 	 * @return
 	 */
-	public String createToken(MemberOutputVo memberOutputVo, String[] memberAuthArray, ChronoUnit chronoUnit, int add) {
+	public String createToken(MemberOutputVo memberOutputVo, String[] memberAuthorityIdArray, ChronoUnit chronoUnit, int add) {
 
 		Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
 		
 		String token = JWT.create()
 			.withClaim(USER_ID, memberOutputVo.getUserId())
 			.withClaim(USER_NAME, memberOutputVo.getUserName())
-			.withArrayClaim(ROLES, memberAuthArray)
+			.withArrayClaim(AUTHORITIES, memberAuthorityIdArray)
 			.withExpiresAt(getDateForExpire(chronoUnit, add))
 			.sign(algorithm);
 		
@@ -143,28 +141,25 @@ public class JwtAdapter {
 	}
 
 	/**
-	 * AccessToken 으로 회원 ID를 가져온다.
-	 * accessToken : 회원정보를 추출할 토큰
-	 * @return
-	 */
-	public String getUserIdFromToken(String accessToken) throws Exception {
-
-		MemberOutputVo memberOutputVo = this.extractUserDataFromToken(accessToken);
-		return memberOutputVo.getUserId();
-
-	}
-
-	/**
-	 * 토큰에서 회원 정보를 추출한다
-	 * request - HttpServletRequest Interface
+	 * httpServletRequest에서 JWT refresh token을 가져온다.
+	 * @param request - HttpServletRequest Interface
 	 * return
 	 */
-	public String getTokenFromHeader(HttpServletRequest request) {
+	public String getRefreshTokenFromHeader(HttpServletRequest request) {
 		return request.getHeader(HEADER_NAME);
 	}
 
 	/**
-	 * 토큰 내 회원의 권한을 가져온다. 
+	 * httpServletRequest에서 JWT access token을 가져온다.
+	 * @param request - HttpServletRequest Interface
+	 * return
+	 */
+	public String getAccessTokenFromHeader(HttpServletRequest request) {
+		return request.getHeader(HEADER_NAME);
+	}
+
+	/**
+	 * access token 또는 refresh token으로 회원 권한을 가져온다.
 	 * @param token
 	 * @return
 	 * @throws AccessTokenNotFoundException 

@@ -224,4 +224,13 @@
 			task_id = #{taskId}
 	</update>
 
+	<select id="getBusStopIdMappedToBisStopId" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.BusStopMappingVo" resultType="int">
+		SELECT
+			ifnull(stop_id, 0) as stop_id
+		FROM
+			tb_bus_stop_mapping
+		WHERE
+			local_stop_id = #{localStopId} AND provider_id = #{providerId}
+	</select>
+
 </mapper>

@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -30,7 +31,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.MemberUtil;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
+import com.naver.pubtrans.itn.api.consts.UserAuthority;
 import com.naver.pubtrans.itn.api.controller.MemberController;
+import com.naver.pubtrans.itn.api.handler.MemberAccessDeniedHandler;
 import com.naver.pubtrans.itn.api.service.MemberService;
 import com.naver.pubtrans.itn.api.vo.common.PagingVo;
 import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
@@ -49,6 +52,7 @@ import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 @RunWith(SpringRunner.class)
 @WebMvcTest(MemberController.class)
 @AutoConfigureRestDocs
+@AutoConfigureMockMvc(addFilters = false)
 public class MemberControllerDocumentTest {
 
 	@Autowired
@@ -65,6 +69,12 @@ public class MemberControllerDocumentTest {
 
 	@MockBean
 	private MemberUtil memberUtil;
+
+	@MockBean
+	private JwtAdapter jwtAdapter;
+
+	@MockBean
+	private MemberAccessDeniedHandler memberAccessDeniedHandler;
 
 	/**
 	 * 회원 정보 등록 rest docs 생성
@@ -188,6 +198,8 @@ public class MemberControllerDocumentTest {
 		memberOutputVo.setUserName("test_user");
 		memberOutputVo.setCompany("test_company");
 		memberOutputVo.setRegDate("2020.03.10");
+		memberOutputVo.setAuthorityId("ROLE_ADMIN");
+		memberOutputVo.setAuthorityName("관리자");
 
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(commonSchemaList, memberOutputVo);
 
@@ -220,7 +232,9 @@ public class MemberControllerDocumentTest {
 					fieldWithPath("result.data.userId").type(JsonFieldType.STRING).description("회원 ID"),
 					fieldWithPath("result.data.userName").type(JsonFieldType.STRING).description("이름"),
 					fieldWithPath("result.data.company").type(JsonFieldType.STRING).description("소속"),
-					fieldWithPath("result.data.regDate").type(JsonFieldType.STRING).description("가입일"))));
+					fieldWithPath("result.data.regDate").type(JsonFieldType.STRING).description("가입일"),
+					fieldWithPath("result.data.authorityId").type(JsonFieldType.STRING).description("역할 ID"),
+					fieldWithPath("result.data.authorityName").type(JsonFieldType.STRING).description("역할 이름"))));
 	}
 
 	/**
@@ -274,6 +288,8 @@ public class MemberControllerDocumentTest {
 	@Test
 	public void getMember() throws Exception {
 
+		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
+
 		OutputFmtUtil outputFmtUtil = new OutputFmtUtil();
 
 		// 스키마
@@ -307,6 +323,8 @@ public class MemberControllerDocumentTest {
 		memberOutputVo.setUserName("test_user");
 		memberOutputVo.setCompany("test_company");
 		memberOutputVo.setRegDate("2020.03.10");
+		memberOutputVo.setAuthorityId("ROLE_ADMIN");
+		memberOutputVo.setAuthorityName("관리자");
 
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(commonSchemaList, memberOutputVo);
 
@@ -317,6 +335,7 @@ public class MemberControllerDocumentTest {
 		//when
 		ResultActions result = this.mockMvc.perform(
 			get("/v1/ntool/api/member/${userId}", "test")
+				.header(JwtAdapter.HEADER_NAME, accessToken)
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 				.accept(MediaType.APPLICATION_JSON)
 				.characterEncoding("UTF-8"));
@@ -340,7 +359,9 @@ public class MemberControllerDocumentTest {
 					fieldWithPath("result.data.userId").type(JsonFieldType.STRING).description("회원 ID"),
 					fieldWithPath("result.data.userName").type(JsonFieldType.STRING).description("이름"),
 					fieldWithPath("result.data.company").type(JsonFieldType.STRING).description("소속"),
-					fieldWithPath("result.data.regDate").type(JsonFieldType.STRING).description("가입일"))));
+					fieldWithPath("result.data.regDate").type(JsonFieldType.STRING).description("가입일"),
+					fieldWithPath("result.data.authorityId").type(JsonFieldType.STRING).description("역할 ID"),
+					fieldWithPath("result.data.authorityName").type(JsonFieldType.STRING).description("역할 이름"))));
 	}
 
 	/**
@@ -350,16 +371,20 @@ public class MemberControllerDocumentTest {
 	@Test
 	public void updateMember() throws Exception {
 
+		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
+
 		MemberInputVo memberInputVo = new MemberInputVo();
 
 		memberInputVo.setUserId("test");
 		memberInputVo.setUserName("test_user");
 		memberInputVo.setCompany("test_company");
 		memberInputVo.setUserPw("qwer1234");
+		memberInputVo.setAuthorityId("ROLE_USER");
 
 		//when
 		ResultActions result = this.mockMvc.perform(
 			put("/v1/ntool/api/member")
+				.header(JwtAdapter.HEADER_NAME, accessToken)
 				.content(objectMapper.writeValueAsString(memberInputVo))
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
@@ -374,7 +399,8 @@ public class MemberControllerDocumentTest {
 					fieldWithPath("userId").type(JsonFieldType.STRING).description("[필수]회원ID"),
 					fieldWithPath("userName").type(JsonFieldType.STRING).description("[필수]이름"),
 					fieldWithPath("userPw").type(JsonFieldType.STRING).description("비밀번호"),
-					fieldWithPath("company").type(JsonFieldType.STRING).description("소속")
+					fieldWithPath("company").type(JsonFieldType.STRING).description("소속"),
+					fieldWithPath("authorityId").type(JsonFieldType.STRING).description("권한 ID")
 
 				),
 				responseFields(
@@ -389,12 +415,15 @@ public class MemberControllerDocumentTest {
 	@Test
 	public void deleteMember() throws Exception {
 
+		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
+
 		MemberParameterVo memberParameterVo = new MemberParameterVo();
 		memberParameterVo.setUserId("test");
 
 		//when
 		ResultActions result = this.mockMvc.perform(
 			delete("/v1/ntool/api/member")
+				.header(JwtAdapter.HEADER_NAME, accessToken)
 				.content(objectMapper.writeValueAsString(memberParameterVo))
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
@@ -418,6 +447,8 @@ public class MemberControllerDocumentTest {
 	 */
 	@Test
 	public void listMember() throws Exception {
+
+		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
 
 		OutputFmtUtil outputFmtUtil = new OutputFmtUtil();
 
@@ -452,6 +483,8 @@ public class MemberControllerDocumentTest {
 		memberOutputVo.setUserName("test_user");
 		memberOutputVo.setCompany("test_company");
 		memberOutputVo.setRegDate("2020.03.10");
+		memberOutputVo.setAuthorityId(UserAuthority.ROLE_ADMIN.name());
+		memberOutputVo.setAuthorityName("관리자");
 
 		List<MemberOutputVo> memberOutputVoList = new ArrayList<>();
 		memberOutputVoList.add(memberOutputVo);
@@ -465,6 +498,7 @@ public class MemberControllerDocumentTest {
 		//when
 		ResultActions result = this.mockMvc.perform(
 			get("/v1/ntool/api/list/member")
+				.header(JwtAdapter.HEADER_NAME, accessToken)
 				.param("userName", "")
 				.param("pageNo", "1")
 				.param("listSize", "20")
@@ -479,6 +513,7 @@ public class MemberControllerDocumentTest {
 				getDocumentResponse(),
 				requestParameters(
 					parameterWithName("userName").description("[선택]이름").optional(),
+					parameterWithName("authorityId").description("[선택]이름").optional(),
 					parameterWithName("pageNo").description("[선택]페이지 번호(기본:1)").optional(),
 					parameterWithName("listSize").description("[선택]페이지당 목록 수(기본:20)").optional(),
 					parameterWithName("sort").description("[선택]정렬(기본:목록 첫번째 Key 내림차순) - 사용 예:userName,asc").optional()),
@@ -496,7 +531,9 @@ public class MemberControllerDocumentTest {
 					fieldWithPath("result.data[].userId").type(JsonFieldType.STRING).description("회원 ID"),
 					fieldWithPath("result.data[].userName").type(JsonFieldType.STRING).description("이름"),
 					fieldWithPath("result.data[].company").type(JsonFieldType.STRING).description("소속"),
-					fieldWithPath("result.data[].regDate").type(JsonFieldType.STRING).description("가입일"))));
+					fieldWithPath("result.data[].regDate").type(JsonFieldType.STRING).description("가입일"),
+					fieldWithPath("result.data[].authorityId").type(JsonFieldType.STRING).description("역할 ID"),
+					fieldWithPath("result.data[].authorityName").type(JsonFieldType.STRING).description("역할 이름"))));
 
 	}
 
@@ -507,6 +544,8 @@ public class MemberControllerDocumentTest {
 	@Test
 	public void schemaMember() throws Exception {
 
+		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
+
 		List<CommonSchema> commonSchema = new ArrayList<>();
 
 		//given
@@ -516,6 +555,7 @@ public class MemberControllerDocumentTest {
 		//when
 		ResultActions result = this.mockMvc.perform(
 			get("/v1/ntool/api/schema/member")
+				.header(JwtAdapter.HEADER_NAME, accessToken)
 				.characterEncoding("UTF-8"));
 
 		//then

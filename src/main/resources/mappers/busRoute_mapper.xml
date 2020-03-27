@@ -83,4 +83,149 @@
 		</if>
 	</sql>
 
+
+	<select id="getBusRoute" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.route.BusRouteVo">
+		SELECT
+		    <include refid="selectCommonBusRoute" />
+		FROM
+			tb_routes route
+			, tb_bus_routes_info sub
+			, tb_calendar cal
+		LEFT JOIN
+			tb_bus_route_mapping mp ON mp.route_id = #{routeId}
+		LEFT JOIN
+			tb_bus_route_bypass_mapping bypass ON bypass.bypass_route_id = #{routeId}
+		WHERE
+			route.route_id = #{routeId}
+			AND route.route_id = sub.route_id
+			AND sub.service_id = cal.service_id
+	</select>
+
+
+	<select id="getBusRouteTask" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.bus.route.BusRouteTaskVo">
+		SELECT
+			<include refid="selectCommonBusRoute" />
+		FROM
+			tb_routes_task route
+			, tb_bus_routes_info_task sub
+			, tb_calendar cal
+		LEFT JOIN
+			tb_bus_route_mapping_task mp ON mp.task_id = #{taskId}
+		LEFT JOIN
+			tb_bus_route_bypass_mapping_task bypass ON bypass.task_id = #{taskId}
+		WHERE
+			route.task_id = #{taskId}
+			AND route.task_id = sub.task_id
+			AND sub.service_id = cal.service_id
+	</select>
+
+	<select id="selectBusRouteCompanyList" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteCompanyOutputVo">
+		SELECT
+		    <include refid="selectCommonBusRouteCompany" />
+		FROM
+			tb_bus_company_mapping mp
+			, tb_bus_company company
+			, tb_city_code city
+		WHERE
+			mp.route_id = #{routeId}
+			AND mp.company_id = company.company_id
+			AND company.city_code = city.city_code
+	</select>
+
+	<select id="getBusRouteCompanyTaskListCnt" parameterType="long" resultType="int">
+		SELECT
+			count(*) as total_list_cnt
+		FROM
+			tb_bus_company_mapping_task mp
+			, tb_bus_company company
+		WHERE
+			mp.task_id = #{taskId}
+			AND mp.company_id = company.company_id
+	</select>
+
+
+	<select id="selectBusRouteCompanyTaskList" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteCompanyOutputVo">
+		SELECT
+			<include refid="selectCommonBusRouteCompany" />
+		FROM
+			tb_bus_company_mapping_task mp
+			, tb_bus_company company
+			, tb_city_code city
+		WHERE
+			mp.task_id = #{taskId}
+			AND mp.company_id = company.company_id
+			AND company.city_code = city.city_code
+	</select>
+
+	<select id="selectBusRouteBypassList" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteBypassOutputVo">
+		SELECT
+			bypass.bypass_route_id
+		    , bypass.parent_route_id
+			, route.route_name
+			, date_format(bypass.bypass_start_date, '%Y%m%d%H%m') as bypass_start_date_time
+			, date_format(bypass.bypass_end_date, '%Y%m%d%H%m') as bypass_end_date_time
+		FROM
+		    tb_routes route
+			, tb_bus_route_bypass_mapping bypass
+		WHERE
+			bypass.parent_route_id = #{parentRouteId}
+			AND route.route_id = bypass.bypass_route_id
+	</select>
+
+	<sql id="selectCommonBusRouteCompany">
+		mp.route_id
+		, company.company_id
+		, company.company_name
+		, company.tel
+		, company.city_code
+		, city.city_name
+	</sql>
+
+	<sql id="selectCommonBusRoute">
+		route.route_id
+		, route.route_name
+		, route.city_code
+		, sub.bus_class
+		, sub.bus_additional_name
+		, sub.start_point_name
+		, sub.end_point_name
+		, sub.turning_point_sequence
+		, sub.weekday_start_point_first_time
+		, sub.weekday_start_point_last_time
+		, sub.weekday_end_point_first_time
+		, sub.weekday_end_point_last_time
+		, sub.weekday_interval_min
+		, sub.weekday_interval_max
+		, sub.weekday_interval_count
+		, sub.saturday_start_point_first_time
+		, sub.saturday_start_point_last_time
+		, sub.saturday_end_point_first_time
+		, sub.saturday_end_point_last_time
+		, sub.saturday_interval_min
+		, sub.saturday_interval_max
+		, sub.saturday_interval_count
+		, sub.sunday_start_point_first_time
+		, sub.sunday_start_point_last_time
+		, sub.sunday_end_point_first_time
+		, sub.sunday_end_point_last_time
+		, sub.sunday_interval_min
+		, sub.sunday_interval_max
+		, sub.sunday_interval_count
+		, sub.nonstep_bus_yn
+		, sub.tel_reservation
+		, sub.provider_id
+		, sub.bypass_yn
+		, mp.local_route_id
+		, cal.monday_yn
+		, cal.tuesday_yn
+		, cal.wednesday_yn
+		, cal.thursday_yn
+		, cal.friday_yn
+		, cal.saturday_yn
+		, cal.sunday_yn
+		, bypass.parent_route_id
+		, date_format(bypass.bypass_start_date, '%Y%m%d%H%m') as bypass_start_date_time
+		, date_format(bypass.bypass_end_date, '%Y%m%d%H%m') as bypass_end_date_time
+	</sql>
+
 </mapper>

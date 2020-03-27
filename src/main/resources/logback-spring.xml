@@ -1,28 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
- 
- 
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+
+	<Property name="logNm" value="pubtrans-itn-api" />
+	<Property name="layoutPattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg %n" />
+
+	<Property name="logFilePath" value="/home1/irteam/logs/pubtrans_itn_api/" />
+	<Property name="logFileBackupPath" value="/home1/irteam/logs/pubtrans_itn_api/backup/" />
+
+	<Property name="logFileName" value="${logFilePath}${logNm}.log" />
+	<Property name="logFileNamePattern" value="${logFileBackupPath}${logNm}_%d{yyyy-MM-dd}.log" />
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%d{yyyyMMdd HH:mm:ss.SSS} [%thread] %-3level %logger{5} - %msg %n</pattern>
+			<pattern>${layoutPattern}</pattern>
 		</encoder>
 	</appender>
-	
-	
-	<logger name="jdbc" level="OFF"/>
-	<logger name="jdbc.sqlonly" level="OFF"/>
-	<logger name="jdbc.audit" level="OFF"/>
-	<logger name="jdbc.resultset" level="OFF"/>
-	<logger name="jdbc.connection" level="OFF"/>
-	
-	
+
+	<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logFileName}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logFileNamePattern}</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${layoutPattern}</pattern>
+        </encoder>
+    </appender>
+
+
+	<logger name="jdbc" level="off"/>
+	<logger name="jdbc.sqlonly" level="off"/>
+	<logger name="jdbc.audit" level="off"/>
+	<logger name="jdbc.resultset" level="off"/>
+	<logger name="jdbc.connection" level="off"/>
+
+
 	<springProfile name="local">
-		<logger name="jdbc.sqltiming" level="DEBUG"/>
-		<logger name="jdbc.resultsettable" level="DEBUG"/>
+		<logger name="jdbc.sqltiming" level="debug"/>
+		<logger name="jdbc.resultsettable" level="debug"/>
 	</springProfile>
-  
-	<root level="INFO">
-		<appender-ref ref="STDOUT" />
+	<springProfile name="dev">
+		<logger name="jdbc.sqltiming" level="off"/>
+		<logger name="jdbc.resultsettable" level="off"/>
+	</springProfile>
+
+
+	<logger name="org.springframework"  level="info" additivity="false">
+        <appender-ref ref="console" />
+        <appender-ref ref="file" />
+    </logger>
+
+
+	<logger name="com.naver.pubtrans.itn.api"  level="debug" additivity="false">
+        <appender-ref ref="console" />
+        <appender-ref ref="file" />
+    </logger>
+
+
+	<root level="debug" additivity="false" >
+		<appender-ref ref="console" />
+        <appender-ref ref="file" />
 	</root>
-  
+
 </configuration>

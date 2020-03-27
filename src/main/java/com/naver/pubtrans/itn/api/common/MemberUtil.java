@@ -14,11 +14,10 @@ import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 @Component
 public class MemberUtil {
 
-//	@Autowired
 	private static JwtAdapter jwtAdapter;
 
-	// API 호출 시 Header에 있는 token
-	public static String TOKEN = "";
+	// API 호출 시 Filter에서 header에 있는 ACCESS_TOKEN 값이 입력됨.
+	public static String ACCESS_TOKEN = "";
 
 	@SuppressWarnings("static-access")
 	@Autowired
@@ -27,24 +26,22 @@ public class MemberUtil {
 	}
 
 	/**
-	 * AccessToken 으로 회원 ID를 가져온다.
-	 * accessToken : 회원정보를 추출할 토큰
-	 * @return
+	* accessToken 으로 회원 ID를 가져온다.
+	* @return
 	 */
 	public static String getUserIdFromToken() throws Exception {
-		MemberOutputVo memberOutputVo = jwtAdapter.extractUserDataFromToken(TOKEN);
+		MemberOutputVo memberOutputVo = jwtAdapter.extractUserDataFromToken(ACCESS_TOKEN);
 		return memberOutputVo.getUserId();
 
 	}
 
 	/**
-	 * AccessToken 으로 회원 정보를 가져온다.
-	 * accessToken : 회원정보를 추출할 토큰
+	 * accessToken 으로 회원 정보를 가져온다.
 	 * @return
 	 */
 	public static MemberOutputVo getMemberFromToken() throws Exception {
 
-		MemberOutputVo memberOutputVo = jwtAdapter.extractUserDataFromToken(TOKEN);
+		MemberOutputVo memberOutputVo = jwtAdapter.extractUserDataFromToken(ACCESS_TOKEN);
 		return memberOutputVo;
 
 	}

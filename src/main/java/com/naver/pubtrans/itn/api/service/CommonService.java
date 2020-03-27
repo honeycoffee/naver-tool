@@ -18,10 +18,12 @@ import com.naver.pubtrans.itn.api.consts.PubTransTable;
 import com.naver.pubtrans.itn.api.repository.CommonRepository;
 import com.naver.pubtrans.itn.api.vo.common.AliasColumnNameVo;
 import com.naver.pubtrans.itn.api.vo.common.BusProviderVo;
+import com.naver.pubtrans.itn.api.vo.common.BusRouteClassVo;
 import com.naver.pubtrans.itn.api.vo.common.CityCodeVo;
 import com.naver.pubtrans.itn.api.vo.common.FieldValue;
 import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
+import com.naver.pubtrans.itn.api.vo.member.AuthorityInfoVo;
 
 /**
  * 공통 서비스
@@ -79,6 +81,36 @@ public class CommonService {
 		List<FieldValue> fieldValueList = new ArrayList<>();
 		for(BusProviderVo vo : busProviderVoList) {
 			fieldValueList.add(new FieldValue(String.valueOf(vo.getProviderId()), vo.getProviderName()));
+		}
+
+		return fieldValueList;
+	}
+
+	/**
+	 * 전체 버스 노선 Class 목록 가져오기
+	 * @return
+	 */
+	public List<FieldValue> selectBusRouteClassListAll(){
+		List<BusRouteClassVo> busRouteClassVoList = commonRepository.selectBusRouteClassList();
+
+		List<FieldValue> fieldValueList = new ArrayList<>();
+		for(BusRouteClassVo vo : busRouteClassVoList) {
+			fieldValueList.add(new FieldValue(String.valueOf(vo.getBusClassId()), vo.getBusClassName()));
+		}
+
+		return fieldValueList;
+	}
+
+	/**
+	 * 회원 권한 목록 가져오기
+	 * @return
+	 */
+	public List<FieldValue> selectAuthorityInfoListAll(){
+		List<AuthorityInfoVo> authorityInfoVoList = commonRepository.selectAuthorityInfoList();
+
+		List<FieldValue> fieldValueList = new ArrayList<>();
+		for(AuthorityInfoVo vo : authorityInfoVoList) {
+			fieldValueList.add(new FieldValue(String.valueOf(vo.getAuthorityId()), vo.getAuthorityName()));
 		}
 
 		return fieldValueList;
@@ -171,11 +203,33 @@ public class CommonService {
 
 		HashMap<String, List<FieldValue>> fieldValuesMap = new HashMap<>();
 
+		/*
+		 * 정류장 부가 정보
+		 */
 		fieldValuesMap.put("nonstop_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
 		fieldValuesMap.put("virtual_stop_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
 		fieldValuesMap.put("center_stop_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
 		fieldValuesMap.put("city_code", this.selectCommonCode(CodeType.CITYCODE.getCodeName()));
 		fieldValuesMap.put("provider_id", this.selectCommonCode(CodeType.BUS_PROVIDER.getCodeName()));
+		/*
+		 * 버스 노선 부가정보
+		 */
+		fieldValuesMap.put("nonstep_bus_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
+		fieldValuesMap.put("bypass_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
+		/*
+		 * 서비스 날짜 정보
+		 */
+		fieldValuesMap.put("monday_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
+		fieldValuesMap.put("tuesday_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
+		fieldValuesMap.put("wednesday_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
+		fieldValuesMap.put("thursday_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
+		fieldValuesMap.put("friday_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
+		fieldValuesMap.put("saturday_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
+		fieldValuesMap.put("sunday_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
+		/*
+		 * 회원 권한 정보
+		 */
+		fieldValuesMap.put("authority_id", this.selectCommonCode(CodeType.AUTHORITY_ID.getCodeName()));
 
 
 		return fieldValuesMap;
@@ -196,6 +250,10 @@ public class CommonService {
 				fieldValueList = this.selectCityCodeAll();
 			}else if(codeType.getCodeName().equals(CodeType.BUS_PROVIDER.getCodeName())) {		// BIS 공급지역
 				fieldValueList = this.selectBusProviderListAll();
+			}else if(codeType.getCodeName().equals(CodeType.BUS_ROUTE_CLASS.getCodeName())) {				// 버스 노선 클래스
+				fieldValueList = this.selectBusRouteClassListAll();
+			}else if(codeType.getCodeName().equals(CodeType.AUTHORITY_ID.getCodeName())) {		// 회원 권한 ID
+				fieldValueList = this.selectAuthorityInfoListAll();
 			}else if(codeType.getCodeName().equals(CodeType.Y_N.getCodeName())) {					// Y/N 선택
 				FieldValue fY = new FieldValue(CommonConstant.Y, CommonConstant.Y);
 				FieldValue fN = new FieldValue(CommonConstant.N, CommonConstant.N);

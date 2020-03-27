@@ -1,6 +1,7 @@
 package com.naver.pubtrans.itn.api.vo.bus.graph;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -36,5 +37,9 @@ public class BusStopGraphVo {
 	// 그래프 정보 - GeoJson 형태
 	@JsonIgnore
 	private String graphInfoToGeoJson;
+
+	// 구간 순서 - 노선ID 그래프 조회인 경우에만 사용
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private Integer stopSequence;
 
 }

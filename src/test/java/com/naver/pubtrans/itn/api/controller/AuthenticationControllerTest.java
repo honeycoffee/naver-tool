@@ -33,7 +33,7 @@ import com.naver.pubtrans.itn.api.vo.auth.LoginVo;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AuthControllerTest {
+public class AuthenticationControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -133,7 +133,7 @@ public class AuthControllerTest {
 		loginVo.setUserPw("qwer1234");
 
 		mockMvc.perform(post("/v1/ntool/api/auth/refresh/token")
-			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.REFRESH_TOKEN))
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.TOKEN_MAP_REFRESH_TOKEN_KEY_FOR_TEST_CASE))
 			.content(objectMapper.writeValueAsString(loginVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -177,6 +177,44 @@ public class AuthControllerTest {
 
 		mockMvc.perform(post("/v1/ntool/api/auth/refresh/token")
 			.header(JwtAdapter.HEADER_NAME, refreshToken)
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON)
+			.characterEncoding("UTF-8"))
+			.andDo(print())
+			.andExpect(status().is4xxClientError())
+			.andExpect(jsonPath("$.code", is(ResultCode.AUTH_TOKEN_EMPTY.getApiErrorCode())))
+			.andExpect(jsonPath("$.message", is(ResultCode.AUTH_TOKEN_EMPTY.getDisplayMessage())));
+	}
+
+	/**
+	 * 로그아웃 - 정상적으로 로그아웃 됐을 때
+	 * @throws Exception
+	 */
+	@Test
+	public void caseSuccessLogout() throws Exception {
+
+		mockMvc.perform(post("/v1/ntool/api/auth/logout")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.TOKEN_MAP_ACCESS_TOKEN_KEY_FOR_TEST_CASE))
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON)
+			.characterEncoding("UTF-8"))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
+			.andExpect(jsonPath("$.message", is(ResultCode.OK.getDisplayMessage())));
+	}
+
+	/**
+	 * 로그아웃 - token 없이 로그아웃 시도 했을 때 실패
+	 * @throws Exception
+	 */
+	@Test
+	public void caseFailLogout() throws Exception {
+
+		String accessToken = "";
+
+		mockMvc.perform(post("/v1/ntool/api/auth/logout")
+			.header(JwtAdapter.HEADER_NAME, accessToken)
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
 			.characterEncoding("UTF-8"))

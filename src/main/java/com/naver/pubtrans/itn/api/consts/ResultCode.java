@@ -29,6 +29,7 @@ public enum ResultCode {
 	UPDATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, 510, "데이터 갱신에 실패하였습니다"),
 	PARAMETER_RULE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 511, "파라미터 구문이 잘못되었습니다"),
 	PASSWORD_NOT_VALID(HttpStatus.INTERNAL_SERVER_ERROR, 512, "비밀번호는 반드시 값이 존재하고 길이 혹은 크기가 8보다 크고 20보다 작아야 합니다"),
+	MEMBER_AUTHORITY_NULL(HttpStatus.INTERNAL_SERVER_ERROR, 513, "회원 권한이 없습니다"),
 	AUTH_TOKEN_EMPTY(HttpStatus.UNAUTHORIZED, 2001, "Token 정보가 없습니다"),
 	AUTH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, 2002, "만료된 Token 입니다"),
 	AUTH_TOKEN_VALID_ERROR(HttpStatus.UNAUTHORIZED, 2003, "Token 검증 오류"),

@@ -199,7 +199,7 @@ public class MemberController {
 	 */
 	@GetMapping(value = "/v1/ntool/api/schema/member")
 	public CommonOutput selectMemberSchema() throws Exception {
-		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberService.selectMemberSchema());
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberService.selectMemberSchemaAll());
 		return new CommonOutput(commonResult);
 	}
 

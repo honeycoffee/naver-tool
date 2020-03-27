@@ -243,9 +243,7 @@ public class BusStopService {
 		commonSchemaList.addAll(taskService.selectTaskSchemaMinimal());
 
 		// 동일 컬럼에 대해 중복을 제거
-		List<CommonSchema> distinctCommonSchemaVoList = commonSchemaList.stream()
-																		.filter(Util.distinctByKey(o -> o.getFieldName()))
-																		.collect(Collectors.toList());
+		List<CommonSchema> distinctCommonSchemaVoList = outputFmtUtil.distinctCommonSchemaList(commonSchemaList);
 
 		return distinctCommonSchemaVoList;
 	}
@@ -274,8 +272,8 @@ public class BusStopService {
 
 
 		ArrayList<String> ignoreColumnNameList = new ArrayList<>();
-		ignoreColumnNameList.add("aliaskor");
-		ignoreColumnNameList.add("mscode");
+		ignoreColumnNameList.add("alias_kor");
+		ignoreColumnNameList.add("ms_code");
 
 		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_BUS_STOPS_INFO.getName(), CommonConstant.IGNORE_COLUMN, ignoreColumnNameList);
 

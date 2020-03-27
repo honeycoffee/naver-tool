@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.pubtrans.itn.api.repository.BusRouteRepository">
+
+
+	<select id="getFareRule" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteSearchVo" resultType="int">
+		SELECT
+			count(*) as total_list_cnt
+		FROM
+			tb_routes route
+			, tb_bus_routes_info sub
+			, tb_city_code city
+			, tb_bus_route_class rc
+		
+		<choose>
+			<when test="@org.apache.commons.lang3.StringUtils@isNotEmpty(fareId)">
+				WHERE
+					fare.fare_id = #{fareId} 
+			</when>
+			<otherwise>
+				WHERE
+					fare.base_yn = 'Y'
+					
+				<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(cityCode)">
+					AND 
+						fare.city_code = #{cityCode}
+				</if>
+		
+				<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(busClass)">
+					AND 
+						fare.bus_class = #{busClass}
+				</if>
+			</otherwise>
+		</choose>
+
+	</select>
+	
+	
+
+	<sql id="whereCityCodeAndBusClass">
+	</sql>
+	
+
+</mapper>

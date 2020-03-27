@@ -335,4 +335,15 @@ public class OutputFmtUtil {
 		return refinedSchemaVoList;
 	}
 
+	/**
+	 * 공통 스키마 목록중 동일 필드명 중복을 제거한다
+	 * @param commonSchemaList - 공통 스키마 목록
+	 * @return
+	 */
+	public List<CommonSchema> distinctCommonSchemaList(List<CommonSchema> commonSchemaList) {
+		return commonSchemaList.stream()
+			.filter(Util.distinctByKey(o -> o.getFieldName()))
+			.collect(Collectors.toList());
+	}
+
 }

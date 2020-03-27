@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
-import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthOutputVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthorityOutputVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
@@ -59,6 +59,14 @@ public interface MemberRepository {
 	int deleteTestMember(MemberSearchVo memberSearchVo) throws DataAccessException;
 
 	/**
+	 * 테스트 회원 권한 정보를 삭제한다
+	 * @param memberSearchVo - 회원 검색 조건
+	 * @return
+	 * @throws DataAccessException
+	 */
+	int deleteTestMemberAuthority(MemberSearchVo memberSearchVo) throws DataAccessException;
+
+	/**
 	 * 회원 정보를 가져온다.
 	 * @param memberSearchVo - 회원 검색 조건
 	 * @return
@@ -83,12 +91,12 @@ public interface MemberRepository {
 	List<MemberOutputVo> selectMemberList(MemberSearchVo memberSearchVo) throws DataAccessException;
 
 	/**
-	 * 회원 권한 목록을 가져온다.
+	 * 회원의 권한 목록을 가져온다.
 	 * @param memberSearchVo - 회원 검색 조건
 	 * @return
 	 * @throws DataAccessException
 	 */
-	List<MemberAuthOutputVo> selectMemberAuthList(MemberSearchVo memberSearchVo) throws DataAccessException;
+	List<MemberAuthorityOutputVo> selectMemberAuthorityList(MemberSearchVo memberSearchVo) throws DataAccessException;
 
 	/**
 	 * 회원 권한을 등록한다
@@ -96,7 +104,7 @@ public interface MemberRepository {
 	 * @return
 	 * @throws DataAccessException
 	 */
-	void insertMemberAuth(MemberInputVo memberInputVo) throws DataAccessException;
+	void insertMemberAuthority(MemberInputVo memberInputVo) throws DataAccessException;
 
 	/**
 	 * 회원 권한을 수정한다
@@ -104,6 +112,6 @@ public interface MemberRepository {
 	 * @return
 	 * @throws DataAccessException
 	 */
-	int updateMemberAuth(MemberInputVo memberInputVo) throws DataAccessException;
+	int updateMemberAuthority(MemberInputVo memberInputVo) throws DataAccessException;
 
 }

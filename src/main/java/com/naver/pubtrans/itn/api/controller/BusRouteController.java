@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.service.BusRouteService;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteSearchVo;
 import com.naver.pubtrans.itn.api.vo.common.input.SearchVo;
@@ -23,10 +24,12 @@ import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 public class BusRouteController {
 
 	private final BusRouteService busRouteService;
+	private final OutputFmtUtil outputFmtUtil;
 
 	@Autowired
-	BusRouteController(BusRouteService busRouteService){
+	BusRouteController(BusRouteService busRouteService, OutputFmtUtil outputFmtUtil){
 		this.busRouteService = busRouteService;
+		this.outputFmtUtil = outputFmtUtil;
 	}
 
 	/**
@@ -63,6 +66,41 @@ public class BusRouteController {
 	@GetMapping("/v1/ntool/api/list/busStopsGraph")
 	public CommonOutput listGraphInfoBetweenBusStops(@RequestParam(required = true) List<String> busStopIds) throws Exception {
 		CommonResult commonResult = busRouteService.getGraphInfoBetweenBusStops(busStopIds);
+		return new CommonOutput(commonResult);
+	}
+
+	/**
+	 * 버스노선 상세 스키마 정보를 가져온다
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/v1/ntool/api/schema/busRoute")
+	public CommonOutput getBusStopSchema() throws Exception {
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(busRouteService.selectBusRouteSchemaAll());
+		return new CommonOutput(commonResult);
+	}
+
+	/**
+	 * 버스노선 상세정보를 조회한다
+	 * @param routeId - 노선ID
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/v1/ntool/api/info/busRoute/{routeId}")
+	public CommonOutput infoBusRoute(@PathVariable int routeId) throws Exception {
+		CommonResult commonResult = busRouteService.getBusRouteInfo(routeId);
+		return new CommonOutput(commonResult);
+	}
+
+	/**
+	 * 버스노선 상세 작업정보를 조회한다
+	 * @param taskId - 작업ID
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/v1/ntool/api/info/busRouteTask/{taskId}")
+	public CommonOutput infoBusRouteTask(@PathVariable long taskId) throws Exception {
+		CommonResult commonResult = busRouteService.getBusRouteTaskInfo(taskId);
 		return new CommonOutput(commonResult);
 	}
 }

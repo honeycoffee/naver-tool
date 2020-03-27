@@ -23,7 +23,6 @@ import com.naver.pubtrans.itn.api.consts.CommonConstant;
 public class Util {
 
 	private final static String DATE_FORMAT = "yyyy-MM-dd";
-	private final static String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	/**
 	 * 현재 날짜를 가져온다
