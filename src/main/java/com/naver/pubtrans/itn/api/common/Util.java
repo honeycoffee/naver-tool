@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -12,6 +13,8 @@ import java.util.function.Predicate;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 
@@ -23,7 +26,6 @@ import com.naver.pubtrans.itn.api.consts.CommonConstant;
 public class Util {
 
 	private final static String DATE_FORMAT = "yyyy-MM-dd";
-	private final static String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	/**
 	 * 현재 날짜를 가져온다
@@ -99,5 +101,16 @@ public class Util {
 	public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
 		Map<Object, Boolean> map = new ConcurrentHashMap<>();
 		return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+	}
+
+	/**
+	 * HttpServletRequest를 가져온다.
+	 * @return
+	 */
+	public static HttpServletRequest getHttpServletRequest() {
+		ServletRequestAttributes servletRequestAttribute = (ServletRequestAttributes)RequestContextHolder
+			.currentRequestAttributes();
+		
+		return servletRequestAttribute.getRequest();
 	}
 }

@@ -4,18 +4,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.naver.pubtrans.itn.api.common.MemberUtil;
-import com.naver.pubtrans.itn.api.service.AuthService;
+import lombok.extern.slf4j.Slf4j;
+
+import com.naver.pubtrans.itn.api.auth.JwtAdapter;
+import com.naver.pubtrans.itn.api.service.AuthenticationService;
 import com.naver.pubtrans.itn.api.vo.auth.LoginVo;
-import com.naver.pubtrans.itn.api.vo.auth.input.AuthInputVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
-
-import lombok.extern.slf4j.Slf4j;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthorityOutputVo;
 
 /**
  * 네이버 대중교통 DB 내재화 인증관리 컨트롤러
@@ -25,13 +28,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestController
-public class AuthController {
+public class AuthenticationController {
 
-	private final AuthService authService;
+	private final AuthenticationService authenticationService;
 
 	@Autowired
-	AuthController(AuthService authService) {
-		this.authService = authService;
+	AuthenticationController(AuthenticationService authenticationService) {
+		this.authenticationService = authenticationService;
 	}
 
 	/**
@@ -47,7 +50,7 @@ public class AuthController {
 	@PostMapping(value = "/v1/ntool/api/auth/login")
 	public CommonOutput login(@RequestBody @Valid LoginVo loginVo, HttpServletRequest request) throws Exception {
 
-		CommonResult commonResult = authService.loginMember(loginVo, request);
+		CommonResult commonResult = authenticationService.loginMember(loginVo, request);
 
 		return new CommonOutput(commonResult);
 
@@ -60,26 +63,24 @@ public class AuthController {
 	 */
 	@PostMapping(value = "/v1/ntool/api/auth/logout")
 	public CommonOutput logout() throws Exception {
-
-		AuthInputVo authInputVo = new AuthInputVo();
-		authInputVo.setUserId(MemberUtil.getMemberFromToken().getUserId());
 		
-		authService.deleteMemberTokenInfo(authInputVo);
-
+		authenticationService.logoutMember();
+		
 		return new CommonOutput();
 
 	}
 
 	/**
 	 * JWT refresh token으로 access token 갱신
+	 * @param request - HttpServletRequest Interface
 	 * @return
 	 * @throws Exception
 	 */
 	@PostMapping(value = "/v1/ntool/api/auth/refresh/token")
-	public CommonOutput refresh() throws Exception {
+	public CommonOutput refresh(HttpServletRequest request) throws Exception {
 		
-		CommonResult commonResult = authService.refreshToken();
-
+		CommonResult commonResult = authenticationService.updateAccessTokenByRefreshToken(request);
+		
 		return new CommonOutput(commonResult);
 
 	}

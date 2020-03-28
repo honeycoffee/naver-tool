@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -28,8 +29,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.controller.NoticeController;
+import com.naver.pubtrans.itn.api.handler.MemberAccessDeniedHandler;
 import com.naver.pubtrans.itn.api.service.NoticeService;
 import com.naver.pubtrans.itn.api.vo.common.PagingVo;
 import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
@@ -48,6 +51,7 @@ import com.naver.pubtrans.itn.api.vo.notice.output.NoticeOutputVo;
 @RunWith(SpringRunner.class)
 @WebMvcTest(NoticeController.class)
 @AutoConfigureRestDocs
+@AutoConfigureMockMvc(addFilters = false)
 public class NoticeControllerDocumentTest {
 
 	private static final List<JsonFieldType> STRING_OR_NULL = Arrays.asList(JsonFieldType.STRING, JsonFieldType.NULL);
@@ -65,6 +69,12 @@ public class NoticeControllerDocumentTest {
 
 	@MockBean
 	private NoticeService noticeService;
+
+	@MockBean
+	private JwtAdapter jwtAdapter;
+
+	@MockBean
+	private MemberAccessDeniedHandler memberAccessDeniedHandler;
 
 	/**
 	 * 공지사항 등록 rest docs 생성

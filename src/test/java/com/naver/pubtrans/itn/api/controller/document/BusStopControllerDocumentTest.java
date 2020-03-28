@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -37,8 +38,11 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.controller.BusStopController;
+import com.naver.pubtrans.itn.api.handler.MemberAccessDeniedHandler;
 import com.naver.pubtrans.itn.api.service.BusStopService;
 import com.naver.pubtrans.itn.api.vo.bus.stop.BusRouteVo;
 import com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo;
@@ -61,6 +65,7 @@ import com.naver.pubtrans.itn.api.vo.task.output.TaskSummaryOutputVo;
 @RunWith(SpringRunner.class)
 @WebMvcTest(BusStopController.class)
 @AutoConfigureRestDocs
+@AutoConfigureMockMvc(addFilters = false)
 public class BusStopControllerDocumentTest {
 
 	private static final List<JsonFieldType> STRING_OR_NULL = Arrays.asList(JsonFieldType.STRING, JsonFieldType.NULL) ;
@@ -79,6 +84,12 @@ public class BusStopControllerDocumentTest {
 
 	@MockBean
 	private OutputFmtUtil outputFmtUtil ;
+
+	@MockBean
+	private JwtAdapter jwtAdapter;
+
+	@MockBean
+	private MemberAccessDeniedHandler memberAccessDeniedHandler;
 
 
 

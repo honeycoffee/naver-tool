@@ -50,6 +50,13 @@
 			user_id = #{userId}
 	</delete>
     
+	<delete id="deleteTestMemberAuthority" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo">
+		DELETE FROM
+			tb_z_svc_member_authority
+		WHERE
+			user_id = #{userId}
+	</delete>
+    
     <select id="getMember" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo">
     	SELECT
 		    member.user_id
@@ -58,10 +65,10 @@
 		    , member.company
 		    , date_format(member.reg_date, '%Y.%m.%d') as reg_date
             , date_format(member.upd_date, '%Y.%m.%d') as upd_date 
-            , auth.auth_id
+            , auth.authority_id
 		FROM
 			tb_z_svc_member `member`
-			, tb_z_svc_member_auth `auth`
+			, tb_z_svc_member_authority `auth`
 		WHERE
 			member.user_id = auth.user_id
 		AND
@@ -73,12 +80,12 @@
 			count(*) as total_list_cnt
 		FROM
 			tb_z_svc_member `member`
-			, tb_z_svc_member_auth `auth`
-			, tb_z_svc_auth_info `info`
+			, tb_z_svc_member_authority `auth`
+			, tb_z_svc_authority_info `info`
 		WHERE
 			member.user_id = auth.user_id
 		AND
-			auth.auth_id = info.auth_id
+			auth.authority_id = info.authority_id
 
 		<include refid="whereMemberList" />
 	</select>
@@ -89,16 +96,16 @@
 			, member.user_name
 			, member.company
 			, date_format(member.reg_date, '%Y.%m.%d') as reg_date
-			, auth.auth_id
-			, info.auth_name
+			, auth.authority_id
+			, info.authority_name
 		FROM
 			tb_z_svc_member `member`
-			, tb_z_svc_member_auth `auth`
-			, tb_z_svc_auth_info `info`
+			, tb_z_svc_member_authority `auth`
+			, tb_z_svc_authority_info `info`
 		WHERE
 			member.user_id = auth.user_id
 		AND
-			auth.auth_id = info.auth_id
+			auth.authority_id = info.authority_id
 
 		<include refid="whereMemberList" />
 
@@ -136,37 +143,37 @@
 			AND member.user_name LIKE CONCAT(#{userName}, '%')
 		</if>
 		
-		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(authId)">
-			AND auth.auth_id LIKE CONCAT(#{authId}, '%')
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(authorityId)">
+			AND auth.authority_id LIKE CONCAT(#{authorityId}, '%')
 		</if>
 
 	</sql>
     
-	<insert id="insertMemberAuth" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
+	<insert id="insertMemberAuthority" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
 		INSERT INTO 
-			tb_z_svc_member_auth(user_id, auth_id) 
+			tb_z_svc_member_authority(user_id, authority_id) 
 		VALUES
-			(#{userId}, #{authId})
+			(#{userId}, #{authorityId})
 	</insert>
     
-	<update id="updateMemberAuth" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
+	<update id="updateMemberAuthority" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
 		UPDATE
-			tb_z_svc_member_auth
+			tb_z_svc_member_authority
 		SET
-			auth_id = #{authId}
+			authority_id = #{authorityId}
 		WHERE
 			user_id = #{userId}
 	</update>
 	
-	<select id="selectMemberAuthList" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberAuthOutputVo">
+	<select id="selectMemberAuthorityList" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberAuthorityOutputVo">
 		SELECT
-			info.auth_id
-			, info.auth_name
+			info.authority_id
+			, info.authority_name
 		FROM
-			tb_z_svc_member_auth `auth`
-			, tb_z_svc_auth_info `info`
+			tb_z_svc_member_authority `auth`
+			, tb_z_svc_authority_info `info`
 		WHERE
-			auth.auth_id = info.auth_id
+			auth.authority_id = info.authority_id
 		AND
 			auth.user_id = #{userId}
 	</select>

@@ -13,6 +13,7 @@ public enum PubTransTable {
 	TB_BUS_COMPANY("tb_bus_company", "버스 운수사 정보"),
 	TB_BUS_COMPANY_MAPPING("tb_bus_company_mapping", "노선별 운수사 매핑"),
 	TB_BUS_PROVIDER("tb_bus_provider","실시간 버스정보 공급처"),
+	TB_BUS_ROUTE_BYPASS_MAPPING("tb_bus_route_bypass_mapping", "우회노선 매핑정보"),
 	TB_BUS_ROUTE_CLASS("tb_bus_route_class","버스노선 클래스 정보"),
 	TB_BUS_ROUTE_MAPPING("tb_bus_route_mapping", "버스노선 매핑"),
 	TB_BUS_ROUTES_INFO("tb_bus_routes_info", "노선 부가 정보"),
@@ -32,7 +33,7 @@ public enum PubTransTable {
 	TB_TRIPS("tb_trips", "각 경로에 대한 이동 정보"),
 
 	TB_Z_SVC_MEMBER("tb_z_svc_member", "회원정보"),
-	TB_Z_SVC_AUTH_INFO("tb_z_svc_auth_info", "권한정보"),
+	TB_Z_SVC_AUTHORITY_INFO("tb_z_svc_authority_info", "권한정보"),
 	TB_Z_SVC_NOTICE("tb_z_svc_notice", "공지사항"),
 	TB_Z_SVC_TASK("tb_z_svc_task", "작업정보");
 

@@ -33,7 +33,7 @@ import com.naver.pubtrans.itn.api.vo.auth.LoginVo;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AuthControllerTest {
+public class AuthenticationControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -133,7 +133,7 @@ public class AuthControllerTest {
 		loginVo.setUserPw("qwer1234");
 
 		mockMvc.perform(post("/v1/ntool/api/auth/refresh/token")
-			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.REFRESH_TOKEN))
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.REFRESH_TOKEN_KEY))
 			.content(objectMapper.writeValueAsString(loginVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
@@ -194,7 +194,7 @@ public class AuthControllerTest {
 	public void caseSuccessLogout() throws Exception {
 
 		mockMvc.perform(post("/v1/ntool/api/auth/logout")
-			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN))
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
 			.characterEncoding("UTF-8"))

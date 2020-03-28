@@ -11,7 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.LinkedHashMap;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.naver.pubtrans.itn.api.auth.JwtAdapter;
+import com.naver.pubtrans.itn.api.common.ApiUtils;
+import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.consts.TaskDataType;
 import com.naver.pubtrans.itn.api.consts.TaskStatus;
@@ -56,6 +61,19 @@ public class BusStopControllerTest {
 	@Autowired
 	private BusStopRepository busStopRepository;
 
+	private ApiUtils apiUtils;
+	
+	// 테스트 header에 전달 될 Token Map
+	private LinkedHashMap<String, String> tokenMap;
+
+	@Before
+	public void setup() throws Exception {
+		//Api Test Utils 초기화
+		apiUtils = new ApiUtils(mockMvc, objectMapper);
+		
+		tokenMap = apiUtils.getTokenMap();
+	}
+
 
 	/**
 	 * 버스정류장 목록 - 데이터가 존재할때
@@ -64,6 +82,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseExistsBusStopList() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/list/busStop")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             	.param("stopName", "")
             	.param("cityCode", "1000")
             	.param("pageNo", "1")
@@ -84,6 +103,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseNotExistsBusStopList() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/list/busStop")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             	.param("stopName", "정류장명칭")
             	.param("cityCode", "2000")
             	.param("pageNo", "1")
@@ -104,6 +124,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseMatchBusStopInfo() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/info/busStop/{stopId}", 55000000)
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
 				.andDo(print())
@@ -119,6 +140,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseNotMatchBusStopInfo() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/info/busStop/{stopId}", 400000)
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
 				.andDo(print())
@@ -133,6 +155,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseMatchBusStopInfoWithBusRoute() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/info/busStop/{stopId}", 55000000)
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
 				.andDo(print())
@@ -148,6 +171,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseNotMatchBusStopInfoWithBusRoute() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/info/busStop/{stopId}", 55000848)
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
 				.andDo(print())
@@ -163,6 +187,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseMatchBusStopTask() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/info/busStopTask/{taskId}", 1)
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
 				.andDo(print())
@@ -178,6 +203,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseNotMatchBusStopTask() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/info/busStopTask/{taskId}", 2000)
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
         	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .characterEncoding("UTF-8"))
 			.andDo(print())
@@ -192,6 +218,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseMatchBusStopTaskWithBisAutoChangeData() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/info/busStopTask/{taskId}", 3)
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
         	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .characterEncoding("UTF-8"))
 			.andDo(print())
@@ -207,6 +234,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseExistsBusStopTaskList() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/list/busStopTask/{busStopId}", 500000)
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
         	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .characterEncoding("UTF-8"))
             .andDo(print())
@@ -222,6 +250,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseNotExistsBusStopTaskList() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/list/busStopTask/{busStopId}", 800)
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
         	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .characterEncoding("UTF-8"))
             .andDo(print())
@@ -237,6 +266,7 @@ public class BusStopControllerTest {
 	@Test
 	public void caseBusStopSchema() throws Exception {
 		mockMvc.perform(get("/v1/ntool/api/schema/busStop")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
         	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .characterEncoding("UTF-8"))
             .andDo(print())
@@ -275,6 +305,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setCheckUserId("kr94666");
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/addTask")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
                 .content(objectMapper.writeValueAsString(busStopInputVo))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
@@ -296,6 +327,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setLongitude(126.123456);
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/addTask")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
                 .content(objectMapper.writeValueAsString(busStopInputVo))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
@@ -336,6 +368,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setCheckUserId("kr94666");
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/editTask")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
                 .content(objectMapper.writeValueAsString(busStopInputVo))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
@@ -357,6 +390,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setLongitude(126.123456);
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/editTask")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
                 .content(objectMapper.writeValueAsString(busStopInputVo))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
@@ -399,6 +433,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setCheckUserId("kr94666");
 
 		mockMvc.perform(put("/v1/ntool/api/modify/busStopTask")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             .content(objectMapper.writeValueAsString(busStopInputVo))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
@@ -440,6 +475,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setCheckUserId("kr94666");
 
 		mockMvc.perform(put("/v1/ntool/api/modify/busStopTask")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             .content(objectMapper.writeValueAsString(busStopInputVo))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
@@ -480,6 +516,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setCheckUserId("kr94666");
 
 		mockMvc.perform(put("/v1/ntool/api/modify/busStopTask")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             .content(objectMapper.writeValueAsString(busStopInputVo))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
@@ -501,6 +538,7 @@ public class BusStopControllerTest {
 		busStopRemoveInputVo.setCheckUserId("kr94666");
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/removeTask")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
                 .content(objectMapper.writeValueAsString(busStopRemoveInputVo))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
@@ -522,6 +560,7 @@ public class BusStopControllerTest {
 		busStopRemoveInputVo.setCheckUserId("kr94666");
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/removeTask")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
                 .content(objectMapper.writeValueAsString(busStopRemoveInputVo))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
@@ -543,6 +582,7 @@ public class BusStopControllerTest {
 		busStopRemoveInputVo.setCheckUserId("kr94666");
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/removeTask")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
                 .content(objectMapper.writeValueAsString(busStopRemoveInputVo))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)

@@ -16,6 +16,7 @@
 			TABLE_NAME = #{tableName}
 			AND COLUMN_NAME != 'reg_date' AND COLUMN_NAME != 'upd_date'
 			AND COLUMN_NAME != 'createdat' AND COLUMN_NAME != 'modifiedat'
+			AND COLUMN_NAME != 'create_date' AND COLUMN_NAME != 'update_date'
     </select>
 
 	<select id="selectCityCodeList" resultType="com.naver.pubtrans.itn.api.vo.common.CityCodeVo">
@@ -47,13 +48,27 @@
 			provider_name asc
 	</select>
 	
-	<select id="selectAuthInfoList" resultType="com.naver.pubtrans.itn.api.vo.member.AuthInfoVo">
+	<select id="selectAuthorityInfoList" resultType="com.naver.pubtrans.itn.api.vo.member.AuthorityInfoVo">
 		SELECT
-			info.auth_id
-			, info.auth_name
-			, info.auth_memo
+			info.authority_id
+			, info.authority_name
+			, info.authority_memo
 		FROM
-			tb_z_svc_auth_info `info`
+			tb_z_svc_authority_info `info`
+	</select>
+
+	<select id="selectBusRouteClassList" resultType="com.naver.pubtrans.itn.api.vo.common.BusRouteClassVo">
+		SELECT
+			bus_class_id
+			, bus_class_name
+			, color
+			, icon_name
+			, sorting_priority
+			, city_code
+		FROM
+			tb_bus_route_class
+		ORDER BY
+			sorting_priority, bus_class_id
 	</select>
 
 

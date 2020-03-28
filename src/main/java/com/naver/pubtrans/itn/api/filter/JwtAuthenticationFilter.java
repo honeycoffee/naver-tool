@@ -10,6 +10,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -20,8 +21,9 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
-import com.naver.pubtrans.itn.api.common.MemberUtil;
+import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.exception.AccessTokenNotFoundException;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
@@ -44,28 +46,36 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 	/**
 	 * JwtToken 유효성 검증을 수행하는 필터를 chain에 등록
 	 */
-	public void doFilter(ServletRequest request, ServletResponse servletResponse, FilterChain chain)
+	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
 			throws IOException, ServletException {
 		
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		request = (HttpServletRequest) request;
+		HttpServletRequest request = (HttpServletRequest) servletRequest;
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-		response.setCharacterEncoding("UTF-8");
-		response.setContentType("application/json");
+		response.setCharacterEncoding(CommonConstant.CHARACTER_ENCODING_UTF_8);
+		response.setContentType(CommonConstant.CONTENT_TYPE_APPLICATION_JSON);
 
 		try {
+			
+			String requestURI = request.getRequestURI();
+			String token = "";
+			
+			if(StringUtils.contains(requestURI, CommonConstant.REFRESH_TOKEN_API_URI)) {
+				token = jwtAdapter.getRefreshTokenFromHeader(request);
+				
+				request.setAttribute(CommonConstant.REFRESH_TOKEN_KEY, token);
+			}else {
+				token = jwtAdapter.getAccessTokenFromHeader(request);
 
-			String token = jwtAdapter.getTokenFromHeader((HttpServletRequest) request);
-
+				request.setAttribute(CommonConstant.ACCESS_TOKEN_KEY, token);
+			}
+			
 			if (token != null) {
 				Authentication auth = jwtAdapter.getAuthentication(token);
 
 				SecurityContextHolder.getContext().setAuthentication(auth);
-
-				// Access Token API에서 사용할 수 있게 저장
-				MemberUtil.TOKEN = token;
 			}
 
 			chain.doFilter(request, response);

@@ -2,8 +2,11 @@ package com.naver.pubtrans.itn.api.common;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
+import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
@@ -14,12 +17,8 @@ import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 @Component
 public class MemberUtil {
 
-//	@Autowired
 	private static JwtAdapter jwtAdapter;
-
-	// API 호출 시 Header에 있는 token
-	public static String TOKEN = "";
-
+	
 	@SuppressWarnings("static-access")
 	@Autowired
 	MemberUtil(JwtAdapter jwtAdapter) {
@@ -27,24 +26,29 @@ public class MemberUtil {
 	}
 
 	/**
-	 * AccessToken 으로 회원 ID를 가져온다.
-	 * accessToken : 회원정보를 추출할 토큰
-	 * @return
+	* accessToken 으로 회원 ID를 가져온다.
+	* @return
 	 */
 	public static String getUserIdFromToken() throws Exception {
-		MemberOutputVo memberOutputVo = jwtAdapter.extractUserDataFromToken(TOKEN);
+		
+		String accessToken =  (String)Util.getHttpServletRequest()
+			.getAttribute(CommonConstant.ACCESS_TOKEN_KEY);
+
+		MemberOutputVo memberOutputVo = jwtAdapter.extractUserDataFromToken(accessToken);
 		return memberOutputVo.getUserId();
 
 	}
 
 	/**
-	 * AccessToken 으로 회원 정보를 가져온다.
-	 * accessToken : 회원정보를 추출할 토큰
+	 * accessToken 으로 회원 정보를 가져온다.
 	 * @return
 	 */
 	public static MemberOutputVo getMemberFromToken() throws Exception {
+		
+		String accessToken =  (String)Util.getHttpServletRequest()
+			.getAttribute(CommonConstant.ACCESS_TOKEN_KEY);
 
-		MemberOutputVo memberOutputVo = jwtAdapter.extractUserDataFromToken(TOKEN);
+		MemberOutputVo memberOutputVo = jwtAdapter.extractUserDataFromToken(accessToken);
 		return memberOutputVo;
 
 	}

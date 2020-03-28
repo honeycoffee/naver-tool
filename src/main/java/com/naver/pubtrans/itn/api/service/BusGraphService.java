@@ -37,6 +37,25 @@ public class BusGraphService {
 		this.busStopRepository = busStopRepository;
 	}
 
+	/**
+	 * GeoJson형태의 Feature 목록을 만든다
+	 * @param busStopGraphVoList - 검색된 그래프 정보 목록
+	 * @return
+	 * @throws Exception
+	 */
+	public List<GeoJsonFeatureVo> makeGeoJsonFeatureList(List<BusStopGraphVo> busStopGraphVoList) throws Exception {
+		List<GeoJsonFeatureVo> geoJsonFeatureVoList = new ArrayList<>();
+
+		for(BusStopGraphVo busStopGraphVo : busStopGraphVoList) {
+			BusStopGraphSearchVo busStopGraphSearchVo = new BusStopGraphSearchVo(busStopGraphVo.getStartStopId(), busStopGraphVo.getEndStopId());
+			GeoJsonFeatureVo geoJsonFeatureVo = this.makeGeoJsonFeature(busStopGraphSearchVo, busStopGraphVo);
+
+			geoJsonFeatureVoList.add(geoJsonFeatureVo);
+		}
+
+		return geoJsonFeatureVoList;
+	}
+
 
 	/**
 	 * GeoJson형태의 Feature 목록을 만든다

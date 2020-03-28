@@ -3,6 +3,7 @@ package com.naver.pubtrans.itn.api.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,17 +22,15 @@ import com.naver.pubtrans.itn.api.common.Util;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.PubTransTable;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
+import com.naver.pubtrans.itn.api.consts.UserAuthority;
 import com.naver.pubtrans.itn.api.exception.ApiException;
 import com.naver.pubtrans.itn.api.repository.MemberRepository;
-import com.naver.pubtrans.itn.api.vo.common.BusProviderVo;
-import com.naver.pubtrans.itn.api.vo.common.FieldValue;
 import com.naver.pubtrans.itn.api.vo.common.PagingVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
-import com.naver.pubtrans.itn.api.vo.member.AuthInfoVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
-import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthOutputVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthorityOutputVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
@@ -53,7 +52,7 @@ public class MemberService implements UserDetailsService {
 
 	@Autowired
 	MemberService(OutputFmtUtil outputFmtUtil, CommonService commonService, MemberRepository memberRepository,
-			MemberPasswordEncoder memberPasswordEncoder) {
+		MemberPasswordEncoder memberPasswordEncoder) {
 		this.outputFmtUtil = outputFmtUtil;
 		this.commonService = commonService;
 		this.memberRepository = memberRepository;
@@ -73,23 +72,24 @@ public class MemberService implements UserDetailsService {
 		// 비밀번호 입력 값 검증
 		if (StringUtils.isEmpty(userPw) || userPw.length() < CommonConstant.PASSWORD_MIN) {
 			throw new ApiException(ResultCode.PASSWORD_NOT_VALID.getApiErrorCode(),
-					ResultCode.PASSWORD_NOT_VALID.getDisplayMessage());
+				ResultCode.PASSWORD_NOT_VALID.getDisplayMessage());
 		}
 
 		memberInputVo.setUserPw(memberPasswordEncoder.encode(memberInputVo.getUserPw()));
 
-		if (StringUtils.isEmpty(memberInputVo.getAuthId())) {
-			memberInputVo.setAuthId(CommonConstant.ROLE_USER);
+		if (StringUtils.isEmpty(memberInputVo.getAuthorityId())) {
+			memberInputVo.setAuthorityId(UserAuthority.ROLE_USER.name());
 		}
 
 		memberRepository.insertMember(memberInputVo);
-		memberRepository.insertMemberAuth(memberInputVo);
+		memberRepository.insertMemberAuthority(memberInputVo);
 	}
 
 	/**
 	 * ID 중복 체크
 	 * 
 	 * @param userId - 체크할 회원 ID
+	 * return
 	 */
 	public CommonResult checkDuplicate(String userId) {
 
@@ -111,7 +111,7 @@ public class MemberService implements UserDetailsService {
 	/**
 	 * 회원 비밀번호 검증
 	 * 
-	 * @param memberInputVo - 회원 입력 Vo return
+	 * @param memberInputVo - 회원 입력 Vo 
 	 * @throws Exception
 	 */
 	public void verifyPassword(MemberInputVo memberInputVo) throws Exception {
@@ -123,14 +123,14 @@ public class MemberService implements UserDetailsService {
 
 		if (memberOutputVo == null) {
 			throw new ApiException(ResultCode.MEMBER_DATA_NULL.getApiErrorCode(),
-					ResultCode.MEMBER_DATA_NULL.getDisplayMessage());
+				ResultCode.MEMBER_DATA_NULL.getDisplayMessage());
 		}
 
 		// 현재 비밀번호와 DB에 저장된 인코딩된 비밀번호 검증
 		if (StringUtils.isEmpty(memberInputVo.getCurrentUserPw()) || !memberPasswordEncoder
-				.matches(memberInputVo.getCurrentUserPw(), memberOutputVo.getEncodedUserPw())) {
+			.matches(memberInputVo.getCurrentUserPw(), memberOutputVo.getEncodedUserPw())) {
 			throw new ApiException(ResultCode.PASSWORD_NOT_MATCH.getApiErrorCode(),
-					ResultCode.PASSWORD_NOT_MATCH.getDisplayMessage());
+				ResultCode.PASSWORD_NOT_MATCH.getDisplayMessage());
 		}
 
 	}
@@ -149,7 +149,7 @@ public class MemberService implements UserDetailsService {
 
 		if (memberOutputVo == null) {
 			throw new ApiException(ResultCode.MEMBER_DATA_NULL.getApiErrorCode(),
-					ResultCode.MEMBER_DATA_NULL.getDisplayMessage());
+				ResultCode.MEMBER_DATA_NULL.getDisplayMessage());
 		}
 
 		return memberOutputVo;
@@ -159,7 +159,6 @@ public class MemberService implements UserDetailsService {
 	/**
 	 * 자신의 정보를 조회한다
 	 * 
-	 * @param accessToken - API 호출 accessToken
 	 * @throws Exception
 	 */
 	public CommonResult getMe() throws Exception {
@@ -179,7 +178,6 @@ public class MemberService implements UserDetailsService {
 	 * 자신의 정보를 수정한다
 	 * 
 	 * @param memberInputVo - 회원 입력 Vo
-	 * @param accessToken   - API 호출 accessToken
 	 * @throws Exception
 	 */
 	public void updateMe(MemberInputVo memberInputVo) throws Exception {
@@ -188,7 +186,7 @@ public class MemberService implements UserDetailsService {
 
 		if (!memberInputVo.getUserId().equals(userId)) {
 			throw new ApiException(ResultCode.MEMBER_TOKEN_NOT_MATCH.getApiErrorCode(),
-					ResultCode.MEMBER_TOKEN_NOT_MATCH.getDisplayMessage());
+				ResultCode.MEMBER_TOKEN_NOT_MATCH.getDisplayMessage());
 		}
 
 		this.verifyPassword(memberInputVo);
@@ -214,14 +212,14 @@ public class MemberService implements UserDetailsService {
 		// 저장 오류 처리
 		if (updateMemberCnt == 0) {
 			throw new ApiException(ResultCode.UPDATE_FAIL.getApiErrorCode(),
-					ResultCode.UPDATE_FAIL.getDisplayMessage());
+				ResultCode.UPDATE_FAIL.getDisplayMessage());
 		}
 
-		// 내 정보 수정의 경우 권한을 가져 오지 않음.
-		if(StringUtils.isNotEmpty(memberInputVo.getAuthId())) {
-			memberRepository.updateMemberAuth(memberInputVo);
+		// 내 정보 수정의 경우, 전달 받은 권한이 존재하면 권한을 업데이트 합니다.
+		if (StringUtils.isNotEmpty(memberInputVo.getAuthorityId())) {
+			memberRepository.updateMemberAuthority(memberInputVo);
 		}
-		
+
 	}
 
 	/**
@@ -237,7 +235,7 @@ public class MemberService implements UserDetailsService {
 		// 삭제 오류 처리
 		if (deleteMemberCnt == 0) {
 			throw new ApiException(ResultCode.DELETE_FAIL.getApiErrorCode(),
-					ResultCode.DELETE_FAIL.getDisplayMessage());
+				ResultCode.DELETE_FAIL.getDisplayMessage());
 		}
 
 	}
@@ -251,6 +249,7 @@ public class MemberService implements UserDetailsService {
 	public void deleteTestMember(MemberSearchVo memberSearchVo) throws Exception {
 
 		memberRepository.deleteTestMember(memberSearchVo);
+		memberRepository.deleteTestMemberAuthority(memberSearchVo);
 
 	}
 
@@ -292,9 +291,9 @@ public class MemberService implements UserDetailsService {
 
 		// 검색 폼 데이터 구조
 		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(
-				PubTransTable.TB_Z_SVC_MEMBER.getName(), CommonConstant.USABLE_COLUMN, usableColumnNameList);
+			PubTransTable.TB_Z_SVC_MEMBER.getName(), CommonConstant.USABLE_COLUMN, usableColumnNameList);
 
-		commonSchemaList.addAll(this.selectAuthInfoSchema());
+		commonSchemaList.addAll(this.selectAuthorityInfoSchema());
 
 		/**
 		 * 3. 공통 출력포맷 생성
@@ -315,11 +314,11 @@ public class MemberService implements UserDetailsService {
 		List<CommonSchema> commonSchemaList = new ArrayList<>();
 
 		commonSchemaList.addAll(this.selectMemberSchema());
-		commonSchemaList.addAll(this.selectAuthInfoSchema());
+		commonSchemaList.addAll(this.selectAuthorityInfoSchema());
 
 		// 동일 컬럼에 대해 중복을 제거
 		List<CommonSchema> distinctCommonSchemaVoList = commonSchemaList.stream()
-				.filter(Util.distinctByKey(o -> o.getFieldName())).collect(Collectors.toList());
+			.filter(Util.distinctByKey(o -> o.getFieldName())).collect(Collectors.toList());
 
 		return distinctCommonSchemaVoList;
 
@@ -335,7 +334,7 @@ public class MemberService implements UserDetailsService {
 
 		// 검색 폼 데이터 구조
 		List<CommonSchema> commonSchemaList = commonService
-				.selectCommonSchemaList(PubTransTable.TB_Z_SVC_MEMBER.getName(), null, null);
+			.selectCommonSchemaList(PubTransTable.TB_Z_SVC_MEMBER.getName(), null, null);
 
 		return commonSchemaList;
 
@@ -351,7 +350,7 @@ public class MemberService implements UserDetailsService {
 	public CommonResult getMemberDataWithSchema(MemberSearchVo memberSearchVo) throws Exception {
 
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(this.selectMemberSchemaAll(),
-				this.getMember(memberSearchVo));
+			this.getMember(memberSearchVo));
 
 		return commonResult;
 	}
@@ -362,15 +361,15 @@ public class MemberService implements UserDetailsService {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<CommonSchema> selectAuthInfoSchema() throws Exception {
+	public List<CommonSchema> selectAuthorityInfoSchema() throws Exception {
 
 		ArrayList<String> usableColumnNameList = new ArrayList<>();
-		usableColumnNameList.add("auth_id");
-		usableColumnNameList.add("auth_name");
+		usableColumnNameList.add("authority_id");
+		usableColumnNameList.add("authority_name");
 
 		// 검색 폼 데이터 구조
 		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(
-				PubTransTable.TB_Z_SVC_AUTH_INFO.getName(), CommonConstant.USABLE_COLUMN, usableColumnNameList);
+			PubTransTable.TB_Z_SVC_AUTHORITY_INFO.getName(), CommonConstant.USABLE_COLUMN, usableColumnNameList);
 		return commonSchemaList;
 
 	}
@@ -381,11 +380,12 @@ public class MemberService implements UserDetailsService {
 	 * @param memberSearchVo - 회원 검색조건
 	 * @return
 	 */
-	public List<MemberAuthOutputVo> selectMemberAuthList(MemberSearchVo memberSearchVo) {
+	public List<MemberAuthorityOutputVo> selectMemberAuthorityList(MemberSearchVo memberSearchVo) {
 
-		List<MemberAuthOutputVo> memberAuthOutputVoList = memberRepository.selectMemberAuthList(memberSearchVo);
+		List<MemberAuthorityOutputVo> memberAuthorityOutputVoList = memberRepository
+			.selectMemberAuthorityList(memberSearchVo);
 
-		return memberAuthOutputVoList;
+		return memberAuthorityOutputVoList;
 
 	}
 
@@ -395,18 +395,14 @@ public class MemberService implements UserDetailsService {
 	 * @param memberSearchVo - 회원 검색조건
 	 * @return
 	 */
-	public String[] getMemberAuthArray(MemberSearchVo memberSearchVo) {
+	public String[] getMemberAuthorityIdArray(MemberSearchVo memberSearchVo) {
 
-		List<MemberAuthOutputVo> memberAuthOutputVoList = this.selectMemberAuthList(memberSearchVo);
+		List<MemberAuthorityOutputVo> memberAuthorityOutputVoList = this.selectMemberAuthorityList(memberSearchVo);
 
-		int cnt = 0;
-		String[] memberAuthArray = new String[memberAuthOutputVoList.size()];
+		String[] memberAuthorityIdArray = memberAuthorityOutputVoList.stream().map(o -> o.getAuthorityId())
+			.toArray(String[]::new);
 
-		for (MemberAuthOutputVo memberAuthOutputVo : memberAuthOutputVoList) {
-			memberAuthArray[cnt++] = memberAuthOutputVo.getAuthId();
-		}
-
-		return memberAuthArray;
+		return memberAuthorityIdArray;
 
 	}
 
@@ -423,21 +419,21 @@ public class MemberService implements UserDetailsService {
 		memberSearchVo.setUserId(userId);
 
 		MemberOutputVo memberOutputVo = memberRepository.getMember(memberSearchVo);
-		MemberAuthOutputVo returnMemberAuthOutputVo = new MemberAuthOutputVo();
+		MemberAuthorityOutputVo memberAuthorityOutputVo = new MemberAuthorityOutputVo();
 
-		returnMemberAuthOutputVo.setUserId(memberOutputVo.getUserId());
-		returnMemberAuthOutputVo.setUsername(memberOutputVo.getUserName());
+		memberAuthorityOutputVo.setUserId(memberOutputVo.getUserId());
+		memberAuthorityOutputVo.setUsername(memberOutputVo.getUserName());
 
-		List<MemberAuthOutputVo> memberAuthOutputVoList = this.selectMemberAuthList(memberSearchVo);
+		List<MemberAuthorityOutputVo> memberAuthorityOutputVoList = this.selectMemberAuthorityList(memberSearchVo);
 		List<GrantedAuthority> grantedAuthorityList = new ArrayList<GrantedAuthority>();
 
-		for (MemberAuthOutputVo memberAuthOutputVo : memberAuthOutputVoList) {
-			grantedAuthorityList.add(new SimpleGrantedAuthority(memberAuthOutputVo.getAuthId()));
+		for (MemberAuthorityOutputVo vo : memberAuthorityOutputVoList) {
+			grantedAuthorityList.add(new SimpleGrantedAuthority(vo.getAuthorityId()));
 		}
 
-		returnMemberAuthOutputVo.setAuthorities(grantedAuthorityList);
+		memberAuthorityOutputVo.setAuthorities(grantedAuthorityList);
 
-		return returnMemberAuthOutputVo;
+		return memberAuthorityOutputVo;
 
 	}
 

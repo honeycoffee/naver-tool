@@ -49,12 +49,12 @@ public class MemberOutputVo {
 	/**
 	 * 권한 ID 
 	 */
-	private String authId;
+	private String authorityId;
 
 	/**
 	 * 권한 이름 
 	 */
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
-	private String authName;
+	private String authorityName;
 
 }

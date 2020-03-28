@@ -18,6 +18,23 @@
 	        </foreach>
 	</select>
 
+	<select id="selectBusRouteGraphList" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.graph.BusStopGraphVo">
+		SELECT
+			<include refid="selectCommonBusStopGraph" />
+			, route.stop_sequence
+		FROM
+			tb_route_stops route, tb_stop_graph graph
+		LEFT JOIN
+			tb_stops startStop on startStop.stop_id = graph.start_stop_id
+		LEFT JOIN
+			tb_stops endStop on endStop.stop_id = graph.end_stop_id
+		WHERE
+			route.route_id = #{routeId}
+			AND route.graph_id = graph.graph_id
+		ORDER BY
+			route.stop_sequence
+	</select>
+
 
 	<sql id="selectCommonBusStopGraph">
 		graph.graph_id
@@ -29,5 +46,41 @@
 	    , ST_AsGeoJSON((graph.graph_info), 14) as graph_info_to_geo_json
 	</sql>
 
+	<select id="geBusRouteGraphTaskListCnt" parameterType="long" resultType="int">
+		SELECT
+			count(*) as total_list_cnt
+		FROM
+			tb_route_stops_task route, tb_stop_graph graph
+		WHERE
+			route.task_id = #{taskId}
+			AND route.graph_id = graph.graph_id
+		ORDER BY
+			route.stop_sequence
+	</select>
+
+	<select id="selectBusRouteGraphTaskList" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.bus.graph.BusStopGraphVo">
+		SELECT
+			graph.graph_id
+		    , graph.start_stop_id
+		    , graph.end_stop_id
+		    , startStop.stop_name as start_stop_name
+		    , endStop.stop_name as end_stop_name
+		    , ST_AsText(if(isnull(gt.graph_info), graph.graph_info, gt.graph_info)) as graph_info
+		    , ST_AsGeoJSON((if(isnull(gt.graph_info), graph.graph_info, gt.graph_info)), 14) as graph_info_to_geo_json
+			, route.stop_sequence
+		FROM
+			tb_route_stops_task route, tb_stop_graph graph
+		LEFT JOIN
+			tb_stops startStop on startStop.stop_id = graph.start_stop_id
+		LEFT JOIN
+			tb_stops endStop on endStop.stop_id = graph.end_stop_id
+		LEFT JOIN
+			tb_stop_graph_task gt on gt.task_id = #{taskId} and gt.start_stop_id = graph.start_stop_id and gt.end_stop_id = graph.end_stop_id
+		WHERE
+			route.task_id = #{taskId}
+			AND route.graph_id = graph.graph_id
+		ORDER BY
+			route.stop_sequence
+	</select>
 
 </mapper>

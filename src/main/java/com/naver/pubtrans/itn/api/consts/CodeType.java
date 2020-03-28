@@ -17,7 +17,8 @@ public enum CodeType {
 	TASK_DATA_TYPE("task_data_type", "Task 데이터 구분"),
 	CITYCODE("citycode", "도시코드"),
 	BUS_PROVIDER("provider_id", "BIS 데이터 공급지역"),
-	AUTH_ID("auth_id", "권한 ID");
+	BUS_ROUTE_CLASS("bus_route_class", "버스 노선 클래스"),
+	AUTHORITY_ID("authority_id", "권한 ID");
 
 	// 코드 타입
 	private String codeName;
@@ -25,11 +26,9 @@ public enum CodeType {
 	// 코드 설명
 	private String codeDescription;
 
-
-	CodeType(String codeName, String codeDescription){
+	CodeType(String codeName, String codeDescription) {
 		this.codeName = codeName;
 		this.codeDescription = codeDescription;
 	}
-
 
 }
