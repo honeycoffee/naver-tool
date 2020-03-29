@@ -3,14 +3,11 @@
 <mapper namespace="com.naver.pubtrans.itn.api.repository.BusRouteRepository">
 
 
-	<select id="getFareRule" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteSearchVo" resultType="int">
+	<select id="getFareRule" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.output.FareOutputVoWithRouteList">
 		SELECT
-			count(*) as total_list_cnt
+			<include refid="selectCommonFareRule" />
 		FROM
-			tb_routes route
-			, tb_bus_routes_info sub
-			, tb_city_code city
-			, tb_bus_route_class rc
+			tb_fare_rule fare
 		
 		<choose>
 			<when test="@org.apache.commons.lang3.StringUtils@isNotEmpty(fareId)">
@@ -21,23 +18,133 @@
 				WHERE
 					fare.base_yn = 'Y'
 					
-				<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(cityCode)">
-					AND 
-						fare.city_code = #{cityCode}
-				</if>
-		
-				<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(busClass)">
-					AND 
-						fare.bus_class = #{busClass}
-				</if>
+				<include refid="whereCityCodeAndBusClass" />
 			</otherwise>
 		</choose>
 
 	</select>
 	
+	<select id="selectIngoredFareRuleList" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.output.IgnoredFareListOutputVo">
+		SELECT
+		
+			<include refid="selectCommonFareRule" />
+			
+		FROM
+			tb_fare_rule fare
+		WHERE
+			fare.base_yn = 'Y'
+					
+		<include refid="whereCityCodeAndBusClass" />
+	</select>
+
+	<select id="getFareRuleTask" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.fare.output.FareTaskOutputVoWithRouteList">
+		SELECT
+
+			<include refid="selectCommonFareRule" />
+
+		FROM
+			tb_fare_rule_task fare
+		WHERE
+		    fare.task_id = #{taskId}
+	</select>
+
+	<insert id="insertFareRuleTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleTaskInputVo">
+		INSERT INTO tb_fare_rule_task
+			(task_id, base_fare, base_dist, youth_fare, child_fare, base_cash_fare, youth_cash_fare, child_cash_fare
+			, unit_fare, unit_dist, max_fare, start_stop_id, end_stop_id, service_id, city_code
+			, base_yn, bus_class, command)
+		VALUES
+			(#{taskId}, #{baseFare}, #{baseDist}, #{youthFare}, #{childFare}, #{baseCashFare}, #{youthCashFare}, #{childCashFare}
+			, #{unitFare}, #{unitDist}, #{maxFare}, #{startStopId}, #{endStopId}, #{serviceId}, #{cityCode}
+			, #{baseYn}, #{busClass}, #{command})
+	</insert>
+
+	<update id="updateFareRuleTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleTaskInputVo">
+		UPDATE
+			tb_fare_rule_task
+		SET
+			base_fare = #{baseFare}
+			, youth_fare = #{youthFare}
+			, child_fare = #{childFare}
+			, base_cash_fare = #{baseCashFare}
+			, youth_cash_fare = #{youthCashFare}
+			, child_cash_fare = #{childCashFare}
+			, base_dist = #{baseDist}
+			, unit_fare = #{unitFare}
+			, unit_dist = #{unitDist}
+			, max_fare = #{maxFare}
+			, start_stop_id = #{startStopId}
+			, end_stop_id = #{endStopId}
+			, service_id = #{serviceId}
+			, city_code = #{cityCode}
+			, bus_class = #{busClass}
+			, base_yn = #{baseYn}
+			command = #{command}
+		WHERE
+			task_id = #{taskId}
+	</update>
+
+	<select id="selectBusRouteList" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.stop.BusRouteVo">
+		SELECT
+			city.city_name
+		    , rc.bus_class_name
+		    , route.route_id
+		    , route.route_name
+			, sub.start_point_name
+			, sub.end_point_name
+		FROM
+			tb_routes route
+			, tb_bus_routes_info sub
+			, tb_city_code city
+			, tb_bus_route_class rc
+			, tb_route_fare_mapping mapping
+        WHERE
+			mapping.fare_id = #{fareId}
+			AND route.city_code = city.city_code
+			AND sub.bus_class = rc.bus_class_id
+			AND route.route_id = mapping.route_id
+			AND route.route_id = sub.route_id
+	</select>
 	
+	<insert id="insertRoutFareMappingTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleTaskInputVo">
+		INSERT INTO tb_fare_rule_mapping_task
+			(task_id, route_id, fare_id)
+		VALUES
+			(#{taskId}, #{routeId}, #{fareId})
+	</insert>
 
 	<sql id="whereCityCodeAndBusClass">
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(cityCode)">
+			AND 
+				fare.city_code = #{cityCode}
+		</if>
+
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(busClass)">
+			AND 
+				fare.bus_class = #{busClass}
+		</if>
+	</sql>
+	
+	<sql id="selectCommonFareRule">
+		fare.fare_id
+		, fare.base_fare
+		, fare.youth_fare
+		, fare.child_fare
+		, fare.base_cash_fare
+		, fare.youth_cash_fare
+		, fare.child_cash_fare
+		, fare.base_dist
+		, fare.unit_fare
+		, fare.unit_dist
+		, fare.max_fare
+		, fare.start_stop_id
+		, fare.end_stop_id
+		, fare.service_id
+		, fare.transfer_group_id
+		, fare.city_code
+		, fare.bus_class
+		, fare.base_yn
+		, fare.command
 	</sql>
 	
 
