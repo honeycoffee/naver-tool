@@ -124,4 +124,10 @@ public interface CommonConstant {
 	// Filter, Handler 에서 Exception 출력시 쓰이는 CharacterEncoding
 	String CHARACTER_ENCODING_UTF_8 = "UTF-8";
 
+	// 요금 룰 Task 입력 정보 VO명
+	String FARE_TASK_INPUT_VO = "FareTaskInputVo";
+
+	// 요금 룰 ID 이름
+	String KEY_FARE = "fareId";
+
 }

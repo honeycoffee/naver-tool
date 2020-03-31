@@ -1,43 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.naver.pubtrans.itn.api.repository.BusRouteRepository">
+<mapper namespace="com.naver.pubtrans.itn.api.repository.FareRepository">
 
 
-	<select id="getFareRule" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.output.FareOutputVoWithRouteList">
+	<select id="getBaseFareRule" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.FareVo">
 		SELECT
 			<include refid="selectCommonFareRule" />
 		FROM
 			tb_fare_rule fare
 		
-		<choose>
-			<when test="@org.apache.commons.lang3.StringUtils@isNotEmpty(fareId)">
-				WHERE
-					fare.fare_id = #{fareId} 
-			</when>
-			<otherwise>
-				WHERE
-					fare.base_yn = 'Y'
-					
-				<include refid="whereCityCodeAndBusClass" />
-			</otherwise>
-		</choose>
-
+		WHERE
+			fare.base_yn = 'Y'
+			
+		<include refid="whereCityCodeAndBusClass" />
+		
 	</select>
 	
-	<select id="selectIngoredFareRuleList" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.output.IgnoredFareListOutputVo">
+	<select id="getIngoredFareRule" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.FareVo">
 		SELECT
-		
 			<include refid="selectCommonFareRule" />
-			
 		FROM
 			tb_fare_rule fare
 		WHERE
-			fare.base_yn = 'Y'
+			fare.fare_id = #{fareId} 
+	</select>
+	
+	<select id="selectIgnoredFareRuleList" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.output.IgnoredFareListOutputVo">
+		SELECT
+			fare.fare_id
+			, @rownum:=@rownum+1 as sort
+		FROM
+			(SELECT @ROWNUM :=0) r
+			, tb_fare_rule fare
+		WHERE
+			fare.base_yn = 'N'
 					
-		<include refid="whereCityCodeAndBusClass" />
 	</select>
 
-	<select id="getFareRuleTask" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.fare.output.FareTaskOutputVoWithRouteList">
+	<sql id="whereCityCodeAndBusClass">
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(cityCode)">
+			AND 
+				fare.city_code = #{cityCode}
+		</if>
+
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(busClass)">
+			AND 
+				fare.bus_class = #{busClass}
+		</if>
+	</sql>
+	
+	<select id="getFareRuleTask" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.fare.FareTaskVo">
 		SELECT
 
 			<include refid="selectCommonFareRule" />
@@ -48,7 +60,7 @@
 		    fare.task_id = #{taskId}
 	</select>
 
-	<insert id="insertFareRuleTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleTaskInputVo">
+	<insert id="insertFareRuleTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareTaskInputVo">
 		INSERT INTO tb_fare_rule_task
 			(task_id, base_fare, base_dist, youth_fare, child_fare, base_cash_fare, youth_cash_fare, child_cash_fare
 			, unit_fare, unit_dist, max_fare, start_stop_id, end_stop_id, service_id, city_code
@@ -59,7 +71,7 @@
 			, #{baseYn}, #{busClass}, #{command})
 	</insert>
 
-	<update id="updateFareRuleTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleTaskInputVo">
+	<update id="updateFareRuleTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareTaskInputVo">
 		UPDATE
 			tb_fare_rule_task
 		SET
@@ -84,7 +96,7 @@
 			task_id = #{taskId}
 	</update>
 
-	<select id="selectBusRouteList" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.stop.BusRouteVo">
+	<select id="selectBusRouteFareMappingList" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteListOutputVo">
 		SELECT
 			city.city_name
 		    , rc.bus_class_name
@@ -106,24 +118,12 @@
 			AND route.route_id = sub.route_id
 	</select>
 	
-	<insert id="insertRoutFareMappingTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleTaskInputVo">
+	<insert id="insertRoutFareMappingTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareTaskInputVo">
 		INSERT INTO tb_fare_rule_mapping_task
 			(task_id, route_id, fare_id)
 		VALUES
 			(#{taskId}, #{routeId}, #{fareId})
 	</insert>
-
-	<sql id="whereCityCodeAndBusClass">
-		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(cityCode)">
-			AND 
-				fare.city_code = #{cityCode}
-		</if>
-
-		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(busClass)">
-			AND 
-				fare.bus_class = #{busClass}
-		</if>
-	</sql>
 	
 	<sql id="selectCommonFareRule">
 		fare.fare_id

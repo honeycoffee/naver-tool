@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 요금 룰 검색 Vo
+ * 요금 룰 검색 조건
  * @author westwind
  *
  */

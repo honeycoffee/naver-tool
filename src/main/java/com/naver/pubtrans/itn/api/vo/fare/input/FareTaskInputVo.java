@@ -1,5 +1,6 @@
 package com.naver.pubtrans.itn.api.vo.fare.input;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -14,6 +15,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FareTaskInputVo {
+
+	/**
+	 * 요금 ID
+	 */
+	private Integer fareId;
+
+	/**
+	 * 작업 ID
+	 */
+	private long taskId;
 
 	/**
 	 * 기본요금(일반_카드기준)
@@ -78,12 +89,12 @@ public class FareTaskInputVo {
 	/**
 	 * 시작 정류장
 	 */
-	private Integer[] startStopId;
+	private Integer startStopId;
 
 	/**
 	 * 도착 정류장
 	 */
-	private Integer[] endStopId;
+	private Integer endStopId;
 
 	/**
 	 * 운행 요일 ID
@@ -117,5 +128,17 @@ public class FareTaskInputVo {
 	 * 버스노선 ID
 	 */
 	private Integer routeId;
+
+	/**
+	 * 작업내용
+	 */
+	@NotBlank
+	private String taskComment;
+
+	/**
+	 * 검수자 ID
+	 */
+	@NotBlank
+	private String checkUserId;
 
 }

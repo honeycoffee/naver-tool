@@ -14,7 +14,8 @@ public enum TaskDataType {
 
 	ROUTE("route", "노선정보"),
 	STOP("stop", "정류장 정보"),
-	COMPANY("company", "운수사");
+	COMPANY("company", "운수사"),
+	FARE("fare", "요금 룰");
 
 	// 코드
 	private String code;

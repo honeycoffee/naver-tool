@@ -1,25 +1,29 @@
 package com.naver.pubtrans.itn.api.vo.fare.output;
 
-import java.util.List;
-
-import com.naver.pubtrans.itn.api.vo.bus.stop.output.BusRouteOutputVo;
-import com.naver.pubtrans.itn.api.vo.fare.FareVo;
-
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 요금 룰  정보
+ * 예외 노선 요금 리스트 Vo
  * @author westwind
  *
  */
 @Getter
 @Setter
-public class IgnoredFareListOutputVo extends FareVo {
+public class IgnoredFareListOutputVo {
 
 	/**
-	 * 요금
+	 * 요금 룰 ID
 	 */
-	private List<BusRouteOutputVo> busRouteInfoList;
+	private int fareId;
 
+	/**
+	 * 목록 순서
+	 */
+	private int order;
+
+	/**
+	 * 예외 요금 이름
+	 */
+	private int ignoredFareName;
 }
