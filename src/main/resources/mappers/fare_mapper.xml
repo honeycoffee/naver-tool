@@ -28,22 +28,28 @@
 	<select id="selectIgnoredFareRuleList" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.output.IgnoredFareListOutputVo">
 		SELECT
 			fare.fare_id
-			, @rownum:=@rownum+1 as sort
+			, group_concat(route_name) as routes
 		FROM
-			(SELECT @ROWNUM :=0) r
-			, tb_fare_rule fare
+			tb_fare_rule fare
+		LEFT JOIN tb_route_fare_mapping mapping on fare.fare_id = mapping.fare_id
+		LEFT JOIN tb_routes route on mapping.route_id = route.route_id
 		WHERE
 			fare.base_yn = 'N'
-					
+		GROUP BY
+			fare.fare_id
+		HAVING
+		<![CDATA[
+			count(mapping.route_id) < 5
+		]]>
 	</select>
 
 	<sql id="whereCityCodeAndBusClass">
-		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(cityCode)">
+		<if test="cityCode!=null">
 			AND 
 				fare.city_code = #{cityCode}
 		</if>
 
-		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(busClass)">
+		<if test="busClass!=null">
 			AND 
 				fare.bus_class = #{busClass}
 		</if>
@@ -98,7 +104,9 @@
 
 	<select id="selectBusRouteFareMappingList" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteListOutputVo">
 		SELECT
-			city.city_name
+			city.city_code
+			, city.city_name
+		    , rc.bus_class_id as bus_class
 		    , rc.bus_class_name
 		    , route.route_id
 		    , route.route_name

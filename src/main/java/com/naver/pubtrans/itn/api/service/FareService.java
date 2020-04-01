@@ -148,15 +148,14 @@ public class FareService {
 		List<IgnoredFareListOutputVo> ignoredFareListOutputVoList = fareRepository
 			.selectIgnoredFareRuleList(fareSearchVo);
 		
-		String[] array = { "G", "e", "e", "k", "s" }; 
-
 		AtomicInteger index = new AtomicInteger(1);   
 
 		ignoredFareListOutputVoList.stream().forEach(o -> o.setOrder(index.getAndIncrement()));
+		ignoredFareListOutputVoList.stream().forEach(o -> o.setIgnoredFareName());
 		
-		ignoredFareListOutputVoList.stream().map(o -> o.getOrder()).forEach(System.out::println);
+		ignoredFareListOutputVoList.stream().map(o -> o.getIgnoredFareName()).forEach(System.out::println);;
 		
-//		ignoredFareListOutputVoList.stream().map(o -> this.selectBusRouteFareMappingList(o.getFareId())).peek(System.out::println);
+//		ignoredFareListOutputVoList.stream().map(o -> this.selectBusRouteFareMappingList(o.getFareId())).
 		
 //		if (Objects.isNull(busStopVo)) {
 //			throw new ApiException(ResultCode.NOT_MATCH.getApiErrorCode(), ResultCode.NOT_MATCH.getDisplayMessage());
@@ -236,7 +235,6 @@ public class FareService {
 
 		commonSchemaList.addAll(this.selectFareSchema());
 		commonSchemaList.addAll(this.selectRouteFareMappingSchema());
-		commonSchemaList.addAll(taskService.selectTaskSchemaMinimal());
 
 		// 동일 컬럼에 대해 중복을 제거
 		List<CommonSchema> distinctCommonSchemaVoList = outputFmtUtil.distinctCommonSchemaList(commonSchemaList);

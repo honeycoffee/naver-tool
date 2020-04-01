@@ -216,6 +216,7 @@ public class CommonService {
 		 */
 		fieldValuesMap.put("nonstep_bus_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
 		fieldValuesMap.put("bypass_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
+		fieldValuesMap.put("bus_class", this.selectCommonCode(CodeType.BUS_ROUTE_CLASS.getCodeName()));
 		/*
 		 * 서비스 날짜 정보
 		 */

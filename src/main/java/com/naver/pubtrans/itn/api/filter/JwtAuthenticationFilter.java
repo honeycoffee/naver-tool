@@ -47,33 +47,38 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 	 * JwtToken 유효성 검증을 수행하는 필터를 chain에 등록
 	 */
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
-			throws IOException, ServletException {
-		
+		throws IOException, ServletException {
+
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		HttpServletRequest request = (HttpServletRequest) servletRequest;
-		HttpServletResponse response = (HttpServletResponse) servletResponse;
+		HttpServletRequest request = (HttpServletRequest)servletRequest;
+		HttpServletResponse response = (HttpServletResponse)servletResponse;
 
 		response.setCharacterEncoding(CommonConstant.CHARACTER_ENCODING_UTF_8);
 		response.setContentType(CommonConstant.CONTENT_TYPE_APPLICATION_JSON);
 
 		try {
-			
+
 			String requestURI = request.getRequestURI();
 			String token = "";
-			
-			if(StringUtils.contains(requestURI, CommonConstant.REFRESH_TOKEN_API_URI)) {
+
+			if (StringUtils.contains(requestURI, CommonConstant.REFRESH_TOKEN_API_URI)) {
 				token = jwtAdapter.getRefreshTokenFromHeader(request);
-				
+
 				request.setAttribute(CommonConstant.REFRESH_TOKEN_KEY, token);
-			}else {
+			} else {
 				token = jwtAdapter.getAccessTokenFromHeader(request);
 
 				request.setAttribute(CommonConstant.ACCESS_TOKEN_KEY, token);
 			}
-			
-			if (token != null) {
+
+			if (StringUtils.isNotEmpty(token)) {
 				Authentication auth = jwtAdapter.getAuthentication(token);
+
+				SecurityContextHolder.getContext().setAuthentication(auth);
+			} else {
+				// token이 아예 없을 시 인증이 필요한 URL에서  커스텀 403 오류 발생하도록 ANONYMOUS 유저 생성
+				Authentication auth = jwtAdapter.getAnonymousAuthentication();
 
 				SecurityContextHolder.getContext().setAuthentication(auth);
 			}
@@ -84,35 +89,35 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			PrintWriter printWriter = response.getWriter();
 			CommonOutput commonOutput = new CommonOutput(ResultCode.AUTH_TOKEN_EMPTY.getApiErrorCode(),
-					ResultCode.AUTH_TOKEN_EMPTY.getDisplayMessage());
+				ResultCode.AUTH_TOKEN_EMPTY.getDisplayMessage());
 			printWriter.println(objectMapper.writeValueAsString(commonOutput));
 			printWriter.close();
 		} catch (TokenExpiredException tokenExpiredException) {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			PrintWriter printWriter = response.getWriter();
 			CommonOutput commonOutput = new CommonOutput(ResultCode.AUTH_TOKEN_EXPIRED.getApiErrorCode(),
-					ResultCode.AUTH_TOKEN_EXPIRED.getDisplayMessage());
+				ResultCode.AUTH_TOKEN_EXPIRED.getDisplayMessage());
 			printWriter.println(objectMapper.writeValueAsString(commonOutput));
 			printWriter.close();
 		} catch (JWTDecodeException jWTDecodeException) {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			PrintWriter printWriter = response.getWriter();
 			CommonOutput commonOutput = new CommonOutput(ResultCode.AUTH_TOKEN_DECODE_ERROR.getApiErrorCode(),
-					ResultCode.AUTH_TOKEN_DECODE_ERROR.getDisplayMessage());
+				ResultCode.AUTH_TOKEN_DECODE_ERROR.getDisplayMessage());
 			printWriter.println(objectMapper.writeValueAsString(commonOutput));
 			printWriter.close();
 		} catch (JWTVerificationException jWTVerificationException) {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			PrintWriter printWriter = response.getWriter();
 			CommonOutput commonOutput = new CommonOutput(ResultCode.AUTH_TOKEN_VALID_ERROR.getApiErrorCode(),
-					ResultCode.AUTH_TOKEN_VALID_ERROR.getDisplayMessage());
+				ResultCode.AUTH_TOKEN_VALID_ERROR.getDisplayMessage());
 			printWriter.println(objectMapper.writeValueAsString(commonOutput));
 			printWriter.close();
 		} catch (Exception exception) {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			PrintWriter printWriter = response.getWriter();
 			CommonOutput commonOutput = new CommonOutput(ResultCode.AUTH_TOKEN_EMPTY.getApiErrorCode(),
-					ResultCode.AUTH_TOKEN_EMPTY.getDisplayMessage());
+				ResultCode.AUTH_TOKEN_EMPTY.getDisplayMessage());
 			printWriter.println(objectMapper.writeValueAsString(commonOutput));
 			printWriter.close();
 		}

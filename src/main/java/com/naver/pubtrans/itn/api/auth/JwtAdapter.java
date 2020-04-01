@@ -2,7 +2,9 @@ package com.naver.pubtrans.itn.api.auth;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -21,12 +25,12 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
-import com.naver.pubtrans.itn.api.common.MemberUtil;
-import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.common.Util;
+import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.exception.AccessTokenNotFoundException;
 import com.naver.pubtrans.itn.api.service.MemberService;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthorityOutputVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
@@ -170,6 +174,21 @@ public class JwtAdapter {
 
 		UserDetails userDetails = memberService.loadUserByUsername(memberOutputVo.getUserId());
 		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+	}
+
+	/**
+	 * 익명의 회원 권한을 가져온다.
+	 * @return
+	 * @throws AccessTokenNotFoundException 
+	 */
+
+	public Authentication getAnonymousAuthentication() throws AccessTokenNotFoundException {
+		MemberAuthorityOutputVo memberAuthorityOutputVo = new MemberAuthorityOutputVo();
+		List<GrantedAuthority> grantedAuthorityList = new ArrayList<GrantedAuthority>();
+		
+		grantedAuthorityList.add(new SimpleGrantedAuthority(CommonConstant.ANONYMOUS));
+
+		return new UsernamePasswordAuthenticationToken(memberAuthorityOutputVo, "", grantedAuthorityList);
 	}
 
 }

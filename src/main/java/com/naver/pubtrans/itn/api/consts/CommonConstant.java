@@ -129,5 +129,8 @@ public interface CommonConstant {
 
 	// 요금 룰 ID 이름
 	String KEY_FARE = "fareId";
+	
+	// 예외 요금 명명에 쓰이는 예외 텍스트
+	String EXCEPTION_TEXT = "예외";
 
 }

@@ -1,6 +1,10 @@
 package com.naver.pubtrans.itn.api.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,6 +13,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
@@ -40,9 +48,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http
 			.httpBasic().disable()
 			.csrf().disable()
+			.cors()
+			.and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
 			.authorizeRequests() // 다음 리퀘스트에 대한 사용권한 체크
+				.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+				.antMatchers("/**/static/docs/index.html")
+					.permitAll() // API 문서 URI
 				.antMatchers("/**/login", "/**/duplicate/member")
 					.permitAll() // 로그인 및 중복 회원 API는 누구나 접속가능
 				.antMatchers(HttpMethod.POST, "/**/api/member")
@@ -57,7 +70,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.DELETE, "/**/member")
 					.hasRole(CommonConstant.ADMIN) // 
 				.anyRequest() // 기타 API는 인증 받은 회원만 가능
-					.authenticated()
+					.hasAnyRole(CommonConstant.USER, CommonConstant.ADMIN)
 			.and()
 			.exceptionHandling() //접근 권한 에러 시 exception 처리
 				.accessDeniedHandler(memberAccessDeniedHandler);
@@ -71,5 +84,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public void configure(WebSecurity web) {
 		web.ignoring().antMatchers("/docs/**");
 	}
+	
+	@Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        final CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*");
+
+        List<String> allowedMethods = new ArrayList<String>();
+        allowedMethods.add(HttpMethod.GET.name());
+        allowedMethods.add(HttpMethod.POST.name());
+        allowedMethods.add(HttpMethod.PUT.name());
+        allowedMethods.add(HttpMethod.DELETE.name());
+        
+        configuration.setAllowedMethods(allowedMethods);
+        configuration.addAllowedHeader("*");
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
 }
