@@ -152,30 +152,10 @@ public class FareService {
 
 		ignoredFareListOutputVoList.stream().forEach(o -> o.setOrder(index.getAndIncrement()));
 		ignoredFareListOutputVoList.stream().forEach(o -> o.setIgnoredFareName());
-		
-		ignoredFareListOutputVoList.stream().map(o -> o.getIgnoredFareName()).forEach(System.out::println);;
-		
-//		ignoredFareListOutputVoList.stream().map(o -> this.selectBusRouteFareMappingList(o.getFareId())).
-		
-//		if (Objects.isNull(busStopVo)) {
-//			throw new ApiException(ResultCode.NOT_MATCH.getApiErrorCode(), ResultCode.NOT_MATCH.getDisplayMessage());
-//		}
-//
-//		BusStopOutputVoWithRoute busStopOutputVoWithRoute = new BusStopOutputVoWithRoute();
-//		BeanUtils.copyProperties(busStopVo, busStopOutputVoWithRoute);
-//
-//		// 경유노선 정보 가져오기
-//		BusRouteOutputVo busRouteOutputVo = this.getBusRouteInfo(stopId);
-//		if (!Objects.isNull(busRouteOutputVo)) {
-//			busStopOutputVoWithRoute.setBusRouteInfo(busRouteOutputVo);
-//		}
-//
-//		// 데이터 스키마 조회
-//		List<CommonSchema> commonSchemaList = this.selectBusStopSchemaAll();
 
-//		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(commonSchemaList, busStopOutputVoWithRoute);
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(ignoredFareListOutputVoList);
 
-		return null;
+		return commonResult;
 	}
 
 	/**

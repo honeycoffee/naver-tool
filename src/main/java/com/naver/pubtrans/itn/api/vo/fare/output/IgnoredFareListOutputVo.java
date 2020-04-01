@@ -3,6 +3,7 @@ package com.naver.pubtrans.itn.api.vo.fare.output;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 
 /**
@@ -22,11 +23,13 @@ public class IgnoredFareListOutputVo {
 	/**
 	 * 목록 순서
 	 */
+	@JsonIgnore
 	private int order;
 
 	/**
 	 * 예외 요금 이름에 쓰일 노선 목록 (최대 5개)
 	 */
+	@JsonIgnore
 	private String routes;
 
 	/**

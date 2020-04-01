@@ -28,19 +28,18 @@
 	<select id="selectIgnoredFareRuleList" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.output.IgnoredFareListOutputVo">
 		SELECT
 			fare.fare_id
-			, group_concat(route_name) as routes
+			, substring_index(group_concat(route_name), ',', 5) as routes
 		FROM
 			tb_fare_rule fare
 		LEFT JOIN tb_route_fare_mapping mapping on fare.fare_id = mapping.fare_id
 		LEFT JOIN tb_routes route on mapping.route_id = route.route_id
 		WHERE
 			fare.base_yn = 'N'
+			
+		<include refid="whereCityCodeAndBusClass" />
+		
 		GROUP BY
 			fare.fare_id
-		HAVING
-		<![CDATA[
-			count(mapping.route_id) < 5
-		]]>
 	</select>
 
 	<sql id="whereCityCodeAndBusClass">
