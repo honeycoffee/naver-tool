@@ -66,18 +66,25 @@
 		    , date_format(member.reg_date, '%Y.%m.%d') as reg_date
             , date_format(member.upd_date, '%Y.%m.%d') as upd_date 
             , auth.authority_id
+            , info.authority_name
 		FROM
 			tb_z_svc_member `member`
 			, tb_z_svc_member_authority `auth`
+			, tb_z_svc_authority_info `info`
 		WHERE
 			member.user_id = auth.user_id
+		AND
+			auth.authority_id = info.authority_id
 		AND
 			member.user_id = #{userId}
     </select>
 	
-	<select id="getMemberListTotalCnt" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="int">
+	<select id="getMemberListTotalCount" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberCountOutputVo">
 		SELECT
-			count(*) as total_list_cnt
+			count(*) as total_list_count
+			, SUM(if(auth.authority_id='ROLE_ADMIN', 1, 0)) as total_admin_count
+			, SUM(if(auth.authority_id='ROLE_USER', 1, 0)) as total_user_count
+			, SUM(if(auth.authority_id='ROLE_ANONYMOUS', 1, 0)) as total_anonymous_count
 		FROM
 			tb_z_svc_member `member`
 			, tb_z_svc_member_authority `auth`
@@ -122,13 +129,16 @@
 						<when test="sortKey.equals('reg_date')">
 							member.reg_date ${sortType}
 						</when>
+						<when test="sortKey.equals('authority_id')">
+							FIELD(auth.authority_id, 'ROLE_ADMIN', 'ROLE_USER') ${sortType}
+						</when>
 						<otherwise>
-							member.reg_date desc
+							FIELD(auth.authority_id, 'ROLE_ADMIN', 'ROLE_USER') asc, member.reg_date asc
 						</otherwise>
 					</choose>
 				</when>
 				<otherwise>
-					member.reg_date desc
+					FIELD(auth.authority_id, 'ROLE_ADMIN', 'ROLE_USER') asc, member.reg_date asc 
 				</otherwise>
 			</choose>
 

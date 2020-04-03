@@ -9,18 +9,19 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import lombok.RequiredArgsConstructor;
+
 import com.naver.pubtrans.itn.api.consts.ColumnKeyType;
 import com.naver.pubtrans.itn.api.consts.ColumnType;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
+import com.naver.pubtrans.itn.api.vo.common.AliasColumnNameVo;
 import com.naver.pubtrans.itn.api.vo.common.FieldValue;
 import com.naver.pubtrans.itn.api.vo.common.PagingVo;
-import com.naver.pubtrans.itn.api.vo.common.AliasColumnNameVo;
 import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonMeta;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
-
-import lombok.RequiredArgsConstructor;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberMeta;
 
 /**
  * 공통 출력 데이터 포맷을 생성하는 유틸.
@@ -258,6 +259,8 @@ public class OutputFmtUtil {
 			case ColumnType.TEXT:
 			case ColumnType.MEDIUMTEXT:
 			case ColumnType.LONGTEXT:
+			case ColumnType.DATE:
+			case ColumnType.DATETIME:
 				type = CommonConstant.STRING;
 				break;
 			case ColumnType.TINYINT:
@@ -344,6 +347,23 @@ public class OutputFmtUtil {
 		return commonSchemaList.stream()
 			.filter(Util.distinctByKey(o -> o.getFieldName()))
 			.collect(Collectors.toList());
+	}
+
+	/**
+	 * 페이징 정보, 목록결과, 목록 검색 폼 스키마 정보가 포함되는 회원 목록 데이터 포맷을 생성한다
+	 * @param schema - 검색 폼 스키마 정보
+	 * @param memberMeta - 회원 목록 페이징 정보
+	 * @param list - 목록 데이터
+	 * @return
+	 */
+	public <T> CommonResult setMemberListFmt(List<CommonSchema> schema, MemberMeta memberMeta, List<T> list) {
+
+		CommonResult result = new CommonResult();
+		result.setSchema(schema);
+		result.setMeta(memberMeta);
+		result.setData(list);
+
+		return result;
 	}
 
 }

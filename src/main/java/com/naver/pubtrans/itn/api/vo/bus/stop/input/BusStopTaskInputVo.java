@@ -40,8 +40,8 @@ public class BusStopTaskInputVo extends BusStopTaskVo {
 	/**
 	 * 도시코드
 	 */
-	@NotBlank
-	private String cityCode;
+	@NotNull
+	private int cityCode;
 
 
 	/**

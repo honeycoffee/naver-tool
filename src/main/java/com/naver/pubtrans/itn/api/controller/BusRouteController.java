@@ -2,15 +2,28 @@ package com.naver.pubtrans.itn.api.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
+import com.naver.pubtrans.itn.api.consts.CommonConstant;
+import com.naver.pubtrans.itn.api.consts.PubTransId;
+import com.naver.pubtrans.itn.api.consts.ResultCode;
+import com.naver.pubtrans.itn.api.consts.TaskType;
 import com.naver.pubtrans.itn.api.service.BusRouteService;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteSearchVo;
+import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo;
+import com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo;
 import com.naver.pubtrans.itn.api.vo.common.input.SearchVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
@@ -101,6 +114,37 @@ public class BusRouteController {
 	@GetMapping("/v1/ntool/api/info/busRouteTask/{taskId}")
 	public CommonOutput infoBusRouteTask(@PathVariable long taskId) throws Exception {
 		CommonResult commonResult = busRouteService.getBusRouteTaskInfo(taskId);
+		return new CommonOutput(commonResult);
+	}
+
+	/**
+	 * 버스노선 생성을 위한 Task를 등록한다
+	 * @param busRouteTaskInputVo - 노선 입력정보
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping("/v1/ntool/api/busRouteTask/addTask")
+	public CommonOutput registerBusRouteAddTask(@RequestBody @Valid BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
+		CommonResult commonResult = busRouteService.registerBusRouteTask(TaskType.REGISTER.getCode(), busRouteTaskInputVo);
+		return new CommonOutput(commonResult);
+	}
+
+	/**
+	 * 버스노선 수정을 위한 Task를 등록한다
+	 * @param busRouteTaskInputVo - 노선 입력정보
+	 * @param bindingResult - 입력정보 바인딩 결과
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping("/v1/ntool/api/busRouteTask/editTask")
+	public CommonOutput registerBusRouteEditTask(@RequestBody @Valid BusRouteTaskInputVo busRouteTaskInputVo, BindingResult bindingResult) throws Exception {
+
+		if(busRouteTaskInputVo.getRouteId() < PubTransId.ROUTE_MIN.getId() || busRouteTaskInputVo.getRouteId() > PubTransId.ROUTE_MAX.getId()) {
+			bindingResult.addError(new FieldError(CommonConstant.BUS_ROUTE_TASK_INPUT_VO, CommonConstant.KEY_ROUTE, ResultCode.PARAMETER_ERROR.getDisplayMessage()));
+    		throw new MethodArgumentNotValidException(null, bindingResult);
+		}
+
+		CommonResult commonResult = busRouteService.registerBusRouteTask(TaskType.MODIFY.getCode(), busRouteTaskInputVo);
 		return new CommonOutput(commonResult);
 	}
 }

@@ -50,6 +50,9 @@
 						<when test="sortKey.equals('city_code')">
 							route.city_code ${sortType}
 						</when>
+						<when test="sortKey.equals('bus_class')">
+							sub.bus_class ${sortType}
+						</when>
 						<otherwise>
 							route.route_id desc
 						</otherwise>
@@ -70,7 +73,7 @@
 		and route.city_code = city.city_code
 		and sub.bus_class = rc.bus_class_id
 
-		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(cityCode)">
+		<if test="cityCode != null and cityCode > 0">
 			AND route.city_code = #{cityCode}
 		</if>
 
@@ -78,8 +81,12 @@
 			AND route.route_name LIKE CONCAT(#{routeName}, '%')
 		</if>
 
-		<if test="routeId > 0">
-			AND route.route_id LIKE CONCAT(#{routeId}, '%')
+		<if test="routeId != null and routeId > 0">
+			AND route.route_id = #{routeId}
+		</if>
+
+		<if test="busClass != null and busClass > 0">
+			AND sub.bus_class = #{busClass}
 		</if>
 	</sql>
 
@@ -227,5 +234,84 @@
 		, date_format(bypass.bypass_start_date, '%Y%m%d%H%m') as bypass_start_date_time
 		, date_format(bypass.bypass_end_date, '%Y%m%d%H%m') as bypass_end_date_time
 	</sql>
+
+
+	<select id="getCalendarServiceId" resultType="int" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo">
+	<![CDATA[
+		SELECT
+			service_id
+	    FROM
+	    	tb_calendar
+	    WHERE
+	    	monday_yn = #{mondayYn} AND tuesday_yn = #{tuesdayYn} AND wednesday_yn = #{wednesdayYn} AND thursday_yn = #{thursdayYn}
+	    	AND friday_yn = #{fridayYn} AND saturday_yn = #{saturdayYn} AND sunday_yn = #{sundayYn}
+		    AND start_date <= now() AND end_date >= now()
+	]]>
+	</select>
+
+	<select id="getBaseFareId" resultType="int" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo">
+		SELECT fare_id FROM tb_fare_rule WHERE city_code = #{cityCode} AND bus_class = #{busClass} AND base_yn = 'Y'
+	</select>
+
+	<insert id="insertBusRouteTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo">
+		INSERT INTO tb_routes_task
+			(task_id, route_id, route_name, transport_id, city_code)
+		VALUES
+			(#{taskId}, #{routeId}, #{routeName}, 1, #{cityCode})
+	</insert>
+
+	<insert id="insertBusRouteSubTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo">
+		INSERT INTO tb_bus_routes_info_task
+			(task_id, route_id, bus_class, bus_additional_name, start_point_name
+			, end_point_name, turning_point_sequence, weekday_start_point_first_time, weekday_start_point_last_time, weekday_end_point_first_time
+			, weekday_end_point_last_time, weekday_interval_min, weekday_interval_max, weekday_interval_count, saturday_start_point_first_time
+			, saturday_start_point_last_time, saturday_end_point_first_time, saturday_end_point_last_time, saturday_interval_min, saturday_interval_max
+			, saturday_interval_count, sunday_start_point_first_time, sunday_start_point_last_time, sunday_end_point_first_time, sunday_end_point_last_time
+			, sunday_interval_min, sunday_interval_max, sunday_interval_count, nonstep_bus_yn, tel_reservation
+			, provider_id, service_id, bypass_yn)
+		VALUES
+			(#{taskId}, #{routeId}, #{busClass}, #{busAdditionalName}, #{startPointName}
+			, #{endPointName}, #{turningPointSequence}, #{weekdayStartPointFirstTime}, #{weekdayStartPointLastTime}, #{weekdayEndPointFirstTime}
+			, #{weekdayEndPointLastTime}, #{weekdayIntervalMin}, #{weekdayIntervalMax}, #{weekdayIntervalCount}, #{saturdayStartPointFirstTime}
+			, #{saturdayStartPointLastTime}, #{saturdayEndPointFirstTime}, #{saturdayEndPointLastTime}, #{saturdayIntervalMin}, #{saturdayIntervalMax}
+			, #{saturdayIntervalCount}, #{sundayStartPointFirstTime}, #{sundayStartPointLastTime}, #{sundayEndPointFirstTime}, #{sundayEndPointLastTime}
+			, #{sundayIntervalMin}, #{sundayIntervalMax}, #{sundayIntervalCount}, #{nonstepBusYn}, #{telReservation}
+			, #{providerId},  #{serviceId}, #{bypassYn})
+	</insert>
+
+	<insert id="insertBusRouteCompanyTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteCompanyTaskInputVo">
+		INSERT INTO tb_bus_company_mapping_task
+			(task_id, route_id, company_id)
+		VALUES
+			(#{taskId}, #{routeId}, #{companyId})
+	</insert>
+
+	<insert id="insertBusRouteMappingTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo">
+		INSERT INTO tb_bus_route_mapping_task
+			(task_id, route_id, local_route_id, provider_id)
+		VALUES
+			(#{taskId}, #{routeId}, #{localRouteId}, #{providerId})
+	</insert>
+
+	<insert id="insertBusRouteBypassTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo">
+		INSERT INTO tb_bus_route_bypass_mapping_task
+			(task_id, bypass_route_id, parent_route_id, bypass_start_date, bypass_end_date)
+		VALUES
+			(#{taskId}, #{bypassRouteId}, #{parentRouteId}, #{bypassStartDateTime}, #{bypassEndDateTime})
+	</insert>
+
+	<insert id="insertBusRouteFareTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo">
+		INSERT INTO tb_route_fare_mapping_task
+			(task_id, route_id, fare_id)
+		VALUES
+			(#{taskId}, #{routeId}, #{fareId})
+	</insert>
+
+	<insert id="insertBusRouteStopTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteStopTaskInputVo">
+		INSERT INTO tb_route_stops_task
+			(task_id, route_id, stop_sequence, stop_id, next_stop_id, up_down, sum_distance, graph_id)
+		VALUES
+			(#{taskId}, #{routeId}, #{stopSequence}, #{stopId}, #{nextStopId}, #{upDown}, #{cumulativeDistance}, #{graphId})
+	</insert>
 
 </mapper>

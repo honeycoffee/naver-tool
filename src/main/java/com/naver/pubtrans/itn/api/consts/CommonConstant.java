@@ -67,11 +67,20 @@ public interface CommonConstant {
 	// 정류장 ID 이름
 	String KEY_STOP = "stopId";
 
+	// 노선 ID 이름
+	String KEY_ROUTE = "routeId";
+
 	// 작업ID 이름
 	String KEY_TASK = "taskId";
 
 	// 버스정류장 Task 입력 정보 VO명
 	String BUS_STOP_TASK_INPUT_VO = "BusStopTaskInputVo";
+
+	// 버스노선 Task 입력 정보 Vo명
+	String BUS_ROUTE_TASK_INPUT_VO = "BusRouteTaskInputVo";
+
+	// 요금 룰 Task 입력 정보 VO명
+	String FARE_TASK_INPUT_VO = "FareTaskInputVo";
 
 	// geojson Geometry  type - LineString 명칭
 	String GEOJSON_GEOMETRY_TYPE_LINE_STRING = "LineString";
@@ -94,43 +103,55 @@ public interface CommonConstant {
 	// 날짜 시간 포맷
 	String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+	// 공백
+	String BLANK = " ";
+
 	// access_token 만료 초단위 (3600 = 1시간)
 	int ACCESS_TOKEN_EXPIRE_TIME_SEC = 3600;
 
 	// refresh_token 만료 초 단위 (86400 = 24시간)
 	int REFRESH_TOKEN_EXPIRE_TIME_SEC = 86400;
 
-	// Test의 tokenMap, request 에서 쓰이는 Access Token Key 
+	// Test의 tokenMap, request 에서 쓰이는 Access Token Key
 	String ACCESS_TOKEN_KEY = "accessToken";
 
-	// Test의 tokenMap, request 에서 쓰이는 Refresh Token Key 
+	// Test의 tokenMap, request 에서 쓰이는 Refresh Token Key
 	String REFRESH_TOKEN_KEY = "refreshToken";
 
 	// Spring Security Config에서 접근 제어에 사용되는 관리자 권한 명
 	String ADMIN = "ADMIN";
-	
+
 	// Spring Security Config에서 접근 제어에 사용되는 사용자 권한 명
 	String USER = "USER";
-	
+
 	// Spring Security Config에서 접근 제어에 사용되는 익명 사용자 권한 명
 	String ANONYMOUS = "ANONYMOUS";
-	
+
 	// 토큰 갱신 API URI
 	String REFRESH_TOKEN_API_URI = "/refresh/token";
-	
+
 	// Filter, Handler 에서 Exception 출력시 쓰이는 ContentType
 	String CONTENT_TYPE_APPLICATION_JSON = "application/json";
-	
+
 	// Filter, Handler 에서 Exception 출력시 쓰이는 CharacterEncoding
 	String CHARACTER_ENCODING_UTF_8 = "UTF-8";
 
-	// 요금 룰 Task 입력 정보 VO명
-	String FARE_TASK_INPUT_VO = "FareTaskInputVo";
+	// 100
+	int EXPONENT_TWO = 2;
+
+	// 100
+	int NUMBER_ONE_HUNDRED = 100;
+
+	// 100.0
+	double DECIMAL_ONE_HUNDRED = 100.0;
 
 	// 요금 룰 ID 이름
 	String KEY_FARE = "fareId";
-	
+
 	// 예외 요금 명명에 쓰이는 예외 텍스트
 	String EXCEPTION_TEXT = "예외";
+
+	// 예외 요금 명명에 쓰이는 요금 텍스트
+	String FARE_TEXT = "요금";
 
 }

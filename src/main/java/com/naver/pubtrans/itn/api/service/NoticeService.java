@@ -25,7 +25,7 @@ import com.naver.pubtrans.itn.api.vo.notice.output.NoticeOutputVo;
 
 /**
  * 네이버 대중교통 내재화 공지사항 서비스
- * 
+ *
  * @author westwind
  *
  */
@@ -51,13 +51,13 @@ public class NoticeService {
 
 	/**
 	 * 공지사항을 등록한다
-	 * 
+	 *
 	 * @param noticeInputVo - 공지사항 입력값
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public CommonResult insertNotice(NoticeInputVo noticeInputVo) throws Exception {
 
-		MemberOutputVo memberOutputVo = MemberUtil.getMemberFromToken();
+		MemberOutputVo memberOutputVo = MemberUtil.getMemberFromAccessToken();
 
 		noticeInputVo.setRegUserId(memberOutputVo.getUserId());
 		noticeInputVo.setRegUserName(memberOutputVo.getUserName());
@@ -74,10 +74,10 @@ public class NoticeService {
 
 	/**
 	 * 공지사항을 가져온다.
-	 * 
+	 *
 	 * @param noticeSearchVo - 공지사항 검색조건
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public CommonResult getNotice(NoticeSearchVo noticeSearchVo) throws Exception {
 
@@ -101,13 +101,13 @@ public class NoticeService {
 
 	/**
 	 * 공지사항을 수정한다
-	 * 
+	 *
 	 * @param noticeInputVo - 공지사항 입력값
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void updateNotice(NoticeInputVo noticeInputVo) throws Exception {
-		
-		MemberOutputVo memberOutputVo = MemberUtil.getMemberFromToken();
+
+		MemberOutputVo memberOutputVo = MemberUtil.getMemberFromAccessToken();
 
 		noticeInputVo.setRegUserId(memberOutputVo.getUserId());
 		noticeInputVo.setRegUserName(memberOutputVo.getUserName());
@@ -123,13 +123,13 @@ public class NoticeService {
 
 	/**
 	 * 공지사항을 삭제한다
-	 * 
+	 *
 	 * @param noticeSearchVo - 공지사항 검색조건
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void deleteNotice(NoticeSearchVo noticeSearchVo) throws Exception {
 
-		MemberOutputVo memberOutputVo = MemberUtil.getMemberFromToken();
+		MemberOutputVo memberOutputVo = MemberUtil.getMemberFromAccessToken();
 
 		if (StringUtils.isEmpty(memberOutputVo.getUserId())) {
 			throw new ApiException(ResultCode.MEMBER_DATA_NULL.getApiErrorCode(),
@@ -199,7 +199,7 @@ public class NoticeService {
 	/**
 	 * 공지사항 데이터 입/출력 구조를 가져온다
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public List<CommonSchema> selectNoticeSchema() throws Exception {
 

@@ -104,13 +104,48 @@ public class Util {
 	}
 
 	/**
+	 * 두 지점간의 거리를 계산한다
+	 * @param sLongitude - 출발지 경도
+	 * @param sLatitude - 출발지 위도
+	 * @param eLongitude - 도착지 경도
+	 * @param eLatitude - 도착지 위도
+	 * @return meter
+	 */
+	public static double calculateDistance(double sLongitude, double sLatitude, double eLongitude, double eLatitude) {
+
+        double katechSx;
+        double katechSy;
+        double katechEx;
+        double katechEy;
+
+        CoordinateTrans cvt = new CoordinateTrans();
+        cvt.SetGeoEllipsSystem(CoordinateTrans.Ellipse.WGS84, CoordinateTrans.CoordSystem.GEOGRAPHIC, CoordinateTrans.Ellipse.BESSEL, CoordinateTrans.CoordSystem.KATECH);
+
+
+        cvt.ConvCoord(sLongitude, sLatitude);
+
+        katechSx = cvt.GetConvX();
+        katechSy = cvt.GetConvY();
+
+        cvt.ConvCoord(eLongitude, eLatitude);
+        katechEx = cvt.GetConvX();
+        katechEy = cvt.GetConvY();
+
+        double dist = Math.sqrt(Math.pow((katechSx-katechEx)/CommonConstant.DECIMAL_ONE_HUNDRED, CommonConstant.EXPONENT_TWO)
+        	+ Math.pow((katechSy-katechEy)/CommonConstant.DECIMAL_ONE_HUNDRED, CommonConstant.EXPONENT_TWO)) * CommonConstant.NUMBER_ONE_HUNDRED;
+
+        return dist;
+    }
+
+	/**
 	 * HttpServletRequest를 가져온다.
 	 * @return
 	 */
 	public static HttpServletRequest getHttpServletRequest() {
 		ServletRequestAttributes servletRequestAttribute = (ServletRequestAttributes)RequestContextHolder
 			.currentRequestAttributes();
-		
+
 		return servletRequestAttribute.getRequest();
 	}
+
 }

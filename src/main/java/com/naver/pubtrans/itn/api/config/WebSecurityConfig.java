@@ -54,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 			.authorizeRequests() // 다음 리퀘스트에 대한 사용권한 체크
 				.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-				.antMatchers("/**/static/docs/index.html")
+				.antMatchers("/**/static/docs/", "/**/static/docs/**/*")
 					.permitAll() // API 문서 URI
 				.antMatchers("/**/login", "/**/duplicate/member")
 					.permitAll() // 로그인 및 중복 회원 API는 누구나 접속가능

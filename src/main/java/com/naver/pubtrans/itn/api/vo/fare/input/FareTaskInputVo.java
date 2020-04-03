@@ -29,61 +29,51 @@ public class FareTaskInputVo {
 	/**
 	 * 기본요금(일반_카드기준)
 	 */
-	@Size(max=11)
 	private Integer baseFare;
 
 	/**
 	 * 기본요금(청소년_카드기준)
 	 */
-	@Size(max=11)
 	private Integer youthFare;
 
 	/**
 	 * 기본요금(어린이_카드기준)
 	 */
-	@Size(max=11)
 	private Integer childFare;
 
 	/**
 	 * 기본요금(일반_현금기준)
 	 */
-	@Size(max=11)
 	private Integer baseCashFare;
 
 	/**
 	 * 기본요금(청소년_현금기준)
 	 */
-	@Size(max=11)
 	private Integer youthCashFare;
 
 	/**
 	 * 기본요금(어린이_현금기준)
 	 */
-	@Size(max=11)
 	private Integer childCashFare;
 
 	/**
 	 * 기본거리
 	 */
-	@Size(max=11)
 	private Integer baseDist;
 
 	/**
 	 * 단위요금
 	 */
-	@Size(max=11)
 	private Integer unitFare;
 
 	/**
 	 * 단위거리
 	 */
-	@Size(max=11)
 	private Integer unitDist;
 
 	/**
 	 * 최대 요금
 	 */
-	@Size(max=11)
 	private Integer maxFare;
 
 	/**

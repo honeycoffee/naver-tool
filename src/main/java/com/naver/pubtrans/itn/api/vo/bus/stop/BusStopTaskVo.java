@@ -40,7 +40,7 @@ public class BusStopTaskVo {
 	/**
 	 * 도시코드
 	 */
-	private String cityCode;
+	private int cityCode;
 
 	/**
 	 * 도시코드 명칭

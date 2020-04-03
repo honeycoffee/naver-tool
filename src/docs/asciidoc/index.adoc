@@ -51,8 +51,14 @@ include::common-code.adoc[]
 &#160;
 
 === 데이터 목록 페이징 정보
-페이징이 필요한 데이터 목록을 제공하는 모든 API에는 페이징 정보를 확인할 수 있는 데이터가 포함된다.
+페이징이 필요한 데이터 목록을 제공하는 API 중 회원 목록을 제외한 API에는 페이징 정보를 확인할 수 있는 데이터가 포함된다.
 include::common-meta.adoc[]
+
+&#160;
+
+=== 회원 데이터 목록 페이징 정보
+회원 목록 API는 각 역할 별 수를 포함하여 페이징 정보를 제공한다.
+include::member-meta.adoc[]
 
 &#160;
 
@@ -140,22 +146,22 @@ include::{snippets}/auth/logout/http-response.adoc[]
 
 [[refresh-token]]
 === API 호출 토큰 갱신
-refreshToken으로 accessToken을 갱신한다. 
+refreshToken으로 accessToken을 갱신한다.
 
 ==== Request HTTP Example
-include::{snippets}/auth/refreshToken/http-request.adoc[]
+include::{snippets}/auth/refreshAccessToken/http-request.adoc[]
 
 ==== Response
-include::{snippets}/auth/refreshToken/response-fields.adoc[]
+include::{snippets}/auth/refreshAccessToken/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/auth/refreshToken/http-response.adoc[]
+include::{snippets}/auth/refreshAccessToken/http-response.adoc[]
 
 &#160;
 
 [[get-me]]
 === 내 정보 조회
-자신의 정보를 조회한다. 
+자신의 정보를 조회한다.
 
 ==== Request HTTP Example
 include::{snippets}/member/getMe/http-request.adoc[]
@@ -188,7 +194,7 @@ include::{snippets}/member/updateMe/http-response.adoc[]
 
 [[get-member]]
 === 회원 정보 조회
-권한관리에서 회원의 정보를 조회한다. 
+권한관리에서 회원의 정보를 조회한다.
 
 ==== Request
 include::{snippets}/member/getMember/path-parameters.adoc[]
@@ -672,5 +678,44 @@ include::{snippets}/busRoute/busRouteTaskInfo/response-fields.adoc[]
 
 ===== Response HTTP Example
 include::{snippets}/busRoute/busRouteTaskInfo/http-response.adoc[]
+
+&#160;
+
+[[busRoute-addTask]]
+=== 버스노선 생성 작업등록
+버스노선 생성 작업을 등록한다
+
+==== Request
+include::{snippets}/busRoute/busRouteAddTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busRoute/busRouteAddTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busRoute/busRouteAddTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busRoute/busRouteAddTask/http-response.adoc[]
+
+&#160;
+
+[[busToure-editTask]]
+=== 버스노선 수정 작업등록
+* 버스노선 정보를 수정하는 작업정보를 등록한다
+** 노선 관리 -> 노선 목록 -> 버스 노선 상세 접근시
+
+==== Request
+include::{snippets}/busRoute/busRouteEditTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busRoute/busRouteEditTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busRoute/busRouteEditTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busRoute/busRouteEditTask/http-response.adoc[]
 
 &#160;

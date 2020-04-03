@@ -121,8 +121,8 @@ public class BusStopController {
 	 */
 	@PostMapping("/v1/ntool/api/busStopTask/addTask")
 	public CommonOutput registerBusStopAddTask(@RequestBody @Valid BusStopTaskInputVo busStopTaskInputVo) throws Exception {
-		busStopService.registerBusStopTask(TaskType.REGISTER.getCode(), busStopTaskInputVo);
-		return new CommonOutput();
+		CommonResult commonResult = busStopService.registerBusStopTask(TaskType.REGISTER.getCode(), busStopTaskInputVo);
+		return new CommonOutput(commonResult);
 	}
 
 	/**
@@ -139,8 +139,8 @@ public class BusStopController {
     		throw new MethodArgumentNotValidException(null, bindingResult);
 		}
 
-		busStopService.registerBusStopTask(TaskType.MODIFY.getCode(), busStopTaskInputVo);
-		return new CommonOutput();
+		CommonResult commonResult = busStopService.registerBusStopTask(TaskType.MODIFY.getCode(), busStopTaskInputVo);
+		return new CommonOutput(commonResult);
 	}
 
 
@@ -166,8 +166,8 @@ public class BusStopController {
 	 */
 	@PostMapping("/v1/ntool/api/busStopTask/removeTask")
 	public CommonOutput registerBusStopRemoveTask(@RequestBody @Valid BusStopRemoveTaskInputVo busStopRemoveTaskInputVo) throws Exception {
-		busStopService.registerBusStopRemoveTask(busStopRemoveTaskInputVo);
-		return new CommonOutput();
+		CommonResult commonResult = busStopService.registerBusStopRemoveTask(busStopRemoveTaskInputVo);
+		return new CommonOutput(commonResult);
 	}
 
 

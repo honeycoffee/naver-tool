@@ -1,5 +1,6 @@
 package com.naver.pubtrans.itn.api.service;
 
+import java.beans.Beans;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,11 +33,13 @@ import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthorityOutputVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberCountOutputVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberMeta;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
  * 네이버 대중교통 내재화 사용자관리 서비스
- * 
+ *
  * @author westwind
  *
  */
@@ -61,7 +65,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 회원 정보를 등록한다
-	 * 
+	 *
 	 * @param memberInputVo - 회원 입력 Vo
 	 * @throws Exception
 	 */
@@ -87,7 +91,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * ID 중복 체크
-	 * 
+	 *
 	 * @param userId - 체크할 회원 ID
 	 * return
 	 */
@@ -110,8 +114,8 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 회원 비밀번호 검증
-	 * 
-	 * @param memberInputVo - 회원 입력 Vo 
+	 *
+	 * @param memberInputVo - 회원 입력 Vo
 	 * @throws Exception
 	 */
 	public void verifyPassword(MemberInputVo memberInputVo) throws Exception {
@@ -137,7 +141,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 회원 데이터를 가져온다.
-	 * 
+	 *
 	 * @param memberSearchVo - 회원 검색조건
 	 * @return
 	 * @throws Exception
@@ -158,12 +162,12 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 자신의 정보를 조회한다
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public CommonResult getMe() throws Exception {
 
-		String userId = MemberUtil.getUserIdFromToken();
+		String userId = MemberUtil.getUserIdFromAccessToken();
 
 		MemberSearchVo memberSearchVo = new MemberSearchVo();
 		memberSearchVo.setUserId(userId);
@@ -176,13 +180,13 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 자신의 정보를 수정한다
-	 * 
+	 *
 	 * @param memberInputVo - 회원 입력 Vo
 	 * @throws Exception
 	 */
 	public void updateMe(MemberInputVo memberInputVo) throws Exception {
 
-		String userId = MemberUtil.getUserIdFromToken();
+		String userId = MemberUtil.getUserIdFromAccessToken();
 
 		if (!memberInputVo.getUserId().equals(userId)) {
 			throw new ApiException(ResultCode.MEMBER_TOKEN_NOT_MATCH.getApiErrorCode(),
@@ -197,7 +201,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 회원 정보를 수정한다
-	 * 
+	 *
 	 * @param memberInputVo - 회원 입력 Vo
 	 * @throws Exception
 	 */
@@ -224,7 +228,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 회원 정보를 삭제한다
-	 * 
+	 *
 	 * @param memberSearchVo - 회원 검색조건
 	 * @throws Exception
 	 */
@@ -242,7 +246,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 테스트 회원 정보를 삭제한다
-	 * 
+	 *
 	 * @param memberSearchVo - 회원 검색조건
 	 * @throws Exception
 	 */
@@ -255,7 +259,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 회원 목록을 가져온다
-	 * 
+	 *
 	 * @param memberSearchVo - 회원 검색조건
 	 * @return
 	 * @throws Exception
@@ -267,10 +271,17 @@ public class MemberService implements UserDetailsService {
 		 */
 
 		// 전체 목록 수 가져오기
-		int totalListCnt = memberRepository.getMemberListTotalCnt(memberSearchVo);
+		MemberCountOutputVo memberCountOutputVo = memberRepository.getMemberListTotalCount(memberSearchVo);
 
 		// 페이징 정보
-		PagingVo pagingVo = new PagingVo(totalListCnt, memberSearchVo.getPageNo(), memberSearchVo.getListSize());
+		PagingVo pagingVo = new PagingVo(memberCountOutputVo.getTotalListCount(), memberSearchVo.getPageNo(), memberSearchVo.getListSize());
+		
+		MemberMeta memberMeta = new MemberMeta();
+		BeanUtils.copyProperties(pagingVo, memberMeta);
+
+		memberMeta.setTotalAdminCount(memberCountOutputVo.getTotalAdminCount());
+		memberMeta.setTotalUserCount(memberCountOutputVo.getTotalUserCount());
+		memberMeta.setTotalAnonymousCount(memberCountOutputVo.getTotalAnonymousCount());
 
 		// 목록 조회 페이징 정보 set
 		memberSearchVo.setStartPageLimit(pagingVo.getStartPageLimit());
@@ -298,14 +309,14 @@ public class MemberService implements UserDetailsService {
 		/**
 		 * 3. 공통 출력포맷 생성
 		 */
-		CommonResult commonResult = outputFmtUtil.setCommonListFmt(commonSchemaList, pagingVo, memberOutputVoList);
+		CommonResult commonResult = outputFmtUtil.setMemberListFmt(commonSchemaList, memberMeta, memberOutputVoList);
 
 		return commonResult;
 	}
 
 	/**
 	 * 회원 상세정보의 전체 스키마 정보를 가져온다
-	 * 
+	 *
 	 * @return
 	 * @throws Exception
 	 */
@@ -326,7 +337,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 회원 데이터 입/출력 구조를 가져온다
-	 * 
+	 *
 	 * @return
 	 * @throws Exception
 	 */
@@ -342,7 +353,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 회원 데이터 및 데이터 입/출력 구조를 가져온다
-	 * 
+	 *
 	 * @param memberSearchVo - 회원 검색조건
 	 * @return
 	 * @throws Exception
@@ -357,7 +368,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 회원 권한 데이터 입/출력 구조를 가져온다
-	 * 
+	 *
 	 * @return
 	 * @throws Exception
 	 */
@@ -376,7 +387,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 회원 권한 목록을 가져온다.
-	 * 
+	 *
 	 * @param memberSearchVo - 회원 검색조건
 	 * @return
 	 */
@@ -391,7 +402,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * 권한 ID만 있는 배열을 생성한다.
-	 * 
+	 *
 	 * @param memberSearchVo - 회원 검색조건
 	 * @return
 	 */
@@ -408,7 +419,7 @@ public class MemberService implements UserDetailsService {
 
 	/**
 	 * Spring Security 에서 권한 검증을 위한 정보를 가져온다.
-	 * 
+	 *
 	 * @param userId - 회원 ID
 	 * @return
 	 */

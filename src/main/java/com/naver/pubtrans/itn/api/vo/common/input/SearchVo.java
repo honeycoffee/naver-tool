@@ -18,10 +18,10 @@ import lombok.Setter;
 public class SearchVo {
 
 	// 요청 페이지 번호
-	private int pageNo;
+	private Integer pageNo;
 
 	// 요청 페이지 목록 수
-	private int listSize;
+	private Integer listSize;
 
 	/**
 	 * 정렬 - 사용자 전송 파라미터
@@ -82,5 +82,29 @@ public class SearchVo {
 			return sortType;
 		}
 
+	}
+
+	/**
+	 * 페이지 번호 가져오기
+	 * @return
+	 */
+	public Integer getPageNo() {
+		if(pageNo == null) {
+			this.pageNo = 1;
+		}
+
+		return pageNo;
+	}
+
+	/**
+	 * 목록 크기 가져오기
+	 * @return
+	 */
+	public Integer getListSize() {
+		if(listSize == null) {
+			this.listSize = 20;
+		}
+
+		return listSize;
 	}
 }

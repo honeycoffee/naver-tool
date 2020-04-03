@@ -47,7 +47,7 @@ public class FareController {
 	}
 
 	/**
-	 * 요금 룰을 조회한다
+	 * 기본 요금 룰을 조회한다
 	 * @param fareSearchVo - 요금 룰 검색 조건
 	 * @return
 	 * @throws Exception
@@ -59,7 +59,7 @@ public class FareController {
 	}
 
 	/**
-	 * 요금 룰을 조회한다
+	 * 예외 요금 룰 리스트를 가져온다
 	 * @param fareSearchVo - 요금 룰 검색 조건
 	 * @return
 	 * @throws Exception
@@ -67,6 +67,22 @@ public class FareController {
 	@GetMapping("/v1/ntool/api/list/ignoredFare")
 	public CommonOutput selectIgnoredFareRuleList(@RequestBody FareSearchVo fareSearchVo) throws Exception {
 		CommonResult commonResult = fareService.selectIgnoredFareRuleList(fareSearchVo);
+		return new CommonOutput(commonResult);
+	}
+
+	/**
+	 * 예외 요금 룰을 조회한다
+	 * @param fareId - 요금 룰 ID
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/v1/ntool/api/fare/{fareId}")
+	public CommonOutput getIgnoredFareRule(@PathVariable int fareId) throws Exception {
+		
+		FareSearchVo fareSearchVo = new FareSearchVo();
+		fareSearchVo.setFareId(fareId);
+		
+		CommonResult commonResult = fareService.getFareRule(fareSearchVo);
 		return new CommonOutput(commonResult);
 	}
 
@@ -101,7 +117,7 @@ public class FareController {
 	 */
 	@PostMapping("/v1/ntool/api/fareTask/addTask")
 	public CommonOutput registerFareAddTask(@RequestBody @Valid FareTaskInputVo fareTaskInputVo) throws Exception {
-		fareService.registerFareTask(TaskType.REGISTER.getCode(), fareTaskInputVo);
+		fareService.registerFareRuleTask(TaskType.REGISTER.getCode(), fareTaskInputVo);
 		return new CommonOutput();
 	}
 
@@ -121,7 +137,7 @@ public class FareController {
 			throw new MethodArgumentNotValidException(null, bindingResult);
 		}
 
-		fareService.registerFareTask(TaskType.MODIFY.getCode(), fareTaskInputVo);
+		fareService.registerFareRuleTask(TaskType.MODIFY.getCode(), fareTaskInputVo);
 		return new CommonOutput();
 	}
 
@@ -148,7 +164,7 @@ public class FareController {
 	@PostMapping("/v1/ntool/api/fareTask/removeTask")
 	public CommonOutput registerBusStopRemoveTask(@RequestBody @Valid FareRemoveTaskInputVo fareRemoveTaskInputVo)
 		throws Exception {
-		fareService.registerFareRemoveTask(fareRemoveTaskInputVo);
+//		fareService.registerFareRemoveTask(fareRemoveTaskInputVo);
 		return new CommonOutput();
 	}
 

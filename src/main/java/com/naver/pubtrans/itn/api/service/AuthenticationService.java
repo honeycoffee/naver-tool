@@ -101,11 +101,11 @@ public class AuthenticationService {
 	 * AccessToken을 생성한다.
 	 * @param refreshToken - 인증 갱신 토큰
 	 * @return
-	 * @throws AccessTokenNotFoundException 
-	 * @throws JWTVerificationException 
-	 * @throws JWTDecodeException 
-	 * @throws TokenExpiredException 
-	 * @throws ApiException 
+	 * @throws AccessTokenNotFoundException
+	 * @throws JWTVerificationException
+	 * @throws JWTDecodeException
+	 * @throws TokenExpiredException
+	 * @throws ApiException
 	 */
 	public String createAccessToken(String refreshToken)
 		throws TokenExpiredException, JWTDecodeException, JWTVerificationException, AccessTokenNotFoundException,
@@ -134,7 +134,7 @@ public class AuthenticationService {
 	 * @param loginVo - 로그인 입력 Vo
 	 * @param request - HttpServletRequest Interface
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public CommonResult loginMember(LoginVo loginVo, HttpServletRequest request) throws Exception {
 
@@ -193,11 +193,11 @@ public class AuthenticationService {
 	/**
 	 * 로그아웃을 처리한다.
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void logoutMember() throws Exception {
 		AuthenticationInputVo authenticationInputVo = new AuthenticationInputVo();
-		authenticationInputVo.setUserId(MemberUtil.getMemberFromToken().getUserId());
+		authenticationInputVo.setUserId(MemberUtil.getMemberFromAccessToken().getUserId());
 
 		this.deleteMemberTokenInfo(authenticationInputVo);
 	}
@@ -206,7 +206,7 @@ public class AuthenticationService {
 	 * JWT refresh_token으로 access_token을 갱신한다.
 	 * @param request - HttpServletRequest Interface
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public CommonResult updateAccessTokenByRefreshToken(HttpServletRequest request) throws Exception {
 

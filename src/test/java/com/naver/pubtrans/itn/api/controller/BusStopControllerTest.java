@@ -12,9 +12,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,6 +27,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,6 +41,8 @@ import com.naver.pubtrans.itn.api.repository.BusStopRepository;
 import com.naver.pubtrans.itn.api.service.TaskService;
 import com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopRemoveTaskInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo;
+import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
+import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.task.input.TaskInputVo;
 
 
@@ -47,6 +54,7 @@ import com.naver.pubtrans.itn.api.vo.task.input.TaskInputVo;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestMethodOrder(OrderAnnotation.class)
 public class BusStopControllerTest {
 
 	@Autowired
@@ -61,8 +69,11 @@ public class BusStopControllerTest {
 	@Autowired
 	private BusStopRepository busStopRepository;
 
+	// 작업ID
+	private static long TASK_ID;
+
 	private ApiUtils apiUtils;
-	
+
 	// 테스트 header에 전달 될 Token Map
 	private LinkedHashMap<String, String> tokenMap;
 
@@ -70,7 +81,7 @@ public class BusStopControllerTest {
 	public void setup() throws Exception {
 		//Api Test Utils 초기화
 		apiUtils = new ApiUtils(mockMvc, objectMapper);
-		
+
 		tokenMap = apiUtils.getTokenMap();
 	}
 
@@ -84,7 +95,7 @@ public class BusStopControllerTest {
 		mockMvc.perform(get("/v1/ntool/api/list/busStop")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             	.param("stopName", "")
-            	.param("cityCode", "1000")
+            	.param("cityCode", "")
             	.param("pageNo", "1")
             	.param("listSize", "20")
             	.param("sort", "stopId,asc")
@@ -185,8 +196,13 @@ public class BusStopControllerTest {
 	 * @throws Exception
 	 */
 	@Test
+	@Order(2)
 	public void caseMatchBusStopTask() throws Exception {
-		mockMvc.perform(get("/v1/ntool/api/info/busStopTask/{taskId}", 1)
+		if(TASK_ID == 0) {
+			this.caseBusStopAddTask();
+		}
+
+		mockMvc.perform(get("/v1/ntool/api/info/busStopTask/{taskId}", TASK_ID)
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
@@ -279,14 +295,16 @@ public class BusStopControllerTest {
 	 * 버스정류장 생성을 위한 Task 등록 - 정상인 경우
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
+	@Order(1)
 	public void caseBusStopAddTask() throws Exception {
 
 		BusStopTaskInputVo busStopInputVo = new BusStopTaskInputVo();
 		busStopInputVo.setStopName("jUnit Test");
 		busStopInputVo.setLongitude(126.123456);
 		busStopInputVo.setLatitude(34.5678);
-		busStopInputVo.setCityCode("1000");
+		busStopInputVo.setCityCode(1000);
 		busStopInputVo.setLevel(1);
 		busStopInputVo.setNonstopYn("N");
 		busStopInputVo.setVirtualStopYn("N");
@@ -302,9 +320,9 @@ public class BusStopControllerTest {
 		busStopInputVo.setProviderId(4);
 		busStopInputVo.setDisplayId("01123");
 		busStopInputVo.setTaskComment("정류장 등록");
-		busStopInputVo.setCheckUserId("kr94666");
+		busStopInputVo.setCheckUserId(this.tokenMap.get("userId"));
 
-		mockMvc.perform(post("/v1/ntool/api/busStopTask/addTask")
+		MvcResult mvcResult = mockMvc.perform(post("/v1/ntool/api/busStopTask/addTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
                 .content(objectMapper.writeValueAsString(busStopInputVo))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -312,7 +330,15 @@ public class BusStopControllerTest {
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())));
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
+				.andReturn();
+
+		String resultString = mvcResult.getResponse().getContentAsString();
+		CommonOutput rsCommonOutput = objectMapper.readValue(resultString, CommonOutput.class);
+		CommonResult rsCommonReuslt = rsCommonOutput.getResult();
+
+		Map<String, Object> map = (Map<String, Object>)rsCommonReuslt.getData();
+		TASK_ID = ((Number)map.get(CommonConstant.KEY_TASK)).longValue();
 
 	}
 
@@ -349,7 +375,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setStopName("jUnit Test");
 		busStopInputVo.setLongitude(126.123456);
 		busStopInputVo.setLatitude(34.5678);
-		busStopInputVo.setCityCode("1000");
+		busStopInputVo.setCityCode(1000);
 		busStopInputVo.setLevel(1);
 		busStopInputVo.setNonstopYn("N");
 		busStopInputVo.setVirtualStopYn("N");
@@ -365,7 +391,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setProviderId(4);
 		busStopInputVo.setDisplayId("01123");
 		busStopInputVo.setTaskComment("정류장 등록");
-		busStopInputVo.setCheckUserId("kr94666");
+		busStopInputVo.setCheckUserId(this.tokenMap.get("userId"));
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/editTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -414,7 +440,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setStopName("SK v1 정류장");
 		busStopInputVo.setLongitude(126.123456);
 		busStopInputVo.setLatitude(34.5678);
-		busStopInputVo.setCityCode("1000");
+		busStopInputVo.setCityCode(1000);
 		busStopInputVo.setLevel(1);
 		busStopInputVo.setNonstopYn("N");
 		busStopInputVo.setVirtualStopYn("N");
@@ -430,7 +456,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setProviderId(4);
 		busStopInputVo.setDisplayId("01123");
 		busStopInputVo.setTaskComment("정류장 등록");
-		busStopInputVo.setCheckUserId("kr94666");
+		busStopInputVo.setCheckUserId(this.tokenMap.get("userId"));
 
 		mockMvc.perform(put("/v1/ntool/api/modify/busStopTask")
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -456,7 +482,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setStopName("SK v1 정류장");
 		busStopInputVo.setLongitude(126.123456);
 		busStopInputVo.setLatitude(34.5678);
-		busStopInputVo.setCityCode("1000");
+		busStopInputVo.setCityCode(1000);
 		busStopInputVo.setLevel(1);
 		busStopInputVo.setNonstopYn("N");
 		busStopInputVo.setVirtualStopYn("N");
@@ -472,7 +498,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setProviderId(4);
 		busStopInputVo.setDisplayId("01123");
 		busStopInputVo.setTaskComment("정류장 등록");
-		busStopInputVo.setCheckUserId("kr94666");
+		busStopInputVo.setCheckUserId(this.tokenMap.get("userId"));
 
 		mockMvc.perform(put("/v1/ntool/api/modify/busStopTask")
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -497,7 +523,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setStopId(5);
 		busStopInputVo.setStopName("SK v1 정류장");
 		busStopInputVo.setLongitude(126.123456);
-		busStopInputVo.setCityCode("1000");
+		busStopInputVo.setCityCode(1000);
 		busStopInputVo.setLevel(1);
 		busStopInputVo.setNonstopYn("N");
 		busStopInputVo.setVirtualStopYn("N");
@@ -513,7 +539,7 @@ public class BusStopControllerTest {
 		busStopInputVo.setProviderId(4);
 		busStopInputVo.setDisplayId("01123");
 		busStopInputVo.setTaskComment("정류장 등록");
-		busStopInputVo.setCheckUserId("kr94666");
+		busStopInputVo.setCheckUserId(this.tokenMap.get("userId"));
 
 		mockMvc.perform(put("/v1/ntool/api/modify/busStopTask")
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -535,7 +561,7 @@ public class BusStopControllerTest {
 		BusStopRemoveTaskInputVo busStopRemoveInputVo = new BusStopRemoveTaskInputVo() ;
 		busStopRemoveInputVo.setStopId(55000848);
 		busStopRemoveInputVo.setTaskComment("미존재 정류장 - 삭제 처리");
-		busStopRemoveInputVo.setCheckUserId("kr94666");
+		busStopRemoveInputVo.setCheckUserId(this.tokenMap.get("userId"));
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/removeTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -557,7 +583,7 @@ public class BusStopControllerTest {
 		BusStopRemoveTaskInputVo busStopRemoveInputVo = new BusStopRemoveTaskInputVo() ;
 		busStopRemoveInputVo.setStopId(3);
 		busStopRemoveInputVo.setTaskComment("미존재 정류장 - 삭제 처리");
-		busStopRemoveInputVo.setCheckUserId("kr94666");
+		busStopRemoveInputVo.setCheckUserId(this.tokenMap.get("userId"));
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/removeTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -579,7 +605,7 @@ public class BusStopControllerTest {
 		BusStopRemoveTaskInputVo busStopRemoveInputVo = new BusStopRemoveTaskInputVo() ;
 		busStopRemoveInputVo.setStopId(55000000);
 		busStopRemoveInputVo.setTaskComment("미존재 정류장 - 삭제 처리");
-		busStopRemoveInputVo.setCheckUserId("kr94666");
+		busStopRemoveInputVo.setCheckUserId(this.tokenMap.get("userId"));
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/removeTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -622,7 +648,7 @@ public class BusStopControllerTest {
 		BusStopTaskInputVo busStopTaskInputVo = new BusStopTaskInputVo();
 		busStopTaskInputVo.setLongitude(126.123456);
 		busStopTaskInputVo.setLatitude(34.5678);
-		busStopTaskInputVo.setCityCode("1000");
+		busStopTaskInputVo.setCityCode(1000);
 		busStopTaskInputVo.setLevel(1);
 
 		assertThrows(DataAccessException.class, () -> {

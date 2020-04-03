@@ -22,6 +22,7 @@ import com.naver.pubtrans.itn.api.vo.common.BusRouteClassVo;
 import com.naver.pubtrans.itn.api.vo.common.CityCodeVo;
 import com.naver.pubtrans.itn.api.vo.common.FieldValue;
 import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
+import com.naver.pubtrans.itn.api.vo.common.TransportVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
 import com.naver.pubtrans.itn.api.vo.member.AuthorityInfoVo;
 
@@ -64,7 +65,7 @@ public class CommonService {
 
 		List<FieldValue> fieldValueList = new ArrayList<>();
 		for(CityCodeVo citycodeVo : citycodeVoList) {
-			fieldValueList.add(new FieldValue(String.valueOf(citycodeVo.getCityCode()), citycodeVo.getCityName()));
+			fieldValueList.add(new FieldValue(citycodeVo.getCityCode(), citycodeVo.getCityName()));
 		}
 
 		return fieldValueList;
@@ -80,7 +81,7 @@ public class CommonService {
 
 		List<FieldValue> fieldValueList = new ArrayList<>();
 		for(BusProviderVo vo : busProviderVoList) {
-			fieldValueList.add(new FieldValue(String.valueOf(vo.getProviderId()), vo.getProviderName()));
+			fieldValueList.add(new FieldValue(vo.getProviderId(), vo.getProviderName()));
 		}
 
 		return fieldValueList;
@@ -95,7 +96,7 @@ public class CommonService {
 
 		List<FieldValue> fieldValueList = new ArrayList<>();
 		for(BusRouteClassVo vo : busRouteClassVoList) {
-			fieldValueList.add(new FieldValue(String.valueOf(vo.getBusClassId()), vo.getBusClassName()));
+			fieldValueList.add(new FieldValue(vo.getBusClassId(), vo.getBusClassName()));
 		}
 
 		return fieldValueList;
@@ -110,7 +111,22 @@ public class CommonService {
 
 		List<FieldValue> fieldValueList = new ArrayList<>();
 		for(AuthorityInfoVo vo : authorityInfoVoList) {
-			fieldValueList.add(new FieldValue(String.valueOf(vo.getAuthorityId()), vo.getAuthorityName()));
+			fieldValueList.add(new FieldValue(vo.getAuthorityId(), vo.getAuthorityName()));
+		}
+
+		return fieldValueList;
+	}
+
+	/**
+	 * 대중교통 수단 목록 가져오기
+	 * @return
+	 */
+	public List<FieldValue> selectTransportInfoListAll() {
+		List<TransportVo> transportVoList = commonRepository.selectTransportList();
+
+		List<FieldValue> fieldValueList = new ArrayList<>();
+		for(TransportVo vo : transportVoList) {
+			fieldValueList.add(new FieldValue(vo.getTranportId(), vo.getName()));
 		}
 
 		return fieldValueList;
@@ -189,6 +205,9 @@ public class CommonService {
 
 		aliasColumnNameVoList.add(new AliasColumnNameVo("do", "sido"));				// tb_bus_stop_info
 
+		aliasColumnNameVoList.add(new AliasColumnNameVo("bypass_start_date", "bypass_start_date_time"));		// tb_bus_routes_info
+		aliasColumnNameVoList.add(new AliasColumnNameVo("bypass_end_date", "bypass_end_date_time"));			// tb_bus_routes_info
+
 
 		return aliasColumnNameVoList;
 	}
@@ -211,12 +230,13 @@ public class CommonService {
 		fieldValuesMap.put("center_stop_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
 		fieldValuesMap.put("city_code", this.selectCommonCode(CodeType.CITYCODE.getCodeName()));
 		fieldValuesMap.put("provider_id", this.selectCommonCode(CodeType.BUS_PROVIDER.getCodeName()));
+		fieldValuesMap.put("transport_id", this.selectCommonCode(CodeType.TRANSPORT_ID.getCodeName()));
 		/*
 		 * 버스 노선 부가정보
 		 */
+		fieldValuesMap.put("bus_class", this.selectCommonCode(CodeType.BUS_ROUTE_CLASS.getCodeName()));
 		fieldValuesMap.put("nonstep_bus_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
 		fieldValuesMap.put("bypass_yn", this.selectCommonCode(CodeType.Y_N.getCodeName()));
-		fieldValuesMap.put("bus_class", this.selectCommonCode(CodeType.BUS_ROUTE_CLASS.getCodeName()));
 		/*
 		 * 서비스 날짜 정보
 		 */
@@ -247,15 +267,17 @@ public class CommonService {
 
 			List<FieldValue> fieldValueList = new ArrayList<>();
 
-			if(codeType.getCodeName().equals(CodeType.CITYCODE.getCodeName())) {					// 도시코드
+			if(codeType.getCodeName().equals(CodeType.CITYCODE.getCodeName())) {				// 도시코드
 				fieldValueList = this.selectCityCodeAll();
 			}else if(codeType.getCodeName().equals(CodeType.BUS_PROVIDER.getCodeName())) {		// BIS 공급지역
 				fieldValueList = this.selectBusProviderListAll();
-			}else if(codeType.getCodeName().equals(CodeType.BUS_ROUTE_CLASS.getCodeName())) {				// 버스 노선 클래스
+			}else if(codeType.getCodeName().equals(CodeType.BUS_ROUTE_CLASS.getCodeName())) {	// 버스 노선 클래스
 				fieldValueList = this.selectBusRouteClassListAll();
 			}else if(codeType.getCodeName().equals(CodeType.AUTHORITY_ID.getCodeName())) {		// 회원 권한 ID
 				fieldValueList = this.selectAuthorityInfoListAll();
-			}else if(codeType.getCodeName().equals(CodeType.Y_N.getCodeName())) {					// Y/N 선택
+			}else if(codeType.getCodeName().equals(CodeType.TRANSPORT_ID.getCodeName())) {		// 대중교통 구분 ID
+				fieldValueList = this.selectTransportInfoListAll();
+			}else if(codeType.getCodeName().equals(CodeType.Y_N.getCodeName())) {				// Y/N 선택
 				FieldValue fY = new FieldValue(CommonConstant.Y, CommonConstant.Y);
 				FieldValue fN = new FieldValue(CommonConstant.N, CommonConstant.N);
 				fieldValueList.add(fY);

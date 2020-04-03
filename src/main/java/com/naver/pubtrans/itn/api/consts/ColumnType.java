@@ -22,4 +22,7 @@ public interface ColumnType {
 	String FLOAT = "float";
 	String DECIMAL = "decimal";
 	String DOUBLE = "double";
+
+	String DATE = "date";
+	String DATETIME = "datetime";
 }

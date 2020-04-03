@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthorityOutputVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberCountOutputVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
@@ -80,7 +81,7 @@ public interface MemberRepository {
 	 * @return
 	 * @throws DataAccessException
 	 */
-	int getMemberListTotalCnt(MemberSearchVo memberSearchVo) throws DataAccessException;
+	MemberCountOutputVo getMemberListTotalCount(MemberSearchVo memberSearchVo) throws DataAccessException;
 
 	/**
 	 * 회원 목록을 가져온다.

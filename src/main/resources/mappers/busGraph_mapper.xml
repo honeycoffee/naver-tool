@@ -22,6 +22,9 @@
 		SELECT
 			<include refid="selectCommonBusStopGraph" />
 			, route.stop_sequence
+			, route.up_down
+			, route.sum_distance
+			, graph.distance
 		FROM
 			tb_route_stops route, tb_stop_graph graph
 		LEFT JOIN
@@ -82,5 +85,12 @@
 		ORDER BY
 			route.stop_sequence
 	</select>
+
+	<insert id="insertBusStopGraphTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.graph.input.BusStopGraphTaskInputVo">
+		INSERT INTO tb_stop_graph_task
+			(task_id, graph_id, start_stop_id, end_stop_id, graph_info, distance)
+		VALUES
+			(#{taskId}, #{graphId}, #{startStopId}, #{endStopId}, ST_GeomFromText(#{graphInfo}), #{distance})
+	</insert>
 
 </mapper>

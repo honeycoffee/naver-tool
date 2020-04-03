@@ -7,6 +7,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.naver.pubtrans.itn.api.common.MemberUtil;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.common.Util;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
@@ -20,6 +21,8 @@ import com.naver.pubtrans.itn.api.vo.common.PagingVo;
 import com.naver.pubtrans.itn.api.vo.common.input.SearchVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
+import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 import com.naver.pubtrans.itn.api.vo.task.TaskAssignInfoVo;
 import com.naver.pubtrans.itn.api.vo.task.TaskStatusInfoVo;
 import com.naver.pubtrans.itn.api.vo.task.input.TaskInputVo;
@@ -42,12 +45,15 @@ public class TaskService {
 
 	private final CommonService commonService;
 
+	private final MemberService memberService;
+
 
 	@Autowired
-	TaskService(OutputFmtUtil outputFmtUtil, TaskRepository taskRepository, CommonService commonService) {
+	TaskService(OutputFmtUtil outputFmtUtil, TaskRepository taskRepository, CommonService commonService, MemberService memberService) {
 		this.outputFmtUtil = outputFmtUtil;
 		this.taskRepository = taskRepository;
 		this.commonService = commonService;
+		this.memberService = memberService;
 	}
 
 
@@ -215,6 +221,33 @@ public class TaskService {
 
 
 		return taskOutputVo;
+	}
+
+	/**
+	 * 등록자/작업자/검수자 회원ID와 이름을 추가한다
+	 * @param assignType - Task 할당 구분
+	 * @param taskInputVo - Task 입력정보
+	 * @throws Exception
+	 */
+	public void addTaskMemberInfo(String assignType, TaskInputVo taskInputVo) throws Exception {
+		MemberOutputVo memberOutputVo = MemberUtil.getMemberFromAccessToken();
+
+		if(assignType.equals(TaskAssignType.REGISTER.getCode())) {
+			taskInputVo.setRegUserName(memberOutputVo.getUserName());
+			taskInputVo.setRegUserId(memberOutputVo.getUserId());
+		} else if(assignType.equals(TaskAssignType.WORK.getCode())) {
+			taskInputVo.setWorkUserName(memberOutputVo.getUserName());
+			taskInputVo.setWorkUserId(memberOutputVo.getUserId());
+		} else if(assignType.equals(TaskAssignType.CHECK.getCode())) {
+			MemberSearchVo memberSearchVo = new MemberSearchVo();
+			memberSearchVo.setUserId(taskInputVo.getCheckUserId());
+
+			MemberOutputVo checkMemberOutputVo = memberService.getMember(memberSearchVo);
+			taskInputVo.setCheckUserId(checkMemberOutputVo.getUserId());
+			taskInputVo.setCheckUserName(checkMemberOutputVo.getUserName());
+		} else {
+			throw new ApiException(ResultCode.SAVE_FAIL.getApiErrorCode(), ResultCode.SAVE_FAIL.getDisplayMessage());
+		}
 	}
 
 }

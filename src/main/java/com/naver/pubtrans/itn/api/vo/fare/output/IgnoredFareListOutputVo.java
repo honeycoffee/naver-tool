@@ -42,13 +42,13 @@ public class IgnoredFareListOutputVo {
 	 */
 	public void setIgnoredFareName() {
 		
-		StringBuilder sb = new StringBuilder( CommonConstant.EXCEPTION_TEXT);
-		sb.append(" ");
-		sb.append(this.order);
-		sb.append(CommonConstant.BRACKET_START);
-		sb.append(this.routes);
-		sb.append(CommonConstant.BRACKET_END);
+		StringBuilder stringBuilder = new StringBuilder( CommonConstant.EXCEPTION_TEXT);
+		stringBuilder.append(" ");
+		stringBuilder.append(this.order);
+		stringBuilder.append(CommonConstant.BRACKET_START);
+		stringBuilder.append(this.routes);
+		stringBuilder.append(CommonConstant.BRACKET_END);
 		
-		ignoredFareName = sb.toString();
+		ignoredFareName = stringBuilder.toString();
 	}
 }

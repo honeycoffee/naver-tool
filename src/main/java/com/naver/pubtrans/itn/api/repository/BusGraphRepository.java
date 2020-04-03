@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.naver.pubtrans.itn.api.vo.bus.graph.BusStopGraphVo;
 import com.naver.pubtrans.itn.api.vo.bus.graph.input.BusStopGraphSearchVo;
+import com.naver.pubtrans.itn.api.vo.bus.graph.input.BusStopGraphTaskInputVo;
 
 /**
  * 버스 그래프 Repository
@@ -47,4 +48,11 @@ public interface BusGraphRepository {
 	 * @throws DataAccessException
 	 */
 	List<BusStopGraphVo> selectBusRouteGraphTaskList(long taskId) throws DataAccessException;
+
+	/**
+	 * 그래프 작업정보를 추가한다
+	 * @param busStopGraphTaskInputVo - 그래프 정보
+	 * @throws DataAccessException
+	 */
+	void insertBusStopGraphTask(BusStopGraphTaskInputVo busStopGraphTaskInputVo) throws DataAccessException;
 }

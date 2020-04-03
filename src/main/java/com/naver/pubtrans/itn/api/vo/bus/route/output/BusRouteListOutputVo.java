@@ -31,7 +31,7 @@ public class BusRouteListOutputVo {
 	private String endPointName;
 
 	// 도시코드
-	private String cityCode;
+	private int cityCode;
 
 	// 도시코드 명칭
 	private String cityName;

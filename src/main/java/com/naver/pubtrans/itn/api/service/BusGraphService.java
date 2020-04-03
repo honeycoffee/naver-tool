@@ -4,18 +4,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.naver.pubtrans.itn.api.common.CoordinateTrans;
+import com.naver.pubtrans.itn.api.common.Util;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.repository.BusStopRepository;
 import com.naver.pubtrans.itn.api.vo.bus.graph.BusStopGraphVo;
 import com.naver.pubtrans.itn.api.vo.bus.graph.GeoJsonFeatureGeometryVo;
 import com.naver.pubtrans.itn.api.vo.bus.graph.GeoJsonFeatureVo;
 import com.naver.pubtrans.itn.api.vo.bus.graph.input.BusStopGraphSearchVo;
+import com.naver.pubtrans.itn.api.vo.bus.graph.input.GeoJsonFeatureInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.graph.output.BusStopGraphOutputVo;
 import com.naver.pubtrans.itn.api.vo.bus.stop.BusStopVo;
 
@@ -142,5 +148,119 @@ public class BusGraphService {
 		geojsonFeatureVo.setProperties(busStopGraphOutputVo);
 
 		return geojsonFeatureVo;
+	}
+
+	/**
+	 * GeoJson feature 정보로부터 구간 거리와 DB에 저장될 geometry 텍스트를 구한다
+	 * @param geoJsonFeatureInputVo - 구간 정보
+	 * @return
+	 * @throws Exception
+	 */
+	public BusStopGraphVo getDistanceAndLineStringFromGeoJsonFeature(GeoJsonFeatureInputVo geoJsonFeatureInputVo) throws Exception {
+
+		// 거리계산
+		GeoJsonFeatureGeometryVo geojsonFeatureGeometryVo = geoJsonFeatureInputVo.getGeometry();
+		List<List<Double>> coordinates = geojsonFeatureGeometryVo.getCoordinates();
+
+
+		StringBuilder coordinateText = new StringBuilder();
+		List<Double> distanceList = new ArrayList<>();
+
+
+		IntStream.range(0, coordinates.size()-1).forEach(i -> {
+
+			double sLongitude = coordinates.get(i).get(0);
+			double sLatitude = coordinates.get(i).get(1);
+			double eLongitude = coordinates.get(i+1).get(0);
+			double eLatitude = coordinates.get(i+1).get(1);
+
+			if(i == 0) {
+				coordinateText.append(String.valueOf(sLongitude));
+				coordinateText.append(CommonConstant.BLANK);
+				coordinateText.append(String.valueOf(sLatitude));
+			}
+
+			coordinateText.append(CommonConstant.COMMA);
+			coordinateText.append(String.valueOf(eLongitude));
+			coordinateText.append(CommonConstant.BLANK);
+			coordinateText.append(String.valueOf(eLatitude));
+
+			// 거리
+			double distance = Util.calculateDistance(sLongitude, sLatitude, eLongitude, eLatitude);
+			distanceList.add(distance);
+		});
+
+		// 전체 거리
+		double totalDistance = distanceList.stream().mapToDouble(Double::doubleValue).sum();
+
+
+		String graphInfo = this.makeLineStringFullText(coordinateText);
+
+		BusStopGraphVo busStopGraphVo = new BusStopGraphVo();
+		busStopGraphVo.setDistance((int)Math.round(totalDistance));
+		busStopGraphVo.setGraphInfo(graphInfo);
+
+		return busStopGraphVo;
+	}
+
+	/**
+	 * 배열에 담겨 있는 좌표정보를 LINESTRING 문자열로 변환한다
+	 * @param coordinates
+	 * @return
+	 */
+	public String convertLineString(List<List<Double>> coordinates) {
+		StringBuilder coordinateText = new StringBuilder();
+
+		IntStream.range(0, coordinates.size()-1).forEach(i -> {
+
+			double sLongitude = coordinates.get(i).get(0);
+			double sLatitude = coordinates.get(i).get(1);
+			double eLongitude = coordinates.get(i+1).get(0);
+			double eLatitude = coordinates.get(i+1).get(1);
+
+			if(i == 0) {
+				coordinateText.append(String.valueOf(sLongitude));
+				coordinateText.append(CommonConstant.BLANK);
+				coordinateText.append(String.valueOf(sLatitude));
+			}
+
+			coordinateText.append(CommonConstant.COMMA);
+			coordinateText.append(String.valueOf(eLongitude));
+			coordinateText.append(CommonConstant.BLANK);
+			coordinateText.append(String.valueOf(eLatitude));
+
+		});
+
+		String graphInfo = this.makeLineStringFullText(coordinateText) ;
+
+		return graphInfo;
+	}
+
+	/**
+	 * DB에서 사용될 LINESTRING 전체 문자열을 생성한다
+	 * @param coordinateText - 좌표 텍스트 정보
+	 * @return
+	 */
+	private String makeLineStringFullText(StringBuilder coordinateText) {
+		return CommonConstant.GEOJSON_GEOMETRY_TYPE_LINE_STRING.toUpperCase() + CommonConstant.BRACKET_START + coordinateText.toString() + CommonConstant.BRACKET_END;
+	}
+
+
+	/**
+	 * Mysql linestring 구문으로부터 마지막 좌표를 가져온다
+	 * @param graphInfo - 그래프 정보
+	 * @return
+	 */
+	public List<Double> selectLastCoordinates(String graphInfo) {
+		graphInfo = graphInfo.replace(CommonConstant.GEOJSON_GEOMETRY_TYPE_LINE_STRING.toUpperCase(), "");
+		graphInfo = graphInfo.replace(CommonConstant.BRACKET_START, "");
+		graphInfo = graphInfo.replace(CommonConstant.BRACKET_END, "");
+
+		String coordinatesList[] = graphInfo.split(CommonConstant.COMMA);
+		String lastCoordinates[] = coordinatesList[coordinatesList.length-1].split(CommonConstant.BLANK);
+
+		List<Double> coordinateList = Arrays.asList(Double.parseDouble(lastCoordinates[0]), Double.parseDouble(lastCoordinates[1]));
+
+		return coordinateList;
 	}
 }

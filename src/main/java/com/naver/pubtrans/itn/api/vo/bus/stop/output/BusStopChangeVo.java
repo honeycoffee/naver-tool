@@ -36,7 +36,7 @@ public class BusStopChangeVo {
 	 * 도시코드
 	 */
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String cityCode;
+	private Integer cityCode;
 
 
 	/**

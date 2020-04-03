@@ -67,11 +67,11 @@
 
 	<insert id="insertFareRuleTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareTaskInputVo">
 		INSERT INTO tb_fare_rule_task
-			(task_id, base_fare, base_dist, youth_fare, child_fare, base_cash_fare, youth_cash_fare, child_cash_fare
+			(fare_id, task_id, base_fare, base_dist, youth_fare, child_fare, base_cash_fare, youth_cash_fare, child_cash_fare
 			, unit_fare, unit_dist, max_fare, start_stop_id, end_stop_id, service_id, city_code
 			, base_yn, bus_class, command)
 		VALUES
-			(#{taskId}, #{baseFare}, #{baseDist}, #{youthFare}, #{childFare}, #{baseCashFare}, #{youthCashFare}, #{childCashFare}
+			(#{fareId}, #{taskId}, #{baseFare}, #{baseDist}, #{youthFare}, #{childFare}, #{baseCashFare}, #{youthCashFare}, #{childCashFare}
 			, #{unitFare}, #{unitDist}, #{maxFare}, #{startStopId}, #{endStopId}, #{serviceId}, #{cityCode}
 			, #{baseYn}, #{busClass}, #{command})
 	</insert>

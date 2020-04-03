@@ -15,7 +15,7 @@ public class BusProviderVo {
 	/**
 	 * BIS 지역 ID
 	 */
-	private String providerId;
+	private int providerId;
 
 	/**
 	 * BIS 지역명

@@ -47,7 +47,7 @@
 		ORDER BY
 			provider_name asc
 	</select>
-	
+
 	<select id="selectAuthorityInfoList" resultType="com.naver.pubtrans.itn.api.vo.member.AuthorityInfoVo">
 		SELECT
 			info.authority_id
@@ -71,5 +71,15 @@
 			sorting_priority, bus_class_id
 	</select>
 
+	<select id="selectTransportList" resultType="com.naver.pubtrans.itn.api.vo.common.TransportVo">
+		SELECT
+			tranport_id
+			, name
+			, station_class
+		FROM
+			tb_transport
+		ORDER BY
+			tranport_id
+	</select>
 
 </mapper>

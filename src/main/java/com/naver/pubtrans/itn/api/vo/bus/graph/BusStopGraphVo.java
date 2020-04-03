@@ -42,4 +42,16 @@ public class BusStopGraphVo {
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private Integer stopSequence;
 
+	// 상하행 구분
+	@JsonIgnore
+	private String upDown;
+
+	// 누적거리
+	@JsonIgnore
+	private int cumulativeDistance;
+
+	// 그래프 구간 거리
+	@JsonIgnore
+	private int distance;
+
 }

@@ -25,7 +25,7 @@ public class BusRouteTaskDetailOutputVo extends BusRouteTaskVo {
 	private List<BusRouteCompanyOutputVo> companyList;
 
 	// 우회노선 목록
-	private List<BusRouteBypassOutputVo> bypassChildrenList;
+	private List<BusRouteBypassOutputVo> bypassChildList;
 
 	// 작업 정보
 	private TaskOutputVo taskInfo;

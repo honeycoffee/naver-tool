@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.vo.auth.LoginVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
@@ -32,7 +33,7 @@ public class ApiUtils {
 	private MockMvc mockMvc;
 
 	private ObjectMapper objectMapper;
-	
+
 	public ApiUtils(MockMvc mockMvc, ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 		this.mockMvc = mockMvc;
@@ -63,6 +64,9 @@ public class ApiUtils {
 		@SuppressWarnings("unchecked")
 		LinkedHashMap<String, String> tokenMap = (LinkedHashMap<String, String>)commonReuslt.getData();
 
+		// 테스트 회원ID 삽입
+		tokenMap.put("userId", loginVo.getUserId());
+
 		return tokenMap;
 	}
 
@@ -72,7 +76,7 @@ public class ApiUtils {
 	 * @throws Exception
 	 */
 	public int getNoticeSeq() throws Exception {
-		
+
 		LinkedHashMap<String, String> tokenMap = this.getTokenMap();
 		String accessToken = tokenMap.get("accessToken");
 
@@ -100,6 +104,32 @@ public class ApiUtils {
 		return seq;
 
 
+	}
+
+
+	/**
+	 * 버스노선 상세정보를 가져온다.
+	 * @param routeId - 노선ID
+	 * @return
+	 * @throws Exception
+	 */
+	public String getBusRouteDetailInfo(int routeId) throws Exception {
+
+		LinkedHashMap<String, String> tokenMap = this.getTokenMap();
+		String accessToken = tokenMap.get("accessToken");
+
+		MvcResult mvcResult = mockMvc.perform(get("/v1/ntool/api/info/busRoute/{routeId}", routeId)
+			.header(JwtAdapter.HEADER_NAME, accessToken)
+        	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        	.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON)
+            .characterEncoding("UTF-8"))
+			.andReturn();
+
+
+		String jsonString = mvcResult.getResponse().getContentAsString();
+
+		return jsonString;
 	}
 
 }

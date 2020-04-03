@@ -59,7 +59,7 @@
 
 
 	<sql id="whereBusStopList">
-		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(cityCode)">
+		<if test="cityCode != null and cityCode > 0">
 			AND stop.city_code = #{cityCode}
 		</if>
 
@@ -67,8 +67,8 @@
 			AND stop.stop_name LIKE CONCAT(#{stopName}, '%')
 		</if>
 
-		<if test="stopId > 0">
-			AND stop.stop_id LIKE CONCAT(#{stopId}, '%')
+		<if test="stopId != null and stopId > 0">
+			AND stop.stop_id = #{stopId}
 		</if>
 	</sql>
 

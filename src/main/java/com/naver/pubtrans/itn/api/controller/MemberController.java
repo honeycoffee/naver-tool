@@ -188,6 +188,9 @@ public class MemberController {
 	 */
 	@GetMapping("/v1/ntool/api/list/member")
 	public CommonOutput listMember(MemberSearchVo memberSearchVo) throws Exception {
+		
+
+		System.out.println(memberSearchVo.getSortKey());
 		CommonResult commonResult = memberService.selectMemberList(memberSearchVo);
 		return new CommonOutput(commonResult);
 	}

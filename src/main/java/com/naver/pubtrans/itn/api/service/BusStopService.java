@@ -1,7 +1,9 @@
 package com.naver.pubtrans.itn.api.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -12,11 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.naver.pubtrans.itn.api.common.MemberUtil;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.common.Util;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.PubTransTable;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
+import com.naver.pubtrans.itn.api.consts.TaskAssignType;
 import com.naver.pubtrans.itn.api.consts.TaskDataType;
 import com.naver.pubtrans.itn.api.consts.TaskStatus;
 import com.naver.pubtrans.itn.api.consts.TaskType;
@@ -38,6 +43,7 @@ import com.naver.pubtrans.itn.api.vo.common.PagingVo;
 import com.naver.pubtrans.itn.api.vo.common.input.SearchVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 import com.naver.pubtrans.itn.api.vo.task.input.TaskInputVo;
 import com.naver.pubtrans.itn.api.vo.task.output.TaskOutputVo;
 
@@ -273,7 +279,7 @@ public class BusStopService {
 
 		ArrayList<String> ignoreColumnNameList = new ArrayList<>();
 		ignoreColumnNameList.add("alias_kor");
-		ignoreColumnNameList.add("ms_code");
+		ignoreColumnNameList.add("mscode");
 
 		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_BUS_STOPS_INFO.getName(), CommonConstant.IGNORE_COLUMN, ignoreColumnNameList);
 
@@ -321,10 +327,11 @@ public class BusStopService {
 	 * 버스정류장 작업정보를 등록한다
 	 * @param taskType - 작업 등록구분(컨텐츠 추가, 수정, 삭제)
 	 * @param busStopTaskInputVo - 버스 정류장 입력정보
+	 * @return
 	 * @throws Exception
 	 */
 	@Transactional
-	public void registerBusStopTask(String taskType, BusStopTaskInputVo busStopTaskInputVo) throws Exception {
+	public CommonResult registerBusStopTask(String taskType, BusStopTaskInputVo busStopTaskInputVo) throws Exception {
 
 
 		// 정류장 신규등록
@@ -352,16 +359,18 @@ public class BusStopService {
 		taskInputVo.setTaskDataName(busStopTaskInputVo.getStopName());
 		taskInputVo.setTaskComment(busStopTaskInputVo.getTaskComment());
 		taskInputVo.setTaskRegisterType(CommonConstant.MANUAL);
+		taskInputVo.setCheckUserId(busStopTaskInputVo.getCheckUserId());
 
-		// TODO 회원정보 파트 개발 완료후 공통에서 ID와 이름등을 가져오는것으로 변경 필요.
-		taskInputVo.setRegUserName("안경현");
-		taskInputVo.setRegUserId("kr94666");
-		taskInputVo.setWorkUserName("안경현");
-		taskInputVo.setWorkUserId("kr94666");
+		/*
+		 * 등록자, 작업자 정보
+		 * 작업 등록시  등록자,작업자는 본인 자신이다.
+		 */
+		taskService.addTaskMemberInfo(TaskAssignType.REGISTER.getCode(), taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.WORK.getCode(), taskInputVo);
 
-		// TODO 권환관련 파트 개발 완료후 검수자 ID, 이름 수정
-		taskInputVo.setCheckUserId("kr94666");
-		taskInputVo.setCheckUserName("안경현");
+		// 검수자 정보
+		taskService.addTaskMemberInfo(TaskAssignType.CHECK.getCode(), taskInputVo);
+
 
 
 		/**
@@ -386,6 +395,12 @@ public class BusStopService {
 		}
 
 
+		// 성공시 작업ID 리턴
+		Map<String, Object> resultMap = new HashMap<>();
+		resultMap.put(CommonConstant.KEY_TASK, taskId);
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(resultMap);
+
+		return commonResult;
 	}
 
 
@@ -404,14 +419,13 @@ public class BusStopService {
 		taskInputVo.setTaskStatus(TaskStatus.PROGRESS.getCode());
 		taskInputVo.setTaskDataName(busStopTaskInputVo.getStopName());
 		taskInputVo.setTaskComment(busStopTaskInputVo.getTaskComment());
+		taskInputVo.setCheckUserId(busStopTaskInputVo.getCheckUserId());
 
-		// TODO 회원정보 파트 개발 완료후 공통에서 ID와 이름등을 가져오는것으로 변경 필요.
-		taskInputVo.setRegUserName("안경현");
-		taskInputVo.setRegUserId("kr94666");
+		// 등록자 정보
+		taskService.addTaskMemberInfo(TaskAssignType.REGISTER.getCode(), taskInputVo);
 
-		// TODO 권환관련 파트 개발 완료후 검수자 ID, 이름 변경 필요
-		taskInputVo.setCheckUserId("kr94666");
-		taskInputVo.setCheckUserName("안경현");
+		// 검수자 정보
+		taskService.addTaskMemberInfo(TaskAssignType.CHECK.getCode(), taskInputVo);
 
 
 		/**
@@ -444,9 +458,10 @@ public class BusStopService {
 	 * 이후 검수자 확인 및 배포처리(배포관리 메뉴)를 통해 최종 마스터 테이블에 반영
 	 * </pre>
 	 * @param busStopRemoveTaskInputVo - 버스정류장 삭제정보
+	 * @return
 	 * @throws Exception
 	 */
-	public void registerBusStopRemoveTask(BusStopRemoveTaskInputVo busStopRemoveTaskInputVo) throws Exception {
+	public CommonResult registerBusStopRemoveTask(BusStopRemoveTaskInputVo busStopRemoveTaskInputVo) throws Exception {
 
 
 		int stopId = busStopRemoveTaskInputVo.getStopId();
@@ -473,7 +488,7 @@ public class BusStopService {
 
 
 		// 정류장 삭제요청 Task 등록
-		this.registerBusStopTask(TaskType.REMOVE.getCode(), busStopTaskInputVo);
+		return this.registerBusStopTask(TaskType.REMOVE.getCode(), busStopTaskInputVo);
 
 	}
 

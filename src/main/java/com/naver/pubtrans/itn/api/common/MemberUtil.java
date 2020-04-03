@@ -18,7 +18,7 @@ import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 public class MemberUtil {
 
 	private static JwtAdapter jwtAdapter;
-	
+
 	@SuppressWarnings("static-access")
 	@Autowired
 	MemberUtil(JwtAdapter jwtAdapter) {
@@ -29,8 +29,8 @@ public class MemberUtil {
 	* accessToken 으로 회원 ID를 가져온다.
 	* @return
 	 */
-	public static String getUserIdFromToken() throws Exception {
-		
+	public static String getUserIdFromAccessToken() throws Exception {
+
 		String accessToken =  (String)Util.getHttpServletRequest()
 			.getAttribute(CommonConstant.ACCESS_TOKEN_KEY);
 
@@ -43,8 +43,8 @@ public class MemberUtil {
 	 * accessToken 으로 회원 정보를 가져온다.
 	 * @return
 	 */
-	public static MemberOutputVo getMemberFromToken() throws Exception {
-		
+	public static MemberOutputVo getMemberFromAccessToken() throws Exception {
+
 		String accessToken =  (String)Util.getHttpServletRequest()
 			.getAttribute(CommonConstant.ACCESS_TOKEN_KEY);
 

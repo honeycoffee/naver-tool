@@ -1,39 +1,59 @@
 package com.naver.pubtrans.itn.api.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ch.qos.logback.core.joran.util.beans.BeanUtil;
+import lombok.extern.slf4j.Slf4j;
+
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.common.Util;
+import com.naver.pubtrans.itn.api.consts.BusDirection;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.PubTransTable;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
+import com.naver.pubtrans.itn.api.consts.TaskAssignType;
 import com.naver.pubtrans.itn.api.consts.TaskDataType;
+import com.naver.pubtrans.itn.api.consts.TaskStatus;
+import com.naver.pubtrans.itn.api.consts.TaskType;
 import com.naver.pubtrans.itn.api.exception.ApiException;
 import com.naver.pubtrans.itn.api.repository.BusGraphRepository;
 import com.naver.pubtrans.itn.api.repository.BusRouteRepository;
 import com.naver.pubtrans.itn.api.repository.BusStopRepository;
 import com.naver.pubtrans.itn.api.repository.TaskRepository;
 import com.naver.pubtrans.itn.api.vo.bus.graph.BusStopGraphVo;
+import com.naver.pubtrans.itn.api.vo.bus.graph.GeoJsonFeatureGeometryVo;
 import com.naver.pubtrans.itn.api.vo.bus.graph.GeoJsonFeatureVo;
+import com.naver.pubtrans.itn.api.vo.bus.graph.input.BusStopGraphInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.graph.input.BusStopGraphSearchVo;
+import com.naver.pubtrans.itn.api.vo.bus.graph.input.BusStopGraphTaskInputVo;
+import com.naver.pubtrans.itn.api.vo.bus.graph.input.GeoJsonFeatureInputVo;
+import com.naver.pubtrans.itn.api.vo.bus.graph.input.GeoJsonInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.graph.output.GeoJsonOutputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.BisBusRouteChangeGraphVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.BisBusRouteChangeVo;
+import com.naver.pubtrans.itn.api.vo.bus.route.BusRouteStopVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.BusRouteTaskVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.BusRouteVo;
+import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteCompanyTaskInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteSearchVo;
+import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteStopTaskInputVo;
+import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteBypassOutputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteCompanyOutputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteDetailOutputVo;
@@ -41,10 +61,13 @@ import com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteListOutputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteTaskDetailOutputVo;
 import com.naver.pubtrans.itn.api.vo.bus.stop.BusStopMappingVo;
 import com.naver.pubtrans.itn.api.vo.bus.stop.BusStopVo;
+import com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo;
+import com.naver.pubtrans.itn.api.vo.bus.stop.output.BusRouteOutputVo;
 import com.naver.pubtrans.itn.api.vo.common.PagingVo;
 import com.naver.pubtrans.itn.api.vo.common.input.SearchVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
+import com.naver.pubtrans.itn.api.vo.task.input.TaskInputVo;
 import com.naver.pubtrans.itn.api.vo.task.output.TaskOutputVo;
 
 /**
@@ -52,6 +75,7 @@ import com.naver.pubtrans.itn.api.vo.task.output.TaskOutputVo;
  * @author adtec10
  *
  */
+@Slf4j
 @Service
 public class BusRouteService {
 
@@ -380,7 +404,7 @@ public class BusRouteService {
 		if(CommonConstant.N.equals(busRouteTaskVo.getBypassYn())) {
 			List<BusRouteBypassOutputVo> busRouteBypassOutputVoList = busRouteRepository.selectBusRouteBypassList(taskOutputVo.getPubTransId());
 			if(busRouteBypassOutputVoList.size() > 0) {
-				busRouteTaskDetailOutputVo.setBypassChildrenList(busRouteBypassOutputVoList);
+				busRouteTaskDetailOutputVo.setBypassChildList(busRouteBypassOutputVoList);
 			}
 		}
 
@@ -406,6 +430,9 @@ public class BusRouteService {
 	public GeoJsonOutputVo getBusRouteGraphInfo(int routeId) throws Exception {
 
 		List<BusStopGraphVo> busStopGraphVoList = busGraphRepository.selectBusRouteGraphList(routeId);
+
+		// 마지막 구간 정보는 출발 정류장과 도착정류장이 동일한 버스노선 종점 정류장 데이터 이므로 제외한다
+		busStopGraphVoList.remove(busStopGraphVoList.size()-1);
 		List<GeoJsonFeatureVo> geoJsonFeatureVoList = busGraphService.makeGeoJsonFeatureList(busStopGraphVoList);
 
 		// geojson 형태의 feature 목록 생성
@@ -435,6 +462,9 @@ public class BusRouteService {
 		}else {
 			busStopGraphVoList = busGraphRepository.selectBusRouteGraphList(taskOutputVo.getPubTransId());
 		}
+
+		// 마지막 구간 정보는 출발 정류장과 도착정류장이 동일한 버스노선 종점 정류장 데이터 이므로 제외한다
+		busStopGraphVoList.remove(busStopGraphVoList.size()-1);
 
 		// geojson 형태의 feature 목록 생성
 		List<GeoJsonFeatureVo> geoJsonFeatureVoList = busGraphService.makeGeoJsonFeatureList(busStopGraphVoList);
@@ -530,6 +560,580 @@ public class BusRouteService {
 		}
 
 		return BisBusRouteChangeVo;
+	}
+
+	/**
+	 * 버스노선 생성/수정/삭제를 위한 Task를 등록한다
+	 * @param taskType - 작업 등록구분(컨텐츠 추가, 수정, 삭제)
+	 * @param busRouteTaskInputVo - 노선 작업정보
+	 * @return
+	 * @throws Exception
+	 */
+	@Transactional
+	public CommonResult registerBusRouteTask(String taskType, BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
+
+		// 노선별 경유정류장 그래프 유효성 검사
+		if(!this.verifyBusRouteGraphInfo(busRouteTaskInputVo.getBusStopGraphInfo())) {
+			throw new ApiException(ResultCode.BUS_ROUTE_STOPS_NOT_VALID.getApiErrorCode(), ResultCode.BUS_ROUTE_STOPS_NOT_VALID.getDisplayMessage());
+		}
+
+		// 노선 신규등록인 경우
+		if(taskType.equals(TaskType.REGISTER.getCode())) {
+			/**
+			 * 노선 임시 ID 설정
+			 * Task 검수 완료 후 배포시 노선 테이블의 auto increment값을 사용하여 ID를 부여한다.
+			 */
+			busRouteTaskInputVo.setRouteId(0);
+		}
+
+		// 스케줄 ID 정보 가져오기
+		Integer calendarServiceId = busRouteRepository.getCalendarServiceId(busRouteTaskInputVo);
+		if(calendarServiceId == null) {
+			throw new ApiException(ResultCode.BUS_SCHEDULE_NOT_MATCH.getApiErrorCode(), ResultCode.BUS_SCHEDULE_NOT_MATCH.getDisplayMessage());
+		}
+
+		busRouteTaskInputVo.setServiceId(calendarServiceId);
+
+
+		// Task 기본정보
+		TaskInputVo taskInputVo = this.createTaskInputInfo(taskType, TaskStatus.PROGRESS.getCode(), busRouteTaskInputVo);
+
+
+		/**
+		 * Task를 구성하는 전체 정보를 저장한다
+		 *
+		 * 1. Task 기본정보 저장
+		 * 2. Task 할당정보 저장
+		 * 3. Task 상태변경 히스토리 정보 저장
+		 */
+		long taskId = taskService.registerTaskInfoAll(taskInputVo);
+		busRouteTaskInputVo.setTaskId(taskId);
+
+		// 노선 기본정보 저장
+		busRouteRepository.insertBusRouteTask(busRouteTaskInputVo);
+
+		// 노선 부가정보 저장
+		busRouteRepository.insertBusRouteSubTask(busRouteTaskInputVo);
+
+		// 운수회사 정보 저장
+		List<BusRouteCompanyTaskInputVo> busRouteCompanyTaskInputVoList = busRouteTaskInputVo.getCompanyList();
+		if(busRouteCompanyTaskInputVoList != null && busRouteCompanyTaskInputVoList.size() > 0) {
+			for(BusRouteCompanyTaskInputVo busRouteCompanyTaskInputVo : busRouteCompanyTaskInputVoList) {
+				busRouteCompanyTaskInputVo.setTaskId(taskId);
+				busRouteRepository.insertBusRouteCompanyTask(busRouteCompanyTaskInputVo);
+			};
+		}
+
+
+		// 노선 매핑정보 저장 (매핑정보가 있는 경우)
+		if(StringUtils.isNotEmpty(busRouteTaskInputVo.getLocalRouteId())) {
+			busRouteRepository.insertBusRouteMappingTask(busRouteTaskInputVo);
+		}
+
+
+		// 우회노선 정보 저장 (우회노선인 경우)
+		if(CommonConstant.Y.equals(busRouteTaskInputVo.getBypassYn())) {
+			busRouteRepository.insertBusRouteBypassTask(busRouteTaskInputVo);
+		}
+
+
+		/**
+		 * 요금정보
+		 * 신규 노선 등록이거나, 도시코드 또는 노선코드가 변경되었을경우에는 기본 요금ID를 검색하여 해당 ID를 저장한다
+		 */
+
+		// 요금ID 변경여부
+		boolean isBusRouteFareChange = false;
+		if(!taskType.equals(TaskType.REGISTER.getCode())) {
+		    // 노선정보
+		    BusRouteVo busRouteVo = busRouteRepository.getBusRoute(busRouteTaskInputVo.getRouteId());
+
+		    // 도시코드나 버스 클래스가 변경되면 요금ID도 변경되어야 한다
+		    if(busRouteVo.getCityCode() != busRouteTaskInputVo.getCityCode() || busRouteVo.getBusClass() != busRouteTaskInputVo.getBusClass()) {
+		        isBusRouteFareChange = true;
+		    }
+		}
+
+		if(taskType.equals(TaskType.REGISTER.getCode()) || isBusRouteFareChange) {
+			Integer fareId = busRouteRepository.getBaseFareId(busRouteTaskInputVo);
+			if(fareId == null) {
+				throw new ApiException(ResultCode.BUS_FARE_NOT_MATCH.getApiErrorCode(), ResultCode.BUS_FARE_NOT_MATCH.getDisplayMessage());
+			}
+
+			// 요금정보 매핑테이블 Task 저장
+			busRouteTaskInputVo.setFareId(fareId);
+
+			busRouteRepository.insertBusRouteFareTask(busRouteTaskInputVo);
+		}
+
+
+		// 사용자 입력 경유정류장 및 그래프 정보 가져오기
+		List<BusStopGraphVo> busStopGraphVoList = this.makeBusStopGraphVoList(busRouteTaskInputVo);
+
+		/**
+		 * 노선 경유정류장 정보가 변경되었을경우 전체 경유정류장 목록을 작업정보로 저장한다
+		 */
+		boolean isSame = false;
+		List<BusRouteStopVo> busRouteStopVoList = null;
+
+		if (taskType.equals(TaskType.MODIFY.getCode())) {
+		   isSame = isTheSameAsBusRouteStopVoListOfDb(taskType, busRouteTaskInputVo.getRouteId(), busStopGraphVoList);
+		} else {
+		  isSame = false;
+		}
+
+		if (isSame == false) {
+		    busRouteStopVoList = buildBusRouteStopVoList(busRouteTaskInputVo.getRouteId(),  busStopGraphVoList);
+		}
+
+		if(!Objects.isNull(busRouteStopVoList) && busRouteStopVoList.size() > 0) {
+			for(BusRouteStopVo busRouteStopVo : busRouteStopVoList) {
+				BusRouteStopTaskInputVo busRouteStopTaskInputVo = new BusRouteStopTaskInputVo();
+				BeanUtils.copyProperties(busRouteStopVo, busRouteStopTaskInputVo);
+				busRouteStopTaskInputVo.setTaskId(taskId);
+
+				busRouteRepository.insertBusRouteStopTask(busRouteStopTaskInputVo);
+			};
+		}
+
+
+		/**
+		 * 그래프 정보가 변경되었을 경우에만 변경된 구간에 대하여 그래프 작업정보를 저장한다
+		 */
+		List<BusStopGraphVo> busStopGraphVoChangeList = this.extractChangedBusStopGraphVoList(busStopGraphVoList);
+		if(!Objects.isNull(busStopGraphVoChangeList) && busStopGraphVoChangeList.size() > 0) {
+			for(BusStopGraphVo busStopGraphVo : busStopGraphVoChangeList) {
+				BusStopGraphTaskInputVo busStopGraphTaskInputVo = new BusStopGraphTaskInputVo();
+				BeanUtils.copyProperties(busStopGraphVo, busStopGraphTaskInputVo);
+				busStopGraphTaskInputVo.setTaskId(taskId);
+
+				busGraphRepository.insertBusStopGraphTask(busStopGraphTaskInputVo);
+			};
+
+		}
+
+		// 성공시 작업ID 리턴
+		Map<String, Object> resultMap = new HashMap<>();
+		resultMap.put(CommonConstant.KEY_TASK, taskId);
+
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(resultMap);
+		return commonResult;
+	}
+
+
+	/**
+	 * 노선 경유 정류장의 입력 정보에 대해 유효성 검사를 진행한다
+	 * @param geoJsonInputVo - 경유정류장 입력정보
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean verifyBusRouteGraphInfo(GeoJsonInputVo geoJsonInputVo) throws Exception {
+
+		List<GeoJsonFeatureInputVo> geoJsonFeatureInputVoList = geoJsonInputVo.getFeatures();
+
+		// 경유 정류장 정보가 없는경우
+		if(geoJsonFeatureInputVoList == null || geoJsonFeatureInputVoList.size() == 0) {
+			return false;
+		}
+
+
+		// 경유 정류장 및 그래프 목록 검증
+		for(int i=0; i < geoJsonFeatureInputVoList.size(); i++) {
+			GeoJsonFeatureInputVo geoJsonFeatureInputVo = geoJsonFeatureInputVoList.get(i);
+			if(geoJsonFeatureInputVo == null) {
+				   return false;
+			}
+
+			GeoJsonFeatureGeometryVo geoJsonFeatureGeometryVo = geoJsonFeatureInputVo.getGeometry();
+			BusStopGraphInputVo busStopGraphInputVo = geoJsonFeatureInputVo.getProperties();
+			if(busStopGraphInputVo == null) {
+			  return false;
+			}
+
+			// 출/도착 정류장
+			int startStopId = busStopGraphInputVo.getStartStopId();
+			int endStopId = busStopGraphInputVo.getEndStopId();
+
+			// 출/도착 구간 좌표
+			List<List<Double>> coordinates = geoJsonFeatureGeometryVo.getCoordinates();
+			List<Double> startPoint = coordinates.get(0);
+
+			// 출발 정류장 또는 도착정류장 ID가 없는 경우. 또는 출/도착 정류장ID가 동일한 경우
+			if(startStopId <= 0 || endStopId <= 0 || startStopId == endStopId) {
+				return false;
+			}
+
+
+			if(i > 0) {
+				// 이전 정류장
+				int prevEndStopId = geoJsonFeatureInputVoList.get(i-1).getProperties().getEndStopId();
+
+				// 이전 구간 그래프 좌표 정보
+				List<List<Double>> prevCoordinates = geoJsonFeatureInputVoList.get(i-1).getGeometry().getCoordinates();
+
+				// 이전구간 마지막 좌표 지점
+				List<Double> prevEndPoint = prevCoordinates.get(prevCoordinates.size()-1);
+
+				// 이전 구간 도착 정류장과 현재 구간 출발 정류장이 다른 경우
+				if(prevEndStopId != startStopId) {
+					return false;
+				}
+
+				// 이전 구간 마지막 좌표와 현재 구간 출발 시작 좌표가 다른경우
+				if(!prevEndPoint.containsAll(startPoint)) {
+					return false;
+				}
+
+			}
+
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * 사용자 입력 그래프정보와 DB에 저장된 그래프 정보를 비교하여 추가/수정되는 그래프 정보를 반환한다
+	 * @param busStopGraphVoList - 버스노선 작업 경유정륲장 및 그래프 정보
+	 * @return
+	 * @throws Exception
+	 */
+	public List<BusStopGraphVo> extractChangedBusStopGraphVoList(List<BusStopGraphVo> busStopGraphVoList) throws Exception {
+
+		/**
+		 * 사용자 입력 정류장 정보를 가지고 DB에 저장된 그래프 정보를 가져온다
+		 */
+		List<BusStopGraphSearchVo> busStopGraphSearchVoList = busStopGraphVoList.stream().map(o -> {
+			int startBusStopId = o.getStartStopId();
+			int endBusStopId = o.getEndStopId();
+			return new BusStopGraphSearchVo(startBusStopId, endBusStopId);
+		}).collect(Collectors.toList());
+
+
+		// 정류장 검색 목록으로 그래프 정보 목록을 가져온다
+		List<BusStopGraphVo> busStopGraphVoListOfDb = busGraphRepository.selectBusStopGraphList(busStopGraphSearchVoList);
+
+		/**
+		 * 사용자 입력 그래프 정보와 DB에 저장된 그래프 정보를 비교한다.
+		 * 그래프가 수정되거나 없는 그래프 정보인 경우 해당 목록을 List에 담는다
+		 */
+		List<BusStopGraphVo> newBusStopGraphVoList = new ArrayList<>();
+
+		busStopGraphVoList.stream().forEach(t -> {
+			BusStopGraphVo newBusStopGraphVo = new BusStopGraphVo();
+
+			boolean isMatchedGraph = busStopGraphVoListOfDb.stream().anyMatch(d -> t.getStartStopId() == d.getStartStopId() && t.getEndStopId() == d.getEndStopId());
+
+			// 기존 그래프 수정
+			busStopGraphVoListOfDb.stream().filter(d -> t.getStartStopId() == d.getStartStopId() && t.getEndStopId() == d.getEndStopId() && !StringUtils.equals(t.getGraphInfo(), d.getGraphInfo())).forEach(o -> {
+				newBusStopGraphVo.setGraphId(o.getGraphId());
+			});
+
+
+			/**
+			 * 그래프가 일치하는 경우가 없는경우 그래프를 추가/수정 하기 위한 정보를 설정한다.
+			 */
+			if(!isMatchedGraph || !Objects.isNull(newBusStopGraphVo.getGraphId())) {
+
+				// 신규 그래프 생성
+				if(Objects.isNull(newBusStopGraphVo.getGraphId())) {
+					newBusStopGraphVo.setGraphId(0);
+				}
+
+				newBusStopGraphVo.setStartStopId(t.getStartStopId());
+				newBusStopGraphVo.setEndStopId(t.getEndStopId());
+				newBusStopGraphVo.setGraphInfo(t.getGraphInfo());
+				newBusStopGraphVo.setDistance(t.getDistance());
+
+				newBusStopGraphVoList.add(newBusStopGraphVo);
+			}
+
+		});
+
+		return newBusStopGraphVoList;
+	}
+
+	/**
+	 * 정류장 전체 목록을 생성한다
+	 * @param routeId - 노선ID
+	 * @param busStopGraphVoList - 버스노선 작업 경유정류장 및 그래프 정보
+	 * @return
+	 * @throws Exception
+	 */
+	public List<BusRouteStopVo> buildBusRouteStopVoList(int routeId, List<BusStopGraphVo> busStopGraphVoList) throws Exception {
+		// 사용자 입력 경유정류장 목록
+		List<BusRouteStopVo> busRouteStopVoListOfTask = busStopGraphVoList.stream().map(o -> {
+			BusRouteStopVo busRouteStopVo = this.makeBusRouteStopVo(o);
+			busRouteStopVo.setRouteId(routeId);
+			return busRouteStopVo;
+		}).collect(Collectors.toList());
+
+		return busRouteStopVoListOfTask;
+	}
+
+
+
+	/**
+	 * 사용자 입력 노선 정류장 목록 정보와 DB에 저장되어 있는 노선 정류장 목록이 동일한지 체크한다
+	 * @param taskType - 작업 등록구분(컨텐츠 추가, 수정)
+	 * @param routeId - 노선ID
+	 * @param busStopGraphVoList - 버스노선 작업 경유정류장 및 그래프 정보
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean isTheSameAsBusRouteStopVoListOfDb(String taskType, int routeId, List<BusStopGraphVo> busStopGraphVoList) throws Exception {
+
+		// 사용자 입력 경유정류장 목록
+		List<BusRouteStopVo> busRouteStopVoListOfTask = this.buildBusRouteStopVoList(routeId, busStopGraphVoList);
+
+		// 노선 수정
+		if(taskType.equals(TaskType.MODIFY.getCode())) {
+
+			// 경유정류장 및 그래프 원본
+			List<BusStopGraphVo> busStopGraphVoListOfDb = busGraphRepository.selectBusRouteGraphList(routeId);
+
+			// 원본 경유정류장 목록
+			List<BusRouteStopVo> busRouteStopVoListOfDb = busStopGraphVoListOfDb.stream().map(o -> {
+				BusRouteStopVo busRouteStopVo = this.makeBusRouteStopVo(o);
+				busRouteStopVo.setRouteId(routeId);
+				return busRouteStopVo;
+			}).collect(Collectors.toList());
+
+
+
+			/**
+			 * 사용자 입력 정류장 목록 정보와 DB에 저장되어 있는 정류장 목록 정보를 비교한다.
+			 *
+			 */
+			List<Integer> matchedRouteStopList = new ArrayList<>();
+			int matchedRouteStopCnt = 0;
+
+			if(busRouteStopVoListOfTask.size() == busRouteStopVoListOfDb.size()) {
+
+				AtomicInteger indexOfTask = new AtomicInteger();
+				AtomicInteger indexOfDb = new AtomicInteger();
+				busRouteStopVoListOfTask.stream().forEach(o -> {
+					busRouteStopVoListOfDb.stream().filter(t -> indexOfTask.getAndIncrement() == indexOfDb.getAndIncrement()
+						&& t.getGraphId() == o.getGraphId() && t.getRouteId() == o.getRouteId()
+						&& t.getStopId() == o.getStopId() && t.getNextStopId() == o.getNextStopId()
+						&& t.getStopSequence() == o.getStopSequence() && StringUtils.equals(t.getUpDown(), o.getUpDown())).forEach(t->{
+							matchedRouteStopList.add(1);
+						});
+
+				});
+
+				matchedRouteStopCnt = matchedRouteStopList.stream().mapToInt(Integer::intValue).sum();
+
+			}
+
+			// 경유 정류장 변경사항이 없으면 true
+			if(busRouteStopVoListOfTask.size() == matchedRouteStopCnt) {
+				return true;
+			}
+
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * 버스 정류장간의 그래프 정보에서 경유 정류장 정보만 가져온다
+	 * @param busStopGraphVo - 버스 정류장 그래프 정보
+	 * @return
+	 * @throws Exception
+	 */
+	public BusRouteStopVo makeBusRouteStopVo(BusStopGraphVo busStopGraphVo) {
+
+		if(busStopGraphVo.getGraphId() == null) {
+			busStopGraphVo.setGraphId(0);
+		}
+
+		BusRouteStopVo busRouteStopVo = new BusRouteStopVo();
+		busRouteStopVo.setStopSequence(busStopGraphVo.getStopSequence());
+		busRouteStopVo.setStopId(busStopGraphVo.getStartStopId());
+		busRouteStopVo.setNextStopId(busStopGraphVo.getEndStopId());
+		busRouteStopVo.setUpDown(busStopGraphVo.getUpDown());
+		busRouteStopVo.setCumulativeDistance(busStopGraphVo.getCumulativeDistance());
+		busRouteStopVo.setGraphId(busStopGraphVo.getGraphId());
+
+		return busRouteStopVo;
+	}
+
+	/**
+	 * 사용자 버스노선 작업 정보에서 DB에서 사용될 경유정류장 및 그래프 정보를 생성한다
+	 * @param busRouteTaskInputVo - 버스노선 작업 정보
+	 * @return
+	 * @throws Exception
+	 */
+	public List<BusStopGraphVo> makeBusStopGraphVoList(BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
+
+		// 작업정보에서 경유정류장 정보를 테이블 포맷에 맞게 가져온다
+		List<BusStopGraphVo> busStopGraphVoList = this.selectBusStopGraphListByTaskInput(busRouteTaskInputVo);
+
+		// 노선 종점데이터를 삽입한다
+		busStopGraphVoList = this.insertLastBusStopGraphInfo(busStopGraphVoList);
+
+		return busStopGraphVoList;
+	}
+
+
+	/**
+	 * 작업 등록정보를 생성한다
+	 * @param taskType - 작업 종류
+	 * @param taskStatus - 작업 상태
+	 * @param busRouteTaskInputVo - 버스노선 작업정보
+	 * @return
+	 * @throws Exception
+	 */
+	private TaskInputVo createTaskInputInfo(String taskType, String taskStatus, BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
+		// Task 기본정보
+		TaskInputVo taskInputVo = new TaskInputVo();
+		taskInputVo.setTaskType(taskType);
+		taskInputVo.setPubTransId(busRouteTaskInputVo.getRouteId());
+
+		taskInputVo.setProviderId(busRouteTaskInputVo.getProviderId());
+		taskInputVo.setTaskStatus(taskStatus);
+		taskInputVo.setTaskDataType(TaskDataType.ROUTE.getCode());
+		taskInputVo.setTaskDataName(busRouteTaskInputVo.getRouteName());
+		taskInputVo.setTaskComment(busRouteTaskInputVo.getTaskComment());
+		taskInputVo.setTaskRegisterType(CommonConstant.MANUAL);
+		taskInputVo.setCheckUserId(busRouteTaskInputVo.getCheckUserId());
+
+		/*
+		 * 등록자, 작업자 정보
+		 * 작업 등록시  등록자,작업자는 본인 자신이다.
+		 */
+		taskService.addTaskMemberInfo(TaskAssignType.REGISTER.getCode(), taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.WORK.getCode(), taskInputVo);
+
+		// 검수자 정보
+		taskService.addTaskMemberInfo(TaskAssignType.CHECK.getCode(), taskInputVo);
+
+
+		return taskInputVo;
+	}
+
+
+	/**
+	 * 노선 작업정보에서 경유정류장 데이터를 DB 테이블 포맷에 맞게 생성하여 가져온다
+	 * @param busRouteTaskInputVo
+	 * @return
+	 * @throws Exception
+	 */
+	private List<BusStopGraphVo> selectBusStopGraphListByTaskInput(BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
+
+		// 입력받은 경유정류장 데이터를 테이블 포맷에 맞게 생성한다
+		GeoJsonInputVo geoJsonInputVo = busRouteTaskInputVo.getBusStopGraphInfo();
+		if(geoJsonInputVo == null) {
+		    throw new ApiException(ResultCode.BUS_ROUTE_STOPS_NOT_VALID.getApiErrorCode(), ResultCode.BUS_ROUTE_STOPS_NOT_VALID.getDisplayMessage());
+		}
+
+		List<GeoJsonFeatureInputVo> geojsonFeatureInputVoList = geoJsonInputVo.getFeatures();
+		if(geojsonFeatureInputVoList == null) {
+		    throw new ApiException(ResultCode.BUS_ROUTE_STOPS_NOT_VALID.getApiErrorCode(), ResultCode.BUS_ROUTE_STOPS_NOT_VALID.getDisplayMessage());
+		}
+
+
+
+		// 누적거리
+		List<Integer> cumulativeDistanceList = new ArrayList<>();
+
+		//
+		AtomicInteger stopSequence = new AtomicInteger();
+
+		List<BusStopGraphVo> busStopGraphVoList = geojsonFeatureInputVoList.stream().map(o -> {
+
+			BusStopGraphInputVo busStopGraphInputVo = o.getProperties();
+			BusStopGraphVo busStopGraphVo = new BusStopGraphVo();
+
+			try {
+				busStopGraphVo = busGraphService.getDistanceAndLineStringFromGeoJsonFeature(o);
+			} catch (Exception e) {
+				log.error(e.getMessage());
+			}
+			busStopGraphVo.setGraphId(busStopGraphInputVo.getGraphId());
+			busStopGraphVo.setStartStopId(busStopGraphInputVo.getStartStopId());
+			busStopGraphVo.setEndStopId(busStopGraphInputVo.getEndStopId());
+			busStopGraphVo.setStopSequence(stopSequence.getAndIncrement()+1);
+			busStopGraphVo.setCumulativeDistance(cumulativeDistanceList.stream().mapToInt(Integer::intValue).sum());
+
+
+			// 회차 정류장 정보가 있을경우 상/하행 표기를 한다. 없을경우에는 하행으로 표기
+			if(busRouteTaskInputVo.getTurningPointSequence() > 0) {
+				// 회차점보다 작을경우 하행(D)으로 표기
+				if(busStopGraphVo.getStopSequence() < busRouteTaskInputVo.getTurningPointSequence()) {
+					busStopGraphVo.setUpDown(BusDirection.DOWN.getCode());
+				}else {
+					busStopGraphVo.setUpDown(BusDirection.UP.getCode());
+				}
+			}else {
+				busStopGraphVo.setUpDown(BusDirection.DOWN.getCode());
+			}
+
+			// 누적거리
+			cumulativeDistanceList.add(busStopGraphVo.getDistance());
+			return busStopGraphVo;
+		}).collect(Collectors.toList());
+
+
+		return busStopGraphVoList;
+	}
+
+
+	/**
+	 * 버스 정류장 종점 데이터를 삽입한다
+	 * @param busStopGraphVoList - 버스 경유정류장 그래프 정보
+	 * @return
+	 * @throws Exception
+	 */
+	private List<BusStopGraphVo> insertLastBusStopGraphInfo(List<BusStopGraphVo> busStopGraphVoList) throws Exception {
+
+		int cumulativeDistance = busStopGraphVoList.stream().mapToInt(i -> i.getDistance()).sum();
+
+		List<Double> lastStopCoordinate = busGraphService.selectLastCoordinates(busStopGraphVoList.get(busStopGraphVoList.size()-1).getGraphInfo());
+
+		double lastStopLongitude = lastStopCoordinate.get(0);		// 마지막 정류장 경도
+		double lastStopLatitude = lastStopCoordinate.get(1);		// 마지막 정류장 위도
+
+		/**
+		 * 버스정류장 종점 데이터를 삽입한다 - 출/도착 정류장 ID가 동일
+		 * 출/도착 정류장이 동일한 그래프가 존재하는지 확인하고 없을경우 출/도착 좌표가 동일한 신규 그래프 정보를 생성한다
+		 */
+		BusStopGraphVo lastBusStopGraphVo = busStopGraphVoList.get(busStopGraphVoList.size()-1);
+		BusStopGraphVo newBusStopGraphVo = new BusStopGraphVo();
+		newBusStopGraphVo.setStartStopId(lastBusStopGraphVo.getEndStopId());
+		newBusStopGraphVo.setEndStopId(lastBusStopGraphVo.getEndStopId());
+		newBusStopGraphVo.setStopSequence(lastBusStopGraphVo.getStopSequence()+1);
+		newBusStopGraphVo.setCumulativeDistance(cumulativeDistance);
+		newBusStopGraphVo.setUpDown(lastBusStopGraphVo.getUpDown());
+
+
+		// 버스 종점 데이터 구간 그래프 정보가 DB에 존재하는 지  확인한다
+		List<BusStopGraphSearchVo> busStopGraphSearchVoList = new ArrayList<>();
+		busStopGraphSearchVoList.add(new BusStopGraphSearchVo(newBusStopGraphVo.getStartStopId(), newBusStopGraphVo.getEndStopId()));
+		List<BusStopGraphVo> resultBusStopGraphVoList = busGraphRepository.selectBusStopGraphList(busStopGraphSearchVoList);
+
+		if(resultBusStopGraphVoList == null) {
+			throw new ApiException(ResultCode.INNER_FAIL.getApiErrorCode(), ResultCode.INNER_FAIL.getDisplayMessage());
+		}
+
+		if(resultBusStopGraphVoList.size() > 0) {
+			newBusStopGraphVo.setGraphId(resultBusStopGraphVoList.get(0).getGraphId());
+			newBusStopGraphVo.setGraphInfo(resultBusStopGraphVoList.get(0).getGraphInfo());
+		}else {
+			// 좌표 정보. 두 지점의 좌표는 종점 정류장 좌표로 지정한다
+			List<Double> startCoordinate = Arrays.asList(lastStopLongitude, lastStopLatitude);
+			List<Double> endCoordinate = Arrays.asList(lastStopLongitude, lastStopLatitude);
+			List<List<Double>> coordinates = Arrays.asList(startCoordinate, endCoordinate);
+
+			newBusStopGraphVo.setGraphInfo(busGraphService.convertLineString(coordinates));
+		}
+
+		busStopGraphVoList.add(newBusStopGraphVo);
+
+		return busStopGraphVoList;
 	}
 
 }

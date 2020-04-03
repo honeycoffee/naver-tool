@@ -15,7 +15,7 @@ import com.naver.pubtrans.itn.api.vo.common.input.SearchVo;
 public class BusRouteSearchVo extends SearchVo {
 
 	// 도시코드
-	private String cityCode;
+	private Integer cityCode;
 
 	// 노선 타입
 	private Integer busClass;
@@ -24,5 +24,5 @@ public class BusRouteSearchVo extends SearchVo {
 	private String routeName;
 
 	// 노선ID
-	private String routeId;
+	private Integer routeId;
 }

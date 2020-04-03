@@ -9,6 +9,7 @@ import com.naver.pubtrans.itn.api.vo.common.BusProviderVo;
 import com.naver.pubtrans.itn.api.vo.common.BusRouteClassVo;
 import com.naver.pubtrans.itn.api.vo.common.CityCodeVo;
 import com.naver.pubtrans.itn.api.vo.common.SchemaVo;
+import com.naver.pubtrans.itn.api.vo.common.TransportVo;
 import com.naver.pubtrans.itn.api.vo.member.AuthorityInfoVo;
 
 /**
@@ -55,4 +56,10 @@ public interface CommonRepository {
 	 */
 	List<AuthorityInfoVo> selectAuthorityInfoList() throws DataAccessException;
 
+	/**
+	 * 전체 대중교통 구분 코드 목록을 가져온다.
+	 * @return
+	 * @throws DataAccessException
+	 */
+	List<TransportVo> selectTransportList() throws DataAccessException;
 }

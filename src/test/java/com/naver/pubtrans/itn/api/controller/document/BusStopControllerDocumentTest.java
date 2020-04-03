@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +42,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
+import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.controller.BusStopController;
 import com.naver.pubtrans.itn.api.handler.MemberAccessDeniedHandler;
 import com.naver.pubtrans.itn.api.service.BusStopService;
@@ -153,7 +155,7 @@ public class BusStopControllerDocumentTest {
 		busStopListOutputVo.setStopName("금강제화");
 		busStopListOutputVo.setLongitude(126.98757);
 		busStopListOutputVo.setLatitude(37.570551);
-		busStopListOutputVo.setCityCode("1000");
+		busStopListOutputVo.setCityCode(1000);
 		busStopListOutputVo.setCityName("서울");
 
 
@@ -210,7 +212,7 @@ public class BusStopControllerDocumentTest {
 	             		fieldWithPath("result.data[].stopName").type(JsonFieldType.STRING).description("정류장명"),
 	             		fieldWithPath("result.data[].longitude").type(JsonFieldType.NUMBER).description("경도"),
 	             		fieldWithPath("result.data[].latitude").type(JsonFieldType.NUMBER).description("위도"),
-	             		fieldWithPath("result.data[].cityCode").type(JsonFieldType.STRING).description("도시코드"),
+	             		fieldWithPath("result.data[].cityCode").type(JsonFieldType.NUMBER).description("도시코드"),
 	             		fieldWithPath("result.data[].cityName").type(JsonFieldType.STRING).description("도시코드명")
 	             )
  		));
@@ -233,7 +235,7 @@ public class BusStopControllerDocumentTest {
 		busStopOutputVo.setStopName("세종문화회관");
 		busStopOutputVo.setLongitude(126.976712);
 		busStopOutputVo.setLatitude(37.57266);
-		busStopOutputVo.setCityCode("1000");
+		busStopOutputVo.setCityCode(1000);
 		busStopOutputVo.setCityName("서울");
 		busStopOutputVo.setTransportId(1);
 		busStopOutputVo.setLevel(0);
@@ -315,7 +317,7 @@ public class BusStopControllerDocumentTest {
 	             		fieldWithPath("result.data.stopName").type(JsonFieldType.STRING).description("정류장명"),
 	             		fieldWithPath("result.data.longitude").type(JsonFieldType.NUMBER).description("경도"),
 	             		fieldWithPath("result.data.latitude").type(JsonFieldType.NUMBER).description("위도"),
-	             		fieldWithPath("result.data.cityCode").type(JsonFieldType.STRING).description("도시코드"),
+	             		fieldWithPath("result.data.cityCode").type(JsonFieldType.NUMBER).description("도시코드"),
 	             		fieldWithPath("result.data.cityName").type(JsonFieldType.STRING).description("도시코드명"),
 	             		fieldWithPath("result.data.transportId").type(JsonFieldType.NUMBER).description("대중교통 구분코드"),
 	             		fieldWithPath("result.data.level").type(JsonFieldType.NUMBER).description("정류장 위치구분"),
@@ -363,7 +365,7 @@ public class BusStopControllerDocumentTest {
 		busStopTaskOutputVo.setStopName("세종문화회관");
 		busStopTaskOutputVo.setLongitude(126.976712);
 		busStopTaskOutputVo.setLatitude(37.57266);
-		busStopTaskOutputVo.setCityCode("1000");
+		busStopTaskOutputVo.setCityCode(1000);
 		busStopTaskOutputVo.setCityName("서울");
 		busStopTaskOutputVo.setTransportId(1);
 		busStopTaskOutputVo.setLevel(0);
@@ -466,7 +468,7 @@ public class BusStopControllerDocumentTest {
 	             		fieldWithPath("result.data.stopName").type(JsonFieldType.STRING).description("정류장명"),
 	             		fieldWithPath("result.data.longitude").type(JsonFieldType.NUMBER).description("경도"),
 	             		fieldWithPath("result.data.latitude").type(JsonFieldType.NUMBER).description("위도"),
-	             		fieldWithPath("result.data.cityCode").type(JsonFieldType.STRING).description("도시코드"),
+	             		fieldWithPath("result.data.cityCode").type(JsonFieldType.NUMBER).description("도시코드"),
 	             		fieldWithPath("result.data.cityName").type(JsonFieldType.STRING).description("도시코드명"),
 	             		fieldWithPath("result.data.transportId").type(JsonFieldType.NUMBER).description("대중교통 구분코드"),
 	             		fieldWithPath("result.data.level").type(JsonFieldType.NUMBER).description("정류장 위치구분"),
@@ -659,13 +661,15 @@ public class BusStopControllerDocumentTest {
 	@Test
 	public void registerBusStopAddTask() throws Exception {
 
+		OutputFmtUtil outputFmtUtil = new OutputFmtUtil() ;
+
 		objectMapper.setSerializationInclusion(Include.NON_DEFAULT) ;
 
 		BusStopTaskInputVo busStopInputVo = new BusStopTaskInputVo() ;
 		busStopInputVo.setStopName("SK v1 정류장");
 		busStopInputVo.setLongitude(126.123456);
 		busStopInputVo.setLatitude(34.5678);
-		busStopInputVo.setCityCode("1000");
+		busStopInputVo.setCityCode(1000);
 		busStopInputVo.setLevel(1);
 		busStopInputVo.setNonstopYn("N");
 		busStopInputVo.setVirtualStopYn("N");
@@ -683,6 +687,15 @@ public class BusStopControllerDocumentTest {
 		busStopInputVo.setTaskComment("정류장 등록");
 		busStopInputVo.setCheckUserId("kr94666");
 
+
+		Map<String, Object> resultMap = new HashMap<>();
+		resultMap.put(CommonConstant.KEY_TASK, 255);
+
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(resultMap);
+
+		//given
+		given(busStopService.registerBusStopTask(ArgumentMatchers.anyString(), any()))
+				.willReturn(commonResult) ;
 
 
 		//when
@@ -704,7 +717,7 @@ public class BusStopControllerDocumentTest {
                         fieldWithPath("stopName").type(JsonFieldType.STRING).description("[필수]정류장 명칭"),
                         fieldWithPath("longitude").type(JsonFieldType.NUMBER).description("[필수]경도"),
                         fieldWithPath("latitude").type(JsonFieldType.NUMBER).description("[필수]위도"),
-                        fieldWithPath("cityCode").type(JsonFieldType.STRING).description("[필수]도시코드"),
+                        fieldWithPath("cityCode").type(JsonFieldType.NUMBER).description("[필수]도시코드"),
                         fieldWithPath("level").type(JsonFieldType.NUMBER).description("정류장 위치구분"),
                         fieldWithPath("nonstopYn").type(JsonFieldType.STRING).description("미정차 정류장(Y/N)"),
                         fieldWithPath("virtualStopYn").type(JsonFieldType.STRING).description("가상 정류장(Y/N)"),
@@ -724,7 +737,10 @@ public class BusStopControllerDocumentTest {
                 ),
 	            responseFields(
 	            		fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
-	             		fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지")
+	             		fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"),
+	             		fieldWithPath("result").type(JsonFieldType.OBJECT).description("결과 정보"),
+	             		fieldWithPath("result.data").type(JsonFieldType.OBJECT).description("상세 정보"),
+	             		fieldWithPath("result.data.taskId").type(JsonFieldType.NUMBER).description("등록 성공한 작업 ID")
 	             )
  		));
 
@@ -738,6 +754,8 @@ public class BusStopControllerDocumentTest {
 	@Test
 	public void registerBusStopEditTask() throws Exception {
 
+		OutputFmtUtil outputFmtUtil = new OutputFmtUtil() ;
+
 		objectMapper.setSerializationInclusion(Include.NON_DEFAULT) ;
 
 		BusStopTaskInputVo busStopInputVo = new BusStopTaskInputVo() ;
@@ -745,7 +763,7 @@ public class BusStopControllerDocumentTest {
 		busStopInputVo.setStopName("SK v1 정류장");
 		busStopInputVo.setLongitude(126.123456);
 		busStopInputVo.setLatitude(34.5678);
-		busStopInputVo.setCityCode("1000");
+		busStopInputVo.setCityCode(1000);
 		busStopInputVo.setLevel(1);
 		busStopInputVo.setNonstopYn("N");
 		busStopInputVo.setVirtualStopYn("N");
@@ -763,6 +781,16 @@ public class BusStopControllerDocumentTest {
 		busStopInputVo.setTaskComment("정류장 등록");
 		busStopInputVo.setCheckUserId("kr94666");
 
+
+		// 성공시 작업ID 리턴
+		Map<String, Object> resultMap = new HashMap<>();
+		resultMap.put(CommonConstant.KEY_TASK, 255);
+
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(resultMap);
+
+		//given
+		given(busStopService.registerBusStopTask(ArgumentMatchers.anyString(), any()))
+				.willReturn(commonResult) ;
 
 
 		//when
@@ -785,7 +813,7 @@ public class BusStopControllerDocumentTest {
                         fieldWithPath("stopName").type(JsonFieldType.STRING).description("[필수]정류장 명칭"),
                         fieldWithPath("longitude").type(JsonFieldType.NUMBER).description("[필수]경도"),
                         fieldWithPath("latitude").type(JsonFieldType.NUMBER).description("[필수]위도"),
-                        fieldWithPath("cityCode").type(JsonFieldType.STRING).description("[필수]도시코드"),
+                        fieldWithPath("cityCode").type(JsonFieldType.NUMBER).description("[필수]도시코드"),
                         fieldWithPath("level").type(JsonFieldType.NUMBER).description("정류장 위치구분"),
                         fieldWithPath("nonstopYn").type(JsonFieldType.STRING).description("미정차 정류장(Y/N)"),
                         fieldWithPath("virtualStopYn").type(JsonFieldType.STRING).description("가상 정류장(Y/N)"),
@@ -805,7 +833,10 @@ public class BusStopControllerDocumentTest {
                 ),
 	            responseFields(
 	            		fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
-	             		fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지")
+	             		fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"),
+	             		fieldWithPath("result").type(JsonFieldType.OBJECT).description("결과 정보"),
+	             		fieldWithPath("result.data").type(JsonFieldType.OBJECT).description("상세 정보"),
+	             		fieldWithPath("result.data.taskId").type(JsonFieldType.NUMBER).description("등록 성공한 작업 ID")
 	             )
  		));
 
@@ -826,7 +857,7 @@ public class BusStopControllerDocumentTest {
 		busStopInputVo.setStopName("SK v1 정류장");
 		busStopInputVo.setLongitude(126.123456);
 		busStopInputVo.setLatitude(34.5678);
-		busStopInputVo.setCityCode("1000");
+		busStopInputVo.setCityCode(1000);
 		busStopInputVo.setLevel(1);
 		busStopInputVo.setNonstopYn("N");
 		busStopInputVo.setVirtualStopYn("N");
@@ -867,7 +898,7 @@ public class BusStopControllerDocumentTest {
                         fieldWithPath("stopName").type(JsonFieldType.STRING).description("[필수]정류장 명칭"),
                         fieldWithPath("longitude").type(JsonFieldType.NUMBER).description("[필수]경도"),
                         fieldWithPath("latitude").type(JsonFieldType.NUMBER).description("[필수]위도"),
-                        fieldWithPath("cityCode").type(JsonFieldType.STRING).description("[필수]도시코드"),
+                        fieldWithPath("cityCode").type(JsonFieldType.NUMBER).description("[필수]도시코드"),
                         fieldWithPath("level").type(JsonFieldType.NUMBER).description("정류장 위치구분"),
                         fieldWithPath("nonstopYn").type(JsonFieldType.STRING).description("미정차 정류장(Y/N)"),
                         fieldWithPath("virtualStopYn").type(JsonFieldType.STRING).description("가상 정류장(Y/N)"),
@@ -902,10 +933,23 @@ public class BusStopControllerDocumentTest {
 	@Test
 	public void busStopRemoveTask() throws Exception {
 
+		OutputFmtUtil outputFmtUtil = new OutputFmtUtil() ;
+
 		BusStopRemoveTaskInputVo busStopRemoveInputVo = new BusStopRemoveTaskInputVo() ;
 		busStopRemoveInputVo.setStopId(3);
 		busStopRemoveInputVo.setTaskComment("미존재 정류장 - 삭제 처리");
 		busStopRemoveInputVo.setCheckUserId("kr94666");
+
+		// 성공시 작업ID 리턴
+		Map<String, Object> resultMap = new HashMap<>();
+		resultMap.put(CommonConstant.KEY_TASK, 255);
+
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(resultMap);
+
+		//given
+		given(busStopService.registerBusStopRemoveTask(any()))
+				.willReturn(commonResult) ;
+
 
 		//when
 		ResultActions result = this.mockMvc.perform(
@@ -929,7 +973,10 @@ public class BusStopControllerDocumentTest {
                 ),
 	            responseFields(
 	            		fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
-	             		fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지")
+	             		fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"),
+	             		fieldWithPath("result").type(JsonFieldType.OBJECT).description("결과 정보"),
+	             		fieldWithPath("result.data").type(JsonFieldType.OBJECT).description("상세 정보"),
+	             		fieldWithPath("result.data.taskId").type(JsonFieldType.NUMBER).description("등록 성공한 작업 ID")
 	             )
  		));
 

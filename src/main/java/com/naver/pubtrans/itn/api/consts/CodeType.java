@@ -15,10 +15,11 @@ public enum CodeType {
 	TASK_STATUS("task_status", "Task 상태"),
 	TASK_ASSIGN_TYPE("task_assign_type", "Task 할당 구분"),
 	TASK_DATA_TYPE("task_data_type", "Task 데이터 구분"),
-	CITYCODE("citycode", "도시코드"),
+	CITYCODE("city_code", "도시코드"),
 	BUS_PROVIDER("provider_id", "BIS 데이터 공급지역"),
 	BUS_ROUTE_CLASS("bus_route_class", "버스 노선 클래스"),
-	AUTHORITY_ID("authority_id", "권한 ID");
+	AUTHORITY_ID("authority_id", "권한 ID"),
+	TRANSPORT_ID("transport_id", "대중교통 구분 ID");
 
 	// 코드 타입
 	private String codeName;

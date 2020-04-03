@@ -17,7 +17,7 @@ public class TaskInputVo {
 	private long taskId;
 
 	// BIS 지자체 ID
-	private int providerId;
+	private Integer providerId;
 
 	// 작업구분
 	private String taskType;

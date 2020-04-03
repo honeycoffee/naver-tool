@@ -182,8 +182,8 @@ public class AuthenticationControllerTest {
 			.characterEncoding("UTF-8"))
 			.andDo(print())
 			.andExpect(status().is4xxClientError())
-			.andExpect(jsonPath("$.code", is(ResultCode.AUTH_TOKEN_EMPTY.getApiErrorCode())))
-			.andExpect(jsonPath("$.message", is(ResultCode.AUTH_TOKEN_EMPTY.getDisplayMessage())));
+			.andExpect(jsonPath("$.code", is(ResultCode.ACCESS_DENIED.getApiErrorCode())))
+			.andExpect(jsonPath("$.message", is(ResultCode.ACCESS_DENIED.getDisplayMessage())));
 	}
 
 	/**
@@ -220,8 +220,8 @@ public class AuthenticationControllerTest {
 			.characterEncoding("UTF-8"))
 			.andDo(print())
 			.andExpect(status().is4xxClientError())
-			.andExpect(jsonPath("$.code", is(ResultCode.AUTH_TOKEN_EMPTY.getApiErrorCode())))
-			.andExpect(jsonPath("$.message", is(ResultCode.AUTH_TOKEN_EMPTY.getDisplayMessage())));
+			.andExpect(jsonPath("$.code", is(ResultCode.ACCESS_DENIED.getApiErrorCode())))
+			.andExpect(jsonPath("$.message", is(ResultCode.ACCESS_DENIED.getDisplayMessage())));
 	}
 
 }
