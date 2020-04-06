@@ -116,7 +116,8 @@ public class FareController {
 	 * @throws Exception
 	 */
 	@PostMapping("/v1/ntool/api/fareTask/addTask")
-	public CommonOutput registerFareAddTask(@RequestBody @Valid FareTaskInputVo fareTaskInputVo) throws Exception {
+	public CommonOutput registerFareAddTask(@RequestBody FareTaskInputVo fareTaskInputVo) throws Exception {
+			
 		fareService.registerFareRuleTask(TaskType.REGISTER.getCode(), fareTaskInputVo);
 		return new CommonOutput();
 	}

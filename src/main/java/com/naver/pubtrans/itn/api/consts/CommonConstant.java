@@ -73,6 +73,9 @@ public interface CommonConstant {
 	// 작업ID 이름
 	String KEY_TASK = "taskId";
 
+	// 작업ID 이름
+	String KEY_TASK_LIST = "taskIdList";
+
 	// 버스정류장 Task 입력 정보 VO명
 	String BUS_STOP_TASK_INPUT_VO = "BusStopTaskInputVo";
 

@@ -1,8 +1,9 @@
 package com.naver.pubtrans.itn.api.vo.fare.input;
 
+import java.util.List;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -77,9 +78,19 @@ public class FareTaskInputVo {
 	private Integer maxFare;
 
 	/**
+	 * 시작 정류장 Array
+	 */
+	private Integer[] startStopIds;
+
+	/**
 	 * 시작 정류장
 	 */
 	private Integer startStopId;
+
+	/**
+	 * 도착 정류장 Array
+	 */
+	private Integer[] endStopIds;
 
 	/**
 	 * 도착 정류장
@@ -115,7 +126,12 @@ public class FareTaskInputVo {
 	private String command;
 
 	/**
-	 * 버스노선 ID
+	 * 버스노선 ID Array
+	 */
+	private Integer[] routeIds;
+
+	/**
+	 * 버스노선 ID 
 	 */
 	private Integer routeId;
 
