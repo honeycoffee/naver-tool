@@ -14,18 +14,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.ApiUtils;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
+import com.naver.pubtrans.itn.api.consts.PubTransId;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.consts.TaskDataType;
 import com.naver.pubtrans.itn.api.consts.TaskStatus;
@@ -51,7 +52,7 @@ import com.naver.pubtrans.itn.api.vo.task.input.TaskInputVo;
  * @author adtec10
  *
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(OrderAnnotation.class)
@@ -77,7 +78,7 @@ public class BusStopControllerTest {
 	// 테스트 header에 전달 될 Token Map
 	private LinkedHashMap<String, String> tokenMap;
 
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
 		//Api Test Utils 초기화
 		apiUtils = new ApiUtils(mockMvc, objectMapper);
@@ -249,7 +250,7 @@ public class BusStopControllerTest {
 	 */
 	@Test
 	public void caseExistsBusStopTaskList() throws Exception {
-		mockMvc.perform(get("/v1/ntool/api/list/busStopTask/{busStopId}", 500000)
+		mockMvc.perform(get("/v1/ntool/api/list/busStopTask/summary/{busStopId}", 55000389)
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
         	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .characterEncoding("UTF-8"))
@@ -265,7 +266,7 @@ public class BusStopControllerTest {
 	 */
 	@Test
 	public void caseNotExistsBusStopTaskList() throws Exception {
-		mockMvc.perform(get("/v1/ntool/api/list/busStopTask/{busStopId}", 800)
+		mockMvc.perform(get("/v1/ntool/api/list/busStopTask/summary/{busStopId}", 800)
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
         	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .characterEncoding("UTF-8"))

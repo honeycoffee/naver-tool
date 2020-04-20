@@ -15,36 +15,6 @@ public class FareVo {
 	// 요금 ID
 	private Integer fareId;
 
-	// 기본요금(일반_카드기준)
-	private Integer baseFare;
-
-	// 기본요금(청소년_카드기준)
-	private Integer youthFare;
-
-	// 기본요금(어린이_카드기준)
-	private Integer childFare;
-
-	// 기본요금(일반_현금기준)
-	private Integer baseCashFare;
-
-	// 기본요금(청소년_현금기준)
-	private Integer youthCashFare;
-
-	// 기본요금(어린이_현금기준)
-	private Integer childCashFare;
-
-	// 기본거리
-	private Integer baseDist;
-
-	// 단위요금
-	private Integer unitFare;
-
-	// 단위거리
-	private Integer unitDist;
-
-	// 최대 요금
-	private Integer maxFare;
-
 	// 시작 정류장 
 	private Integer startStopId;
 
@@ -59,11 +29,23 @@ public class FareVo {
 
 	// 버스 노선 종류
 	private Integer busClass;
+	
+	// 총 노선 수
+	private Integer totalRouteCount;
 
-	// 요금 룰의 기본 정보 여부
-	private String baseYn;
+	// 출처 명
+	private String sourceName;
+
+	// 출처 URL
+	private String sourceUrl;
 
 	// 설명
-	private String command;
+	private String comment;
+
+	// 생성일
+	private String createDate;
+	
+	// 일반 - 카드 요금 상세정보
+	private FareInfoVo generalCardFare;
 
 }

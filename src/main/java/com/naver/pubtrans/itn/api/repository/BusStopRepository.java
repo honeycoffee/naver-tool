@@ -66,7 +66,7 @@ public interface BusStopRepository {
 	List<BusRouteVo> selectBusRouteList(int busStopId) throws DataAccessException;
 
 	/**
-	 * 버스정류장 변경정보 저장
+	 * 버스정류장 작업 정보 저장
 	 * @param busStopTaskInputVo - 정류장 정보
 	 * @return
 	 * @throws DataAccessException
@@ -74,7 +74,7 @@ public interface BusStopRepository {
 	void insertBusStopTask(BusStopTaskInputVo busStopTaskInputVo) throws DataAccessException;
 
 	/**
-	 * 버스정류장 부가정보 변경정보 저장
+	 * 버스정류장 부가정보 작업 정보 저장
 	 * @param busStopTaskInputVo - 정류장 정보
 	 * @return
 	 * @throws DataAccessException
@@ -82,14 +82,14 @@ public interface BusStopRepository {
 	void insertBusStopSubInfoTask(BusStopTaskInputVo busStopTaskInputVo) throws DataAccessException;
 
 	/**
-	 * 버스정류장 BIS 매핑 변경정보 저장
+	 * 버스정류장 BIS 매핑 작업 정보 저장
 	 * @param busStopTaskInputVo - 정류장 정보
 	 * @throws DataAccessException
 	 */
 	void insertBusStopMappingTask(BusStopTaskInputVo busStopTaskInputVo) throws DataAccessException;
 
 	/**
-	 * 버스정류장 변경정보 업데이트
+	 * 버스정류장 작업 정보 업데이트
 	 * @param busStopTaskInputVo - 정류장 정보
 	 * @return
 	 * @throws DataAccessException
@@ -97,7 +97,7 @@ public interface BusStopRepository {
 	int updateBusStopTask(BusStopTaskInputVo busStopTaskInputVo) throws DataAccessException;
 
 	/**
-	 * 버스정류장 부가정보 변경정보 업데이트
+	 * 버스정류장 부가정보 작업 정보 업데이트
 	 * @param busStopTaskInputVo - 정류장 정보
 	 * @return
 	 * @throws DataAccessException
@@ -105,7 +105,7 @@ public interface BusStopRepository {
 	int updateBusStopSubInfoTask(BusStopTaskInputVo busStopTaskInputVo) throws DataAccessException;
 
 	/**
-	 * 버스정류장 BIS 매핑 변경정보 업데이트
+	 * 버스정류장 BIS 매핑 작업 정보 업데이트
 	 * @param busStopTaskInputVo - 정류장 정보
 	 * @throws DataAccessException
 	 */

@@ -42,8 +42,8 @@ public class IgnoredFareListOutputVo {
 	 */
 	public void setIgnoredFareName() {
 		
-		StringBuilder stringBuilder = new StringBuilder( CommonConstant.EXCEPTION_TEXT);
-		stringBuilder.append(" ");
+		StringBuilder stringBuilder = new StringBuilder(CommonConstant.EXCEPTION_TEXT);
+		stringBuilder.append(CommonConstant.BLANK);
 		stringBuilder.append(this.order);
 		stringBuilder.append(CommonConstant.BRACKET_START);
 		stringBuilder.append(this.routes);

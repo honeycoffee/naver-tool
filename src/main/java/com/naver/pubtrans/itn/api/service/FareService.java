@@ -30,6 +30,8 @@ import com.naver.pubtrans.itn.api.vo.common.FieldValue;
 import com.naver.pubtrans.itn.api.vo.common.input.SearchVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
+import com.naver.pubtrans.itn.api.vo.fare.FareInfoTaskVo;
+import com.naver.pubtrans.itn.api.vo.fare.FareInfoVo;
 import com.naver.pubtrans.itn.api.vo.fare.FareTaskVo;
 import com.naver.pubtrans.itn.api.vo.fare.FareVo;
 import com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo;
@@ -105,16 +107,25 @@ public class FareService {
 		if (Objects.isNull(fareVo)) {
 			throw new ApiException(ResultCode.NOT_MATCH.getApiErrorCode(), ResultCode.NOT_MATCH.getDisplayMessage());
 		}
+		
+		// 상세정보 검색을 위해 fareId 입력
+		fareSearchVo.setFareId(fareVo.getFareId());
+		
+		// 일반 - 카드 요금 상세정보 가져오기 (ageId, paymentId 미 설정시 default 1) 
+		FareInfoVo fareInfoVo = fareRepository.getFareRuleInfo(fareSearchVo);
+
+		fareVo.setGeneralCardFare(fareInfoVo);
 
 		FareOutputVoWithRouteList fareOutputVoWithRouteList = new FareOutputVoWithRouteList();
 		BeanUtils.copyProperties(fareVo, fareOutputVoWithRouteList);
 
 		// 관련 노선 목록 가져오기
 		List<BusRouteListOutputVo> busRouteListOutputVoList = this
-				.selectBusRouteFareMappingList(fareOutputVoWithRouteList.getFareId());
+			.selectBusRouteFareMappingList(fareOutputVoWithRouteList.getFareId());
 
 		if (!Objects.isNull(busRouteListOutputVoList)) {
 			fareOutputVoWithRouteList.setBusRouteInfoList(busRouteListOutputVoList);
+			fareVo.setTotalRouteCount(busRouteListOutputVoList.size());
 		}
 
 		// 데이터 스키마 조회
@@ -140,6 +151,20 @@ public class FareService {
 	}
 
 	/**
+	 * 요금 룰 관련 노선 작업정보 목록을 가져온다.
+	 * 
+	 * @param taskId - 작업 ID
+	 * @return
+	 */
+	public List<BusRouteListOutputVo> selectBusRouteFareMappingTaskList(long taskId) {
+
+		List<BusRouteListOutputVo> busRouteListOutputVoList = fareRepository.selectBusRouteFareMappingTaskList(taskId);
+
+		return busRouteListOutputVoList;
+
+	}
+
+	/**
 	 * 예외 요금 목록을 가져온다.
 	 * 
 	 * @param fareSearchVo - 요금 룰 검색 조건
@@ -150,7 +175,7 @@ public class FareService {
 
 		// 정류장 정보
 		List<IgnoredFareListOutputVo> ignoredFareListOutputVoList = fareRepository
-				.selectIgnoredFareRuleList(fareSearchVo);
+			.selectIgnoredFareRuleList(fareSearchVo);
 
 		AtomicInteger index = new AtomicInteger(1);
 
@@ -174,21 +199,19 @@ public class FareService {
 		// 요금 룰 작업정보
 		FareTaskVo fareTaskVo = fareRepository.getFareRuleTask(taskId);
 
+		// 일반 - 카드 요금 상세정보  작업정보 가져오기
+		FareInfoVo fareInfoVo = fareRepository.getFareRuleInfoTask(taskId);
+
+		if (fareInfoVo != null) {
+			fareTaskVo.setGeneralCardFare(fareInfoVo);
+		}
+		
 		// 작업 기본 정보
 		TaskOutputVo taskOutputVo = taskRepository.getTaskInfo(taskId);
 
 		if (Objects.isNull(fareTaskVo) || Objects.isNull(taskOutputVo)) {
 			throw new ApiException(ResultCode.NOT_MATCH.getApiErrorCode(), ResultCode.NOT_MATCH.getDisplayMessage());
 		}
-
-		// if (StringUtils.isNotEmpty(taskOutputVo.getBisAutoChangeData())) {
-		//
-		// // Json형태의 Text를 vo로 변경한다
-		// BusStopChangeVo busStopChangeVo = new
-		// ObjectMapper().readValue(taskOutputVo.getBisAutoChangeData(),
-		// BusStopChangeVo.class);
-		// taskOutputVo.setBisChangeDataInfo(busStopChangeVo);
-		// }
 
 		FareTaskOutputVoWithRouteList fareTaskOutputVoWithRouteList = new FareTaskOutputVoWithRouteList();
 
@@ -197,7 +220,7 @@ public class FareService {
 
 		// 관련 노선 목록 가져오기
 		List<BusRouteListOutputVo> busRouteListOutputVoList = this
-				.selectBusRouteFareMappingList(fareTaskOutputVoWithRouteList.getFareId());
+			.selectBusRouteFareMappingTaskList(taskId);
 
 		if (!Objects.isNull(busRouteListOutputVoList)) {
 			fareTaskOutputVoWithRouteList.setBusRouteInfoList(busRouteListOutputVoList);
@@ -221,6 +244,7 @@ public class FareService {
 		List<CommonSchema> commonSchemaList = new ArrayList<>();
 
 		commonSchemaList.addAll(this.selectFareSchema());
+		commonSchemaList.addAll(this.selectFareInfoSchema());
 		commonSchemaList.addAll(this.selectRouteFareMappingSchema());
 
 		// 동일 컬럼에 대해 중복을 제거
@@ -239,7 +263,23 @@ public class FareService {
 
 		// 검색 폼 데이터 구조
 		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_FARE_RULE.getName(),
-				null, null);
+			null, null);
+
+		return commonSchemaList;
+	}
+
+	/**
+	 * 요금 룰 상세 테이블 스키마
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	private List<CommonSchema> selectFareInfoSchema() throws Exception {
+
+		// 검색 폼 데이터 구조
+		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(
+			PubTransTable.TB_FARE_RULE_INFO.getName(),
+			null, null);
 
 		return commonSchemaList;
 	}
@@ -256,7 +296,7 @@ public class FareService {
 		usableColumnNameList.add("route_id");
 
 		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(
-				PubTransTable.TB_ROUTE_FARE_MAPPING.getName(), CommonConstant.USABLE_COLUMN, usableColumnNameList);
+			PubTransTable.TB_ROUTE_FARE_MAPPING.getName(), CommonConstant.USABLE_COLUMN, usableColumnNameList);
 
 		return commonSchemaList;
 	}
@@ -291,24 +331,24 @@ public class FareService {
 		taskInputVo.setTaskDataType(TaskDataType.FARE.getCode());
 
 		List<FieldValue> busRouteClassList = commonService.selectBusRouteClassListAll();
-		
+
 		String busClassName = busRouteClassList.stream()
-			.filter(o -> (int)o.getValue()==fareTaskInputVo.getBusClass().intValue())
+			.filter(o -> (int)o.getValue() == fareTaskInputVo.getBusClass().intValue())
 			.map(o -> o.getText()).collect(Collectors.joining());
 
 		List<FieldValue> cityCodeList = commonService.selectCityCodeAll();
 		String cityName = cityCodeList.stream()
-			.filter(o -> (int)o.getValue()==fareTaskInputVo.getCityCode().intValue())
+			.filter(o -> (int)o.getValue() == fareTaskInputVo.getCityCode().intValue())
 			.map(o -> o.getText()).collect(Collectors.joining());
 
 		StringBuilder fareDataName = new StringBuilder();
-		
+
 		fareDataName.append(cityName);
 		fareDataName.append(CommonConstant.BLANK);
 		fareDataName.append(busClassName);
 		fareDataName.append(CommonConstant.BLANK);
 		fareDataName.append(CommonConstant.FARE_TEXT);
-		
+
 		taskInputVo.setTaskDataName(fareDataName.toString());
 		taskInputVo.setTaskComment(fareTaskInputVo.getTaskComment());
 		taskInputVo.setTaskRegisterType(CommonConstant.MANUAL);
@@ -331,35 +371,33 @@ public class FareService {
 		 * 2. Task 할당정보 저장
 		 * 3. Task 상태변경 히스토리 정보 저장
 		 */
-		
+
 		Integer[] startStopIds = fareTaskInputVo.getStartStopIds();
 		Integer[] endStopIds = fareTaskInputVo.getEndStopIds();
 		List<Long> taskIdList = new ArrayList<Long>();
-		
-		
+
 		// 구간 시작과 종료 데이터가 1개 이상 있다면 각각의 요금 룰을 task로 등록해야 해서 반복문 실행  
-		if(ArrayUtils.isNotEmpty(startStopIds) && ArrayUtils.isNotEmpty(endStopIds)) {
-			
-			long taskId = taskService.registerTaskInfoAll(taskInputVo);
-			fareTaskInputVo.setTaskId(taskId);
-			
-			for(int i=0; i<startStopIds.length; i++) {
+		if (ArrayUtils.isNotEmpty(startStopIds) && ArrayUtils.isNotEmpty(endStopIds)) {
+
+			for (int i = 0; i < startStopIds.length; i++) {
+				long taskId = taskService.registerTaskInfoAll(taskInputVo);
+				fareTaskInputVo.setTaskId(taskId);
+				
 				fareTaskInputVo.setStartStopId(startStopIds[i]);
 				fareTaskInputVo.setEndStopId(endStopIds[i]);
+				
+				this.insertFareRuleTasks(fareTaskInputVo);
+
+				taskIdList.add(taskId);
 			}
 			
-			fareRepository.insertFareRuleTask(fareTaskInputVo);
-			
-			taskIdList.add(taskId);
-			
-		}else {
-			
+		} else {
+
 			long taskId = taskService.registerTaskInfoAll(taskInputVo);
 			fareTaskInputVo.setTaskId(taskId);
 
-			// 정류장 연관 Task 테이블에 저장
-			fareRepository.insertFareRuleTask(fareTaskInputVo);
-			
+			this.insertFareRuleTasks(fareTaskInputVo);
+
 			taskIdList.add(taskId);
 		}
 
@@ -431,36 +469,59 @@ public class FareService {
 	 * @param fareRemoveTaskInputVo - 요금 룰 삭제정보
 	 * @throws Exception
 	 */
-//	public void registerFareRemoveTask(FareRemoveTaskInputVo fareRemoveTaskInputVo) throws Exception {
-//
-//		int fareId = fareRemoveTaskInputVo.getFareId();
-//		
-//		FareSearchVo fareSearchVo = new FareSearchVo(); 
-//
-//		// 기본정보 가져오기
-//		FareVo fareVo = fareRepository.getIngoredFareRule(fareSearchVo);
-//
-//		if(Objects.isNull(fareVo)) {
-//			throw new ApiException(ResultCode.NOT_MATCH.getApiErrorCode(), ResultCode.NOT_MATCH.getDisplayMessage());
-//		}
-//
-//		// 경유노선 정보 가져오기
-//		List<BusRouteVo> busRouteVoList = fareRepository.selectBusRouteList(stopId);
-//
-//		if(busRouteVoList.size() > 0) {
-//			throw new ApiException(ResultCode.STOP_REMOVE_EXISTS_BUS_ROUTE.getApiErrorCode(), ResultCode.STOP_REMOVE_EXISTS_BUS_ROUTE.getDisplayMessage());
-//		}
-//
-//		BusStopTaskInputVo busStopTaskInputVo = new BusStopTaskInputVo();
-//		BeanUtils.copyProperties(busStopVo, busStopTaskInputVo);
-//
-//		busStopTaskInputVo.setTaskComment(busStopRemoveTaskInputVo.getTaskComment());
-//		busStopTaskInputVo.setCheckUserId(busStopRemoveTaskInputVo.getCheckUserId());
-//
-//
-//		// 정류장 삭제요청 Task 등록
-//		return this.registerBusStopTask(TaskType.REMOVE.getCode(), busStopTaskInputVo);
-//
-//	}
+	//	public void registerFareRemoveTask(FareRemoveTaskInputVo fareRemoveTaskInputVo) throws Exception {
+	//
+	//		int fareId = fareRemoveTaskInputVo.getFareId();
+	//		
+	//		FareSearchVo fareSearchVo = new FareSearchVo(); 
+	//
+	//		// 기본정보 가져오기
+	//		FareVo fareVo = fareRepository.getIngoredFareRule(fareSearchVo);
+	//
+	//		if(Objects.isNull(fareVo)) {
+	//			throw new ApiException(ResultCode.NOT_MATCH.getApiErrorCode(), ResultCode.NOT_MATCH.getDisplayMessage());
+	//		}
+	//
+	//		// 경유노선 정보 가져오기
+	//		List<BusRouteVo> busRouteVoList = fareRepository.selectBusRouteList(stopId);
+	//
+	//		if(busRouteVoList.size() > 0) {
+	//			throw new ApiException(ResultCode.STOP_REMOVE_EXISTS_BUS_ROUTE.getApiErrorCode(), ResultCode.STOP_REMOVE_EXISTS_BUS_ROUTE.getDisplayMessage());
+	//		}
+	//
+	//		BusStopTaskInputVo busStopTaskInputVo = new BusStopTaskInputVo();
+	//		BeanUtils.copyProperties(busStopVo, busStopTaskInputVo);
+	//
+	//		busStopTaskInputVo.setTaskComment(busStopRemoveTaskInputVo.getTaskComment());
+	//		busStopTaskInputVo.setCheckUserId(busStopRemoveTaskInputVo.getCheckUserId());
+	//
+	//
+	//		// 정류장 삭제요청 Task 등록
+	//		return this.registerBusStopTask(TaskType.REMOVE.getCode(), busStopTaskInputVo);
+	//
+	//	}
+	
+	/**
+	 * 요금 룰 작업정보들을 등록한다.
+	 * 
+	 * @param fareTaskInputVo - 요금 룰 작업정보
+	 * @throws Exception
+	 */
+	public void insertFareRuleTasks(FareTaskInputVo fareTaskInputVo) throws Exception{
+
+		fareRepository.insertFareRuleTask(fareTaskInputVo);
+		fareRepository.insertFareRuleInfoTask(fareTaskInputVo);
+
+		Integer[] routeIds = fareTaskInputVo.getRouteIds();
+		
+		// 예외노선 등록을 위한 입력받은 노선 ID for문
+		if (ArrayUtils.isNotEmpty(routeIds)) {
+			for(Integer routeId : routeIds) {
+				fareTaskInputVo.setRouteId(routeId);
+				fareRepository.insertRoutFareMappingTask(fareTaskInputVo);
+			}
+		}
+		
+	}
 
 }

@@ -16,6 +16,7 @@ public class CommonMeta {
 	// 전체 목록 수
 	private long totalListCount;
 
+	// 페이지당 목록 수 
 	private long listCountPerPage;
 
 	// 전체 페이지 수

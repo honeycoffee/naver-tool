@@ -29,26 +29,28 @@ public class MemberOutputVo {
 	 */
 	private String company;
 
-	@JsonIgnore
 	/**
 	 * 인코딩된 비밀번호
 	 */
+	@JsonIgnore
 	private String encodedUserPw;
 
 	/**
 	 * 가입일
 	 */
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String regDate;
 
-	@JsonIgnore
 	/**
 	 * 수정일
 	 */
+	@JsonIgnore
 	private String updDate;
 
 	/**
 	 * 권한 ID 
 	 */
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String authorityId;
 
 	/**

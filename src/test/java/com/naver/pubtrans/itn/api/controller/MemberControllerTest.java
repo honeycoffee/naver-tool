@@ -28,6 +28,7 @@ import com.naver.pubtrans.itn.api.service.MemberService;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberParameterVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
+import com.naver.pubtrans.itn.api.vo.member.input.MemberUpdateVo;
 
 /**
  * 사용자 관리 Test
@@ -288,14 +289,13 @@ public class MemberControllerTest {
 	@Test
 	public void caseSuccessUpdateMember() throws Exception {
 
-		MemberInputVo memberInputVo = new MemberInputVo();
-		memberInputVo.setUserId("test");
-		memberInputVo.setUserName("test_name");
-		memberInputVo.setCompany("test_company");
+		MemberUpdateVo memberUpdateVo = new MemberUpdateVo();
+		memberUpdateVo.setUserId("test");
+		memberUpdateVo.setAuthorityId("ROLE_ADMIN");
 
 		mockMvc.perform(put("/v1/ntool/api/member")
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
-			.content(objectMapper.writeValueAsString(memberInputVo))
+			.content(objectMapper.writeValueAsString(memberUpdateVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
 			.characterEncoding("UTF-8"))
@@ -311,14 +311,12 @@ public class MemberControllerTest {
 	@Test
 	public void caseValidErrorUpdateMember() throws Exception {
 
-		MemberInputVo memberInputVo = new MemberInputVo();
-		memberInputVo.setUserName("test_name");
-		memberInputVo.setUserPw("qwer1234");
-		memberInputVo.setCompany("test_company");
+		MemberUpdateVo memberUpdateVo = new MemberUpdateVo();
+		memberUpdateVo.setAuthorityId("ROLE_ADMIN");
 
 		mockMvc.perform(put("/v1/ntool/api/member")
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
-			.content(objectMapper.writeValueAsString(memberInputVo))
+			.content(objectMapper.writeValueAsString(memberUpdateVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
 			.characterEncoding("UTF-8"))
@@ -335,15 +333,13 @@ public class MemberControllerTest {
 	@Test
 	public void caseNotMatchUpdateMember() throws Exception {
 
-		MemberInputVo memberInputVo = new MemberInputVo();
-		memberInputVo.setUserId("no_match_user");
-		memberInputVo.setUserName("test_name");
-		memberInputVo.setUserPw("qwer1234");
-		memberInputVo.setCompany("test_company");
+		MemberUpdateVo memberUpdateVo = new MemberUpdateVo();
+		memberUpdateVo.setUserId("no_match_user");
+		memberUpdateVo.setAuthorityId("ROLE_ADMIN");
 
 		mockMvc.perform(put("/v1/ntool/api/member")
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
-			.content(objectMapper.writeValueAsString(memberInputVo))
+			.content(objectMapper.writeValueAsString(memberUpdateVo))
 			.contentType(MediaType.APPLICATION_JSON)
 			.accept(MediaType.APPLICATION_JSON)
 			.characterEncoding("UTF-8"))
@@ -450,6 +446,43 @@ public class MemberControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
 			.andExpect(jsonPath("$.result.schema", is(not(hasSize(0)))));
+	}
+
+	/**
+	 * 검수자(관리자) 목록 - 목록이 존재하는 경우
+	 * @throws Exception
+	 */
+	@Test
+	public void caseExistsAdminMemberList() throws Exception {
+
+		mockMvc.perform(get("/v1/ntool/api/list/adminMember")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
+			.param("pageNo", "1")
+			.param("listSize", "20")
+			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+			.characterEncoding("UTF-8"))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
+			.andExpect(jsonPath("$.result.data", is(not(hasSize(0)))));
+	}
+
+	/**
+	 * 검수자(관리자) 목록 - 목록이 존재하지 않는 경우
+	 * @throws Exception
+	 */
+	@Test
+	public void caseNotExistsAdminMemberList() throws Exception {
+
+		mockMvc.perform(get("/v1/ntool/api/list/adminMember")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
+			.param("userName", "no_match_user")
+			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+			.characterEncoding("UTF-8"))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
+			.andExpect(jsonPath("$.result.data", is(hasSize(0))));
 	}
 
 }

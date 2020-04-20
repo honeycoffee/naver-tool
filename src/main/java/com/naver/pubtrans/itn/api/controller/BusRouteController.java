@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,7 @@ import com.naver.pubtrans.itn.api.consts.PubTransId;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.consts.TaskType;
 import com.naver.pubtrans.itn.api.service.BusRouteService;
+import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteRemoveTaskInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteSearchVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo;
@@ -64,7 +66,7 @@ public class BusRouteController {
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping("/v1/ntool/api/list/busRouteTask/{busRouteId}")
+	@GetMapping("/v1/ntool/api/list/busRouteTask/summary/{busRouteId}")
 	public CommonOutput listBusRouteTaskSummary(@PathVariable int busRouteId, SearchVo searchVo) throws Exception {
 		CommonResult commonResult = busRouteService.getBusRouteTaskSummaryList(busRouteId, searchVo);
 		return new CommonOutput(commonResult);
@@ -146,5 +148,29 @@ public class BusRouteController {
 
 		CommonResult commonResult = busRouteService.registerBusRouteTask(TaskType.MODIFY.getCode(), busRouteTaskInputVo);
 		return new CommonOutput(commonResult);
+	}
+
+	/**
+	 * 버스노선 삭제를 위한 Task를 등록한다
+	 * @param busRouteRemoveTaskInputVo - 삭제노선 입력정보
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping("/v1/ntool/api/busRouteTask/removeTask")
+	public CommonOutput registerBusRouteRemoveTask(@RequestBody @Valid BusRouteRemoveTaskInputVo busRouteRemoveTaskInputVo) throws Exception {
+		CommonResult commonResult = busRouteService.registerBusRouteRemoveTask(busRouteRemoveTaskInputVo);
+		return new CommonOutput(commonResult);
+	}
+
+	/**
+	 * 등록된 버스노선 Task를 수정한다
+	 * @param busRouteTaskInputVo - 버스노선 Task 수정 입력정보
+	 * @return
+	 * @throws Exception
+	 */
+	@PutMapping("/v1/ntool/api/modify/busRouteTask")
+	public CommonOutput modifyBusRouteTask(@RequestBody @Valid BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
+		busRouteService.modifyBusRouteTask(busRouteTaskInputVo);
+		return new CommonOutput();
 	}
 }

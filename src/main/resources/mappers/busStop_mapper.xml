@@ -131,7 +131,6 @@
 	<sql id="selectCommonBusStop">
 		stn.stop_id
 		, stn.stop_name
-		, stn.transport_id
 		, stn.x as longitude
 		, stn.y as latitude
 		, stn.level

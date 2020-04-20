@@ -11,18 +11,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -39,8 +40,10 @@ import com.naver.pubtrans.itn.api.vo.bus.graph.BusStopGraphVo;
 import com.naver.pubtrans.itn.api.vo.bus.graph.input.GeoJsonInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.graph.output.GeoJsonOutputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteCompanyTaskInputVo;
+import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteRemoveTaskInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteDetailOutputVo;
+import com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteTaskDetailOutputVo;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonOutput;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.task.output.TaskOutputVo;
@@ -50,7 +53,7 @@ import com.naver.pubtrans.itn.api.vo.task.output.TaskOutputVo;
  * @author adtec10
  *
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(OrderAnnotation.class)
@@ -70,10 +73,13 @@ public class BusRouteControllerTest {
 	// 작업ID
 	private static long TASK_ID;
 
+	// 작업 상세정보
+	private static BusRouteTaskDetailOutputVo BUS_ROUTE_TASK_DETAIL;
+
 	// 테스트 header에 전달 될 Token Map
 	private LinkedHashMap<String, String> tokenMap;
 
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
 		//Api Test Utils 초기화
 		apiUtils = new ApiUtils(mockMvc, objectMapper);
@@ -130,7 +136,7 @@ public class BusRouteControllerTest {
 	 */
 	@Test
 	public void caseExistsBusRouteTaskList() throws Exception {
-		mockMvc.perform(get("/v1/ntool/api/list/busRouteTask/{busRouteId}", 11000000)
+		mockMvc.perform(get("/v1/ntool/api/list/busRouteTask/summary/{busRouteId}", 11000000)
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
         	.param("pageNo", "1")
         	.param("listSize", "20")
@@ -149,7 +155,7 @@ public class BusRouteControllerTest {
 	 */
 	@Test
 	public void caseNotExistsBusRouteTaskList() throws Exception {
-		mockMvc.perform(get("/v1/ntool/api/list/busRouteTask/{busRouteId}", 11000005)
+		mockMvc.perform(get("/v1/ntool/api/list/busRouteTask/summary/{busRouteId}", 10000000)
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
         	.param("pageNo", "1")
         	.param("listSize", "20")
@@ -310,14 +316,23 @@ public class BusRouteControllerTest {
 			this.caseBusRouteAddTask();
 		}
 
-		mockMvc.perform(get("/v1/ntool/api/info/busRouteTask/{taskId}", TASK_ID)
+		MvcResult mvcResult = mockMvc.perform(get("/v1/ntool/api/info/busRouteTask/{taskId}", TASK_ID)
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .characterEncoding("UTF-8"))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
-				.andExpect(jsonPath("$.result.data", is(notNullValue())));
+				.andExpect(jsonPath("$.result.data", is(notNullValue())))
+				.andReturn();
+
+
+		String resultString = mvcResult.getResponse().getContentAsString();
+
+		JsonNode rootNode = objectMapper.readTree(resultString);
+		JsonNode dataNode = rootNode.get("result").get("data");
+
+		BUS_ROUTE_TASK_DETAIL = objectMapper.readValue(dataNode.toString(), BusRouteTaskDetailOutputVo.class);
 	}
 
 	/**
@@ -731,5 +746,253 @@ public class BusRouteControllerTest {
 
 
 		return busRouteTaskInputVo;
+	}
+
+	/**
+	 * 버스노선 삭제 Task 등록 - 성공일때 taskId를 반환한다
+	 * @throws Exception
+	 */
+	@Test
+	public void caseBusRouteRemoveTask() throws Exception {
+
+		// 입력정보 설정
+		BusRouteRemoveTaskInputVo busRouteRemoveTaskInputVo = new BusRouteRemoveTaskInputVo();
+		busRouteRemoveTaskInputVo.setRouteId(11000000);
+		busRouteRemoveTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busRouteRemoveTaskInputVo.setTaskComment("노선삭제 Junit");
+
+		mockMvc.perform(post("/v1/ntool/api/busRouteTask/removeTask")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
+	            .content(objectMapper.writeValueAsString(busRouteRemoveTaskInputVo))
+	            .contentType(MediaType.APPLICATION_JSON)
+	            .accept(MediaType.APPLICATION_JSON)
+	            .characterEncoding("UTF-8"))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
+				.andExpect(jsonPath("$.result.data", is(hasKey("taskId"))));
+
+	}
+
+	/**
+	 * 버스노선 삭제 Task 등록 - 해당 버스노선이 없어 실패인경우
+	 * @throws Exception
+	 */
+	@Test
+	public void caseBusRouteRemoveTaskError() throws Exception {
+
+		// 입력정보 설정
+		BusRouteRemoveTaskInputVo busRouteRemoveTaskInputVo = new BusRouteRemoveTaskInputVo();
+		busRouteRemoveTaskInputVo.setRouteId(13000000);
+		busRouteRemoveTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busRouteRemoveTaskInputVo.setTaskComment("노선삭제 Junit");
+
+		mockMvc.perform(post("/v1/ntool/api/busRouteTask/removeTask")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
+	            .content(objectMapper.writeValueAsString(busRouteRemoveTaskInputVo))
+	            .contentType(MediaType.APPLICATION_JSON)
+	            .accept(MediaType.APPLICATION_JSON)
+	            .characterEncoding("UTF-8"))
+				.andDo(print())
+				.andExpect(status().is5xxServerError())
+				.andExpect(jsonPath("$.code", is(ResultCode.NOT_MATCH.getApiErrorCode())));
+
+	}
+
+	/**
+	 * 버스노선 삭제 Task 등록 - 필수 파라미터터가 없어 실패인경우
+	 * @throws Exception
+	 */
+	@Test
+	public void caseBusRouteRemoveTaskValidError() throws Exception {
+
+		// 입력정보 설정
+		BusRouteRemoveTaskInputVo busRouteRemoveTaskInputVo = new BusRouteRemoveTaskInputVo();
+		busRouteRemoveTaskInputVo.setRouteId(11000000);
+		busRouteRemoveTaskInputVo.setCheckUserId("");
+		busRouteRemoveTaskInputVo.setTaskComment("노선삭제 Junit");
+
+		mockMvc.perform(post("/v1/ntool/api/busRouteTask/removeTask")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
+	            .content(objectMapper.writeValueAsString(busRouteRemoveTaskInputVo))
+	            .contentType(MediaType.APPLICATION_JSON)
+	            .accept(MediaType.APPLICATION_JSON)
+	            .characterEncoding("UTF-8"))
+				.andDo(print())
+				.andExpect(status().is4xxClientError())
+				.andExpect(jsonPath("$.code", is(ResultCode.PARAMETER_ERROR.getApiErrorCode())))
+				.andExpect(jsonPath("$.message", is("[checkUserId](은)는 " + ResultCode.PARAMETER_ERROR.getDisplayMessage())));
+
+	}
+
+
+	/**
+	 * 버스노선 작업정보 수정 - 성공일때
+	 * @throws Exception
+	 */
+	@Test
+	@Order(3)
+	public void caseBusRouteTaskModify() throws Exception {
+		if(BUS_ROUTE_TASK_DETAIL == null) {
+			this.caseMatchBusRouteTaskInfo();
+		}
+
+		GeoJsonOutputVo geoJsonOutputVo = BUS_ROUTE_TASK_DETAIL.getBusStopGraphInfo();
+		String geojsonText = objectMapper.writeValueAsString(geoJsonOutputVo);
+		GeoJsonInputVo geoJsonInputVo = objectMapper.readValue(geojsonText, GeoJsonInputVo.class);
+
+
+		BusRouteTaskInputVo busRouteTaskInputVo = new BusRouteTaskInputVo();
+		BeanUtils.copyProperties(BUS_ROUTE_TASK_DETAIL, busRouteTaskInputVo);
+
+
+		busRouteTaskInputVo.setBusStopGraphInfo(geoJsonInputVo);
+		busRouteTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busRouteTaskInputVo.setTaskComment("버스노선 Task 수정입니다");
+
+		mockMvc.perform(put("/v1/ntool/api/modify/busRouteTask")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
+            .content(objectMapper.writeValueAsString(busRouteTaskInputVo))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .characterEncoding("UTF-8"))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())));
+	}
+
+	/**
+	 * 버스노선 작업정보 수정 - 경유정류장 정보가 없어 실패인 경우
+	 * @throws Exception
+	 */
+	@Test
+	@Order(4)
+	public void caseBusRouteTaskModifyBusStopError() throws Exception {
+		if(BUS_ROUTE_TASK_DETAIL == null) {
+			this.caseMatchBusRouteTaskInfo();
+		}
+
+
+		BusRouteTaskInputVo busRouteTaskInputVo = new BusRouteTaskInputVo();
+		BeanUtils.copyProperties(BUS_ROUTE_TASK_DETAIL, busRouteTaskInputVo);
+
+		busRouteTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busRouteTaskInputVo.setTaskComment("버스노선 Task 수정입니다");
+
+		mockMvc.perform(put("/v1/ntool/api/modify/busRouteTask")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
+            .content(objectMapper.writeValueAsString(busRouteTaskInputVo))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .characterEncoding("UTF-8"))
+			.andDo(print())
+			.andExpect(status().is4xxClientError())
+			.andExpect(jsonPath("$.code", is(ResultCode.PARAMETER_ERROR.getApiErrorCode())))
+			.andExpect(jsonPath("$.message", is("[busStopGraphInfo](은)는 " + ResultCode.PARAMETER_ERROR.getDisplayMessage())));
+	}
+
+
+	/**
+	 * 우회노선 생성하는 Task 등록 - 성공일때
+	 * @throws Exception
+	 */
+	@Test
+	public void caseBusRouteBypassAddTask() throws Exception {
+
+		// 입력정보 설정
+		BusRouteTaskInputVo busRouteTaskInputVo = this.getBusRouteTaskInputInfo(TaskType.REGISTER.getCode());
+
+
+		// 우회노선 정보 설정
+		busRouteTaskInputVo.setBypassYn("Y");
+		busRouteTaskInputVo.setParentRouteId(11000000);
+		busRouteTaskInputVo.setBypassStartDateTime("202004091530");
+		busRouteTaskInputVo.setBypassEndDateTime("202012302359");
+
+
+		MvcResult mvcResult = mockMvc.perform(post("/v1/ntool/api/busRouteTask/addTask")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
+	            .content(objectMapper.writeValueAsString(busRouteTaskInputVo))
+	            .contentType(MediaType.APPLICATION_JSON)
+	            .accept(MediaType.APPLICATION_JSON)
+	            .characterEncoding("UTF-8"))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
+				.andReturn();
+
+		String resultString = mvcResult.getResponse().getContentAsString();
+		CommonOutput rsCommonOutput = objectMapper.readValue(resultString, CommonOutput.class);
+		CommonResult rsCommonReuslt = rsCommonOutput.getResult();
+
+		Map<String, Object> map = (Map<String, Object>)rsCommonReuslt.getData();
+		long taskId = ((Number)map.get(CommonConstant.KEY_TASK)).longValue();
+	}
+
+	/**
+	 * 우회노선 생성하는 Task 등록 - 우회노선 오류
+	 * @throws Exception
+	 */
+	@Test
+	public void caseBusRouteBypassAddTaskError() throws Exception {
+
+		// 입력정보 설정
+		BusRouteTaskInputVo busRouteTaskInputVo = this.getBusRouteTaskInputInfo(TaskType.REGISTER.getCode());
+
+
+		// 우회노선 정보 설정
+		busRouteTaskInputVo.setBypassYn("Y");
+		busRouteTaskInputVo.setParentRouteId(null);
+		busRouteTaskInputVo.setBypassStartDateTime("202004091530");
+		busRouteTaskInputVo.setBypassEndDateTime("202012302359");
+
+
+		mockMvc.perform(post("/v1/ntool/api/busRouteTask/addTask")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
+	            .content(objectMapper.writeValueAsString(busRouteTaskInputVo))
+	            .contentType(MediaType.APPLICATION_JSON)
+	            .accept(MediaType.APPLICATION_JSON)
+	            .characterEncoding("UTF-8"))
+				.andDo(print())
+				.andExpect(status().is5xxServerError())
+				.andExpect(jsonPath("$.code", is(ResultCode.BUS_ROUTE_BYPASS_PARAMETER_ERROR.getApiErrorCode())))
+				.andExpect(jsonPath("$.message", is(ResultCode.BUS_ROUTE_BYPASS_PARAMETER_ERROR.getDisplayMessage())));
+
+	}
+
+	/**
+	 * 우회노선 입력값의 유효성 검사를 진행한다
+	 * @throws Exception
+	 */
+	@Test
+	public void verifyBusRouteBypass() throws Exception {
+
+		// 입력정보 설정
+		BusRouteTaskInputVo busRouteTaskInputVo = this.getBusRouteTaskInputInfo(TaskType.REGISTER.getCode());
+
+		// 우회노선 정보 설정
+		busRouteTaskInputVo.setBypassYn("Y");
+		busRouteTaskInputVo.setParentRouteId(11000000);
+		busRouteTaskInputVo.setBypassStartDateTime("202004091530");
+		busRouteTaskInputVo.setBypassEndDateTime("202012302359");
+
+		// 정상일때
+		assertTrue(busRouteService.verifyBusRouteBypass(busRouteTaskInputVo));
+
+
+		// 종료일 날짜를 지웠을때
+		busRouteTaskInputVo.setBypassEndDateTime(null);
+		assertFalse(busRouteService.verifyBusRouteBypass(busRouteTaskInputVo));
+
+		// 날짜 형식이 다를 경우 - 패턴이 다른경우
+		busRouteTaskInputVo.setBypassEndDateTime("2020-12-30 23:59");
+		assertFalse(busRouteService.verifyBusRouteBypass(busRouteTaskInputVo));
+
+
+		// 부모 노선이 없는경우
+		busRouteTaskInputVo.setParentRouteId(null);
+		busRouteTaskInputVo.setBypassEndDateTime("20201230235959");
+		assertFalse(busRouteService.verifyBusRouteBypass(busRouteTaskInputVo));
+
 	}
 }

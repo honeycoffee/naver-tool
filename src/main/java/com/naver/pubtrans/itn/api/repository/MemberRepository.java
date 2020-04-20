@@ -7,8 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
+import com.naver.pubtrans.itn.api.vo.member.input.MemberUpdateVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthorityIdCountSummaryVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthorityOutputVo;
-import com.naver.pubtrans.itn.api.vo.member.output.MemberCountOutputVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
@@ -76,12 +77,12 @@ public interface MemberRepository {
 	MemberOutputVo getMember(MemberSearchVo memberSearchVo) throws DataAccessException;
 
 	/**
-	 * 회원 목록 수를 가져온다.
+	 * 회원 총 카운트 및 역할 별 카운트를 가져온다.
 	 * @param memberSearchVo - 회원 검색 조건
 	 * @return
 	 * @throws DataAccessException
 	 */
-	MemberCountOutputVo getMemberListTotalCount(MemberSearchVo memberSearchVo) throws DataAccessException;
+	MemberAuthorityIdCountSummaryVo getSummarizingCountOfMemberAuthorityId(MemberSearchVo memberSearchVo) throws DataAccessException;
 
 	/**
 	 * 회원 목록을 가져온다.
@@ -109,10 +110,26 @@ public interface MemberRepository {
 
 	/**
 	 * 회원 권한을 수정한다
-	 * @param memberInputVo - 회원 입력 값
+	 * @param memberUpdateVo - 회원 수정 시 입력 값
 	 * @return
 	 * @throws DataAccessException
 	 */
-	int updateMemberAuthority(MemberInputVo memberInputVo) throws DataAccessException;
+	int updateMemberAuthority(MemberUpdateVo memberUpdateVo) throws DataAccessException;
+
+	/**
+	 * 회원 Refresh Token 정보를 삭제한다.
+	 * @param memberSearchVo - 회원 검색 조건
+	 * @return
+	 * @throws DataAccessException
+	 */
+	void deleteMemberRefreshTokenInfo(MemberSearchVo memberSearchVo) throws DataAccessException;
+
+	/**
+	 * 검수자(관리자) 목록을 가져온다.
+	 * @param memberSearchVo - 회원 검색 조건
+	 * @return
+	 * @throws DataAccessException
+	 */
+	List<MemberOutputVo> selectAdminMemberList(MemberSearchVo memberSearchVo) throws DataAccessException;
 
 }

@@ -42,6 +42,7 @@ import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberParameterVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
+import com.naver.pubtrans.itn.api.vo.member.input.MemberUpdateVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
 /**
@@ -373,19 +374,16 @@ public class MemberControllerDocumentTest {
 
 		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
 
-		MemberInputVo memberInputVo = new MemberInputVo();
+		MemberUpdateVo memberUpdateVo = new MemberUpdateVo();
 
-		memberInputVo.setUserId("test");
-		memberInputVo.setUserName("test_user");
-		memberInputVo.setCompany("test_company");
-		memberInputVo.setUserPw("qwer1234");
-		memberInputVo.setAuthorityId("ROLE_USER");
+		memberUpdateVo.setUserId("test");
+		memberUpdateVo.setAuthorityId("ROLE_USER");
 
 		//when
 		ResultActions result = this.mockMvc.perform(
 			put("/v1/ntool/api/member")
 				.header(JwtAdapter.HEADER_NAME, accessToken)
-				.content(objectMapper.writeValueAsString(memberInputVo))
+				.content(objectMapper.writeValueAsString(memberUpdateVo))
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
 				.characterEncoding("UTF-8"));
@@ -397,11 +395,7 @@ public class MemberControllerDocumentTest {
 				getDocumentResponse(),
 				requestFields(
 					fieldWithPath("userId").type(JsonFieldType.STRING).description("[필수]회원ID"),
-					fieldWithPath("userName").type(JsonFieldType.STRING).description("[필수]이름"),
-					fieldWithPath("userPw").type(JsonFieldType.STRING).description("비밀번호"),
-					fieldWithPath("company").type(JsonFieldType.STRING).description("소속"),
-					fieldWithPath("authorityId").type(JsonFieldType.STRING).description("권한 ID")
-
+					fieldWithPath("authorityId").type(JsonFieldType.STRING).description("[필수]권한 ID")
 				),
 				responseFields(
 					fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
@@ -571,6 +565,58 @@ public class MemberControllerDocumentTest {
 
 					subsectionWithPath("result.schema[]").type(JsonFieldType.ARRAY)
 						.description("데이터 필드 정보 - link:#_데이터_스키마_정보[공통사항 참고]"))));
+	}
+
+	/**
+	 * 검수자(관리자) 목록 rest docs 생성
+	 * @throws Exception
+	 */
+	@Test
+	public void listAdminMember() throws Exception {
+
+		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTU5MTgzMTM2NCwidXNlcklkIjoidGVzdCJ9.J3jWR6IDJU6Ly_okU-T3F8lSQXC9tpgbX6TSH7R8hHo";
+
+		OutputFmtUtil outputFmtUtil = new OutputFmtUtil();
+		// 목록
+		MemberOutputVo memberOutputVo = new MemberOutputVo();
+		memberOutputVo.setUserId("test");
+		memberOutputVo.setUserName("test_user");
+		memberOutputVo.setCompany("test_company");
+
+		List<MemberOutputVo> memberOutputVoList = new ArrayList<>();
+		memberOutputVoList.add(memberOutputVo);
+
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberOutputVoList);
+
+		//given
+		given(memberService.selectAdminMemberList(any(MemberSearchVo.class)))
+			.willReturn(commonResult);
+
+		//when
+		ResultActions result = this.mockMvc.perform(
+			get("/v1/ntool/api/list/adminMember")
+				.header(JwtAdapter.HEADER_NAME, accessToken)
+				.param("userName", "test")
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.characterEncoding("UTF-8"));
+
+		//then
+		result.andExpect(status().isOk())
+			.andDo(document("member/listAdminMember",
+				getDocumentRequest(),
+				getDocumentResponse(),
+				requestParameters(
+					parameterWithName("userName").description("[선택]이름").optional()),
+				responseFields(
+					fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
+					fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"),
+					fieldWithPath("result").type(JsonFieldType.OBJECT).description("결과 정보"),
+
+					fieldWithPath("result.data[]").type(JsonFieldType.ARRAY).description("검수자 목록"),
+					fieldWithPath("result.data[].userId").type(JsonFieldType.STRING).description("검수자 ID"),
+					fieldWithPath("result.data[].userName").type(JsonFieldType.STRING).description("이름"),
+					fieldWithPath("result.data[].company").type(JsonFieldType.STRING).description("소속"))));
+
 	}
 
 }

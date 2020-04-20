@@ -10,9 +10,9 @@
 |`+Object+`
 |페이지 정보
 
-|`+result.meta.totalListCount+`
+|`+result.meta.totalRoleCount+`
 |`+Number+`
-|전체 목록 수
+|전체 회원 수
 
 |`+result.meta.listCountPerPage+`
 |`+Number+`
@@ -34,15 +34,15 @@
 |`+Boolean+`
 |마지막 페이지 여부
 
-|`+result.meta.totalAdminCount+`
+|`+result.meta.totalAdminRoleCount+`
 |`+Number+`
 |총 관리자 수
 
-|`+result.meta.totalUserCount+`
+|`+result.meta.totalUserRoleCount+`
 |`+Number+`
 |총 일반 사용자 수
 
-|`+result.meta.totalAnonymousCount+`
+|`+result.meta.totalUnauthorizedRoleCount+`
 |`+Number+`
 |총 승인 대기중인 회원 수
 
@@ -55,23 +55,23 @@
   "message" : "정상 처리되었습니다",
   "result" : {
     "meta" : {
-        "totalListCount": 52,
+        "totalRoleCount": 52,
         "listCountPerPage": 0,
         "totalPageCount": 3,
         "currentPage": 1,
         "firstPage": true,
         "lastPage": false,
-        "totalAdminCount": 1,
-        "totalUserCount": 51,
-        "totalAnonymousCount": 0
+        "totalAdminRoleCount": 1,
+        "totalUserRoleCount": 51,
+        "totalUnauthorizedRoleCount": 0
     },
     "data" : [ {
-      "stopId" : 88,
-      "stopName" : "금강제화",
-      "x" : 126.98757,
-      "y" : 37.570551,
-      "citycode" : "1000",
-      "cityname" : "서울"
+        "userId": "테스트2",
+        "userName": "테스트_이름",
+        "company": "test",
+        "regDate": "2020.03.03",
+        "authorityId": "ROLE_USER",
+        "authorityName": "일반 사용자"
     } ]
   }
 }

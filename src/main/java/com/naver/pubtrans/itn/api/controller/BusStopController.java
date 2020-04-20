@@ -71,7 +71,7 @@ public class BusStopController {
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping("/v1/ntool/api/list/busStopTask/{busStopId}")
+	@GetMapping("/v1/ntool/api/list/busStopTask/summary/{busStopId}")
 	public CommonOutput listBusStopTaskSummary(@PathVariable int busStopId, SearchVo searchVo) throws Exception {
 		CommonResult commonResult = busStopService.getBusStopTaskSummaryList(busStopId, searchVo);
 		return new CommonOutput(commonResult);

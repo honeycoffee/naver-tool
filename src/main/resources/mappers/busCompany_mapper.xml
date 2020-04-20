@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.naver.pubtrans.itn.api.repository.BusCompanyRepository">
+
+	<select id="getBusCompanyListTotalCnt" parameterType="com.naver.pubtrans.itn.api.vo.bus.company.input.BusCompanySearchVo" resultType="int">
+		SELECT
+			count(*) as total_list_cnt
+		FROM
+			tb_bus_company company, tb_city_code city
+		WHERE
+			company.city_code = city.city_code
+
+			<include refid="whereBusCompanyList" />
+
+	</select>
+
+	<select id="selectBusCompanyList" parameterType="com.naver.pubtrans.itn.api.vo.bus.company.input.BusCompanySearchVo" resultType="com.naver.pubtrans.itn.api.vo.bus.company.output.BusCompanyListOutputVo">
+		SELECT
+			company.company_id
+			, company.company_name
+			, company.tel
+			, company.city_code
+			, city.city_name
+		FROM
+			tb_bus_company company, tb_city_code city
+		WHERE
+			company.city_code = city.city_code
+
+		<include refid="whereBusCompanyList" />
+
+		ORDER BY
+			company.company_name asc
+		LIMIT
+			#{startPageLimit}, #{endPageLimit}
+	</select>
+
+
+	<sql id="whereBusCompanyList">
+		<if test="cityCode != null and cityCode > 0">
+			AND company.city_code = #{cityCode}
+		</if>
+
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(companyName)">
+			AND company.company_name LIKE CONCAT(#{companyName}, '%')
+		</if>
+
+		<if test="companyId != null and companyId > 0">
+			AND company.company_id = #{companyId}
+		</if>
+		
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(tel)">
+			AND company.tel LIKE CONCAT(#{tel}, '%')
+		</if>
+	</sql>
+
+
+	<select id="getBusCompany" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.company.BusCompanyVo">
+		SELECT
+
+			<include refid="selectCommonBusCompany" />
+
+		FROM
+			tb_bus_company company
+		WHERE
+		    company.company_id = #{busCompanyId}
+	</select>
+
+
+	<select id="getBusCompanyTask" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.bus.company.output.BusCompanyTaskOutputVo">
+		SELECT
+
+			<include refid="selectCommonBusCompany" />
+
+		FROM
+			tb_bus_company_task company
+		WHERE
+		    company.task_id = #{taskId}
+	</select>
+	
+	
+	<sql id="selectCommonBusCompany">
+		company.company_id
+		, company.company_name
+		, company.tel
+		, company.address_name
+		, company.source_name
+		, company.source_url
+		, company.comment
+		, company.city_code
+	</sql>
+	
+
+	<insert id="insertBusCompanyTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.company.input.BusCompanyTaskInputVo">
+		INSERT INTO tb_bus_company_task
+			(task_id, company_id, company_name, tel, address_name, source_name, source_url, comment, city_code)
+		VALUES
+			(#{taskId}, #{companyId}, #{companyName}, #{tel}, #{addressName}, #{sourceName}, #{sourceUrl}, #{comment}, #{cityCode})
+	</insert>
+
+
+	<update id="updateBusCompanyTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.company.input.BusCompanyTaskInputVo">
+		UPDATE
+			tb_bus_company_task
+		SET
+			company_name = #{companyName}
+			, tel = #{tel}
+			, address_name = #{addressName}
+			, source_name = #{sourceName}
+			, source_url = #{sourceUrl}
+			, comment = #{comment}
+			, city_code = #{cityCode}
+		WHERE
+			task_id = #{taskId}
+	</update>
+
+</mapper>

@@ -19,6 +19,7 @@ import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.common.Util;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
+import com.naver.pubtrans.itn.api.consts.UserAuthority;
 import com.naver.pubtrans.itn.api.exception.AccessTokenNotFoundException;
 import com.naver.pubtrans.itn.api.exception.ApiException;
 import com.naver.pubtrans.itn.api.repository.AuthenticationRepository;
@@ -67,12 +68,12 @@ public class AuthenticationService {
 	}
 
 	/**
-	 * 회원 Token 정보를 저장한다.
+	 * 회원 Refresh Token 정보를 저장한다.
 	 * @param authenticationInputVo - 회원 로그인 인증 입력 Vo
 	 */
-	public void insertMemberTokenInfo(AuthenticationInputVo authenticationInputVo) {
+	public void insertMemberRefreshTokenInfo(AuthenticationInputVo authenticationInputVo) {
 
-		authenticationRepository.insertMemberTokenInfo(authenticationInputVo);
+		authenticationRepository.insertMemberRefreshTokenInfo(authenticationInputVo);
 	}
 
 	/**
@@ -80,21 +81,12 @@ public class AuthenticationService {
 	 * @param authenticationInputVo - 회원 로그인 인증 입력 Vo
 	 * @return
 	 */
-	public AuthenticationOutputVo getMemberTokenInfo(AuthenticationInputVo authenticationInputVo) {
+	public AuthenticationOutputVo getMemberRefreshTokenInfo(AuthenticationInputVo authenticationInputVo) {
 
 		AuthenticationOutputVo authenticationOutputVo = authenticationRepository
-			.getMemberTokenInfo(authenticationInputVo);
+			.getMemberRefreshTokenInfo(authenticationInputVo);
 
 		return authenticationOutputVo;
-	}
-
-	/**
-	 * 회원 Token 정보를 삭제한다.
-	 * @param authenticationInputVo - 회원 로그인 인증 입력 Vo
-	 */
-	public void deleteMemberTokenInfo(AuthenticationInputVo authenticationInputVo) {
-
-		authenticationRepository.deleteMemberTokenInfo(authenticationInputVo);
 	}
 
 	/**
@@ -151,6 +143,12 @@ public class AuthenticationService {
 			throw new ApiException(ResultCode.MEMBER_DATA_NULL.getApiErrorCode(),
 				ResultCode.MEMBER_DATA_NULL.getDisplayMessage());
 		}
+		
+		// 승인 대기중인 회원이면 승인 대기 에러 메시지 표출
+		if(StringUtils.equals(memberOutputVo.getAuthorityId(), UserAuthority.ROLE_UNAUTHORIZED.name())) {
+			throw new ApiException(ResultCode.MEMBER_NOT_APPROVED.getApiErrorCode(),
+				ResultCode.MEMBER_NOT_APPROVED.getDisplayMessage());
+		}
 
 		authenticationInputVo.setUserId(memberOutputVo.getUserId());
 		authenticationInputVo.setAccessIp(Util.getClientIpAddress(request));
@@ -179,8 +177,8 @@ public class AuthenticationService {
 		authenticationInputVo.setRefreshToken(refreshToken);
 
 		this.insertMemberLoginLog(authenticationInputVo);
-		this.deleteMemberTokenInfo(authenticationInputVo);
-		this.insertMemberTokenInfo(authenticationInputVo);
+		memberService.deleteMemberRefreshTokenInfo(loginVo.getUserId());
+		this.insertMemberRefreshTokenInfo(authenticationInputVo);
 
 		authenticationOutputVo.setAccessToken(accessToken);
 		authenticationOutputVo.setRefreshToken(refreshToken);
@@ -196,10 +194,9 @@ public class AuthenticationService {
 	 * @throws Exception
 	 */
 	public void logoutMember() throws Exception {
-		AuthenticationInputVo authenticationInputVo = new AuthenticationInputVo();
-		authenticationInputVo.setUserId(MemberUtil.getMemberFromAccessToken().getUserId());
+		String userId = MemberUtil.getMemberFromAccessToken().getUserId();
 
-		this.deleteMemberTokenInfo(authenticationInputVo);
+		memberService.deleteMemberRefreshTokenInfo(userId);
 	}
 
 	/**
@@ -221,7 +218,7 @@ public class AuthenticationService {
 
 		authenticationInputVo.setRefreshToken(refreshToken);
 
-		AuthenticationOutputVo authenticationOutputVo = this.getMemberTokenInfo(authenticationInputVo);
+		AuthenticationOutputVo authenticationOutputVo = this.getMemberRefreshTokenInfo(authenticationInputVo);
 
 		if (authenticationOutputVo == null) {
 			throw new AccessTokenNotFoundException(ResultCode.AUTH_TOKEN_EMPTY.getApiErrorCode(),

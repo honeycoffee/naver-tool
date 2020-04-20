@@ -10,13 +10,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.MemberUtil;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
@@ -27,6 +25,7 @@ import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberParameterVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
+import com.naver.pubtrans.itn.api.vo.member.input.MemberUpdateVo;
 
 /**
  * 네이버 대중교통 DB 내재화 사용자관리 컨트롤러
@@ -85,7 +84,7 @@ public class MemberController {
 		return new CommonOutput(commonResult);
 
 	}
-	
+
 	/**
 	 * 자신의 정보를 조회한다.
 	 * @return
@@ -144,14 +143,14 @@ public class MemberController {
 	 * <pre>
 	 * Valid를 이용하여 유효성 검사를 진행한다
 	 * </pre>
-	 * @param memberInputVo - 회원 정보 입력 값
+	 * @param memberUpdateVo - 회원 수정 시 입력 값
 	 * @return
 	 * @throws Exception
 	 */
 	@PutMapping(value = "/v1/ntool/api/member")
-	public CommonOutput updateMember(@RequestBody @Valid MemberInputVo memberInputVo) throws Exception {
+	public CommonOutput updateMember(@RequestBody @Valid MemberUpdateVo memberUpdateVo) throws Exception {
 
-		memberService.updateMember(memberInputVo);
+		memberService.updateMember(memberUpdateVo);
 
 		return new CommonOutput();
 
@@ -188,9 +187,6 @@ public class MemberController {
 	 */
 	@GetMapping("/v1/ntool/api/list/member")
 	public CommonOutput listMember(MemberSearchVo memberSearchVo) throws Exception {
-		
-
-		System.out.println(memberSearchVo.getSortKey());
 		CommonResult commonResult = memberService.selectMemberList(memberSearchVo);
 		return new CommonOutput(commonResult);
 	}
@@ -203,6 +199,18 @@ public class MemberController {
 	@GetMapping(value = "/v1/ntool/api/schema/member")
 	public CommonOutput selectMemberSchema() throws Exception {
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberService.selectMemberSchemaAll());
+		return new CommonOutput(commonResult);
+	}
+
+	/**
+	 * 검수자(관리자) 목록 조회
+	 * @param memberSearchVo - 검색 조건
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/v1/ntool/api/list/adminMember")
+	public CommonOutput listAdminMember(MemberSearchVo memberSearchVo) throws Exception {
+		CommonResult commonResult = memberService.selectAdminMemberList(memberSearchVo);
 		return new CommonOutput(commonResult);
 	}
 

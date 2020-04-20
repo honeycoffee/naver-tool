@@ -51,6 +51,7 @@ import com.naver.pubtrans.itn.api.vo.bus.graph.input.GeoJsonInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.graph.output.BusStopGraphOutputVo;
 import com.naver.pubtrans.itn.api.vo.bus.graph.output.GeoJsonOutputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteCompanyTaskInputVo;
+import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteRemoveTaskInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteSearchVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteCompanyOutputVo;
@@ -184,7 +185,7 @@ public class BusRouteControllerDocumentTest {
 		//when
 		ResultActions result = this.mockMvc.perform(
                 get("/v1/ntool/api/list/busRoute")
-                	.param("busClass", "11")
+                	.param("busClass", "")
 	                .param("routeName", "")
 	            	.param("cityCode", "1000")
 	            	.param("pageNo", "1")
@@ -278,7 +279,7 @@ public class BusRouteControllerDocumentTest {
 
 		//when
 		ResultActions result = this.mockMvc.perform(
-                get("/v1/ntool/api/list/busRouteTask/{busRouteId}", 11000000)
+                get("/v1/ntool/api/list/busRouteTask/summary/{busRouteId}", 11000000)
 	                .param("pageNo", "1")
 	            	.param("listSize", "20")
                 	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -554,8 +555,8 @@ public class BusRouteControllerDocumentTest {
 	             		fieldWithPath("result.data.saturdayYn").type(STRING).description("토요일 운행여부(Y/N)"),
 	             		fieldWithPath("result.data.sundayYn").type(STRING).description("일요일 운행여부(Y/N)"),
 	             		fieldWithPath("result.data.parentRouteId").type(STRING_OR_NULL).description("우회노선인경우 본노선 ID"),
-	             		fieldWithPath("result.data.bypassStartDateTime").type(STRING_OR_NULL).description("우회노선인경우 우회 시작일시"),
-	             		fieldWithPath("result.data.bypassEndDateTime").type(STRING_OR_NULL).description("우회노선인경우 우회 종료일시"),
+	             		fieldWithPath("result.data.bypassStartDateTime").type(STRING_OR_NULL).description("우회노선인경우 우회 시작일시(yyyyMMddHHmm)"),
+	             		fieldWithPath("result.data.bypassEndDateTime").type(STRING_OR_NULL).description("우회노선인경우 우회 종료일시(yyyyMMddHHmm)"),
 
 	             		fieldWithPath("result.data.busStopGraphInfo").type(OBJECT).description("버스 경유정류장 및 그래프 정보(GeoJson 형식)"),
 	             		fieldWithPath("result.data.busStopGraphInfo.type").type(STRING).description("geojson type"),
@@ -584,8 +585,8 @@ public class BusRouteControllerDocumentTest {
 	             		fieldWithPath("result.data.bypassChildList[].bypassRouteId").type(NUMBER).description("우회노선 ID"),
 	             		fieldWithPath("result.data.bypassChildList[].parentRouteId").type(NUMBER).description("본 노선 ID"),
 	             		fieldWithPath("result.data.bypassChildList[].routeName").type(STRING).description("우회노선 명칭"),
-	             		fieldWithPath("result.data.bypassChildList[].bypassStartDateTime").type(STRING).description("우회 시작일시"),
-	             		fieldWithPath("result.data.bypassChildList[].bypassEndDateTime").type(STRING).description("우회 종료일시")
+	             		fieldWithPath("result.data.bypassChildList[].bypassStartDateTime").type(STRING).description("우회 시작일시(yyyyMMddHHmm)"),
+	             		fieldWithPath("result.data.bypassChildList[].bypassEndDateTime").type(STRING).description("우회 종료일시(yyyyMMddHHmm)")
 
 
 
@@ -684,8 +685,8 @@ public class BusRouteControllerDocumentTest {
 	             		fieldWithPath("result.data.saturdayYn").type(STRING).description("토요일 운행여부(Y/N)"),
 	             		fieldWithPath("result.data.sundayYn").type(STRING).description("일요일 운행여부(Y/N)"),
 	             		fieldWithPath("result.data.parentRouteId").type(STRING_OR_NULL).description("우회노선인경우 본노선 ID"),
-	             		fieldWithPath("result.data.bypassStartDateTime").type(STRING_OR_NULL).description("우회노선인경우 우회 시작일시"),
-	             		fieldWithPath("result.data.bypassEndDateTime").type(STRING_OR_NULL).description("우회노선인경우 우회 종료일시"),
+	             		fieldWithPath("result.data.bypassStartDateTime").type(STRING_OR_NULL).description("우회노선인경우 우회 시작일시(yyyyMMddHHmm)"),
+	             		fieldWithPath("result.data.bypassEndDateTime").type(STRING_OR_NULL).description("우회노선인경우 우회 종료일시(yyyyMMddHHmm)"),
 
 	             		fieldWithPath("result.data.busStopGraphInfo").type(OBJECT).description("버스 경유정류장 및 그래프 정보(GeoJson 형식)"),
 	             		fieldWithPath("result.data.busStopGraphInfo.type").type(STRING).description("geojson type"),
@@ -713,8 +714,8 @@ public class BusRouteControllerDocumentTest {
 	             		fieldWithPath("result.data.bypassChildList[].bypassRouteId").type(NUMBER).description("우회노선 ID"),
 	             		fieldWithPath("result.data.bypassChildList[].parentRouteId").type(NUMBER).description("본 노선 ID"),
 	             		fieldWithPath("result.data.bypassChildList[].routeName").type(STRING).description("우회노선 명칭"),
-	             		fieldWithPath("result.data.bypassChildList[].bypassStartDateTime").type(STRING).description("우회 시작일시"),
-	             		fieldWithPath("result.data.bypassChildList[].bypassEndDateTime").type(STRING).description("우회 종료일시"),
+	             		fieldWithPath("result.data.bypassChildList[].bypassStartDateTime").type(STRING).description("우회 시작일시(yyyyMMddHHmm)"),
+	             		fieldWithPath("result.data.bypassChildList[].bypassEndDateTime").type(STRING).description("우회 종료일시(yyyyMMddHHmm)"),
 
 	             		fieldWithPath("result.data.taskInfo").type(JsonFieldType.OBJECT).description("작업정보"),
 	             		fieldWithPath("result.data.taskInfo.taskId").type(NUMBER_OR_NULL).description("작업ID (작업정보 존재시)"),
@@ -828,8 +829,8 @@ public class BusRouteControllerDocumentTest {
                     fieldWithPath("saturdayYn").type(STRING).description("[필수]토요일 운행여부(Y/N)"),
                     fieldWithPath("sundayYn").type(STRING).description("[필수]일요일 운행여부(Y/N)"),
                     fieldWithPath("parentRouteId").type(NUMBER).description("본 노선 ID").optional(),
-                    fieldWithPath("bypassStartDateTime").type(STRING).description("우회 시작일시").optional(),
-                    fieldWithPath("bypassEndDateTime").type(STRING).description("우회 종료일시").optional(),
+                    fieldWithPath("bypassStartDateTime").type(STRING).description("우회 시작일시(yyyyMMddHHmm)").optional(),
+                    fieldWithPath("bypassEndDateTime").type(STRING).description("우회 종료일시(yyyyMMddHHmm)").optional(),
                     fieldWithPath("taskComment").type(STRING).description("[필수]작업내용"),
                     fieldWithPath("checkUserId").type(STRING).description("[필수]검수자 ID"),
                     fieldWithPath("companyList[]").type(ARRAY).description("[필수]운수회사 정보"),
@@ -859,7 +860,7 @@ public class BusRouteControllerDocumentTest {
 
 
 	/**
-	 * 버스노선 생성 수정 Task 등록
+	 * 버스노선 수정 Task 등록
 	 * @throws Exception
 	 */
 	@Test
@@ -942,8 +943,8 @@ public class BusRouteControllerDocumentTest {
                     fieldWithPath("sundayYn").type(STRING).description("[필수]일요일 운행여부(Y/N)"),
                     fieldWithPath("bypassYn").type(STRING).description("우회노선 여부(Y/N)").optional(),
                     fieldWithPath("parentRouteId").type(NUMBER).description("본 노선 ID").optional(),
-                    fieldWithPath("bypassStartDateTime").type(STRING).description("우회 시작일시(YYYYmmddHHmm)").optional(),
-                    fieldWithPath("bypassEndDateTime").type(STRING).description("우회 종료일시(YYYYmmddHHmm)").optional(),
+                    fieldWithPath("bypassStartDateTime").type(STRING).description("우회 시작일시(yyyyMMddHHmm)").optional(),
+                    fieldWithPath("bypassEndDateTime").type(STRING).description("우회 종료일시(yyyyMMddHHmm)").optional(),
                     fieldWithPath("taskComment").type(STRING).description("[필수]작업내용"),
                     fieldWithPath("checkUserId").type(STRING).description("[필수]검수자 ID"),
                     fieldWithPath("companyList[]").type(ARRAY).description("[필수]운수회사 정보"),
@@ -969,6 +970,163 @@ public class BusRouteControllerDocumentTest {
 	             		fieldWithPath("result.data.taskId").type(NUMBER).description("등록 성공한 작업 ID")
 	             )
  		));
+	}
+
+	/**
+	 * 버스노선 삭제 Task 등록
+	 * @throws Exception
+	 */
+	@Test
+	public void busRouteRemoveTask() throws Exception {
+		OutputFmtUtil outputFmtUtil = new OutputFmtUtil() ;
+
+		BusRouteRemoveTaskInputVo busRouteRemoveTaskInputVo = new BusRouteRemoveTaskInputVo();
+		busRouteRemoveTaskInputVo.setRouteId(11000000);
+		busRouteRemoveTaskInputVo.setCheckUserId("kr94666");
+		busRouteRemoveTaskInputVo.setTaskComment("폐선에 따른 노선정보 삭제");
+
+
+		// 성공시 작업ID 리턴
+		Map<String, Object> resultMap = new HashMap<>();
+		resultMap.put(CommonConstant.KEY_TASK, 782);
+
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(resultMap);
+
+		//given
+
+		given(busRouteService.registerBusRouteRemoveTask(any()))
+				.willReturn(commonResult) ;
+
+
+		//when
+		ResultActions result = this.mockMvc.perform(
+                post("/v1/ntool/api/busRouteTask/removeTask")
+                .content(objectMapper.writeValueAsString(busRouteRemoveTaskInputVo))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+	            .characterEncoding("UTF-8")
+        );
+
+		//then
+		result.andExpect(status().isOk())
+	 		.andDo(document("busRoute/busRouteRemoveTask",
+	 			getDocumentRequest(),
+	            getDocumentResponse(),
+	            requestFields(
+	            	fieldWithPath("routeId").type(NUMBER).description("[필수]노선ID"),
+	            	fieldWithPath("taskComment").type(STRING).description("[필수]작업내용"),
+                    fieldWithPath("checkUserId").type(STRING).description("[필수]검수자 ID")
+	            ),
+	            responseFields(
+	            		fieldWithPath("code").type(NUMBER).description("API 응답코드"),
+	             		fieldWithPath("message").type(STRING).description("API 응답 메세지"),
+	             		fieldWithPath("result").type(OBJECT).description("결과 정보"),
+	             		fieldWithPath("result.data").type(OBJECT).description("상세 정보"),
+	             		fieldWithPath("result.data.taskId").type(NUMBER).description("등록 성공한 작업 ID")
+	             )
+ 		));
+
+	}
+
+	/**
+	 * 노선 작업정보를 수정한다
+	 * @throws Exception
+	 */
+	@Test
+	public void busRouteTaskModify() throws Exception {
+		OutputFmtUtil outputFmtUtil = new OutputFmtUtil() ;
+		objectMapper.setSerializationInclusion(Include.NON_DEFAULT) ;
+
+		// 입력정보 설정
+		BusRouteTaskInputVo busRouteTaskInputVo = this.getBusRouteTaskInputVo();
+		busRouteTaskInputVo.setRouteId(11000000);
+		busRouteTaskInputVo.setTaskId(783);
+
+
+
+		//when
+		ResultActions result = this.mockMvc.perform(
+                put("/v1/ntool/api/modify/busRouteTask")
+                .content(objectMapper.writeValueAsString(busRouteTaskInputVo))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+	            .characterEncoding("UTF-8")
+        );
+
+		//then
+		result.andExpect(status().isOk())
+	 		.andDo(document("busRoute/busRouteModifyTask",
+	 			getDocumentRequest(),
+	            getDocumentResponse(),
+	            requestFields(
+	            	fieldWithPath("taskId").type(NUMBER).description("[필수]작업ID"),
+	            	fieldWithPath("routeId").type(NUMBER).description("[필수]노선ID"),
+                    fieldWithPath("routeName").type(STRING).description("[필수]노선명칭"),
+                    fieldWithPath("cityCode").type(NUMBER).description("[필수]도시코드"),
+                    fieldWithPath("busClass").type(NUMBER).description("[필수]버스 노선타입"),
+                    fieldWithPath("busAdditionalName").type(STRING).description("노선 부가명칭").optional(),
+                    fieldWithPath("startPointName").type(STRING).description("[필수]기점 정류장 명"),
+                    fieldWithPath("endPointName").type(STRING).description("[필수]종점 정류장 명"),
+                    fieldWithPath("turningPointSequence").type(NUMBER).description("회차 정류장 순번").optional(),
+                    fieldWithPath("weekdayStartPointFirstTime").type(STRING).description("평일 기점 기준 첫차 출발시간(HHmm)").optional(),
+                    fieldWithPath("weekdayStartPointLastTime").type(STRING).description("평일 기점 기준 첫차 도착시간(HHmm)").optional(),
+                    fieldWithPath("weekdayEndPointFirstTime").type(STRING).description("평일 종점 기준  첫차 출발시간(HHmm)").optional(),
+                    fieldWithPath("weekdayEndPointLastTime").type(STRING).description("평일 종점 기준 첫차 도착시간(HHmm)").optional(),
+                    fieldWithPath("weekdayIntervalMin").type(NUMBER).description("평일 최소 배차간격(분)").optional(),
+                    fieldWithPath("weekdayIntervalMax").type(NUMBER).description("평일 최대 배차간격(분)").optional(),
+                    fieldWithPath("weekdayIntervalCount").type(NUMBER).description("평일 배차간격(횟수)").optional(),
+                    fieldWithPath("saturdayStartPointFirstTime").type(STRING).description("토요일 기점 기준 첫차 출발시간(HHmm)").optional(),
+                    fieldWithPath("saturdayStartPointLastTime").type(STRING).description("토요일 기점 기준 첫차 도착시간(HHmm)").optional(),
+                    fieldWithPath("saturdayEndPointFirstTime").type(STRING).description("토요일 종점 기준 첫차 출발시간(HHmm)").optional(),
+                    fieldWithPath("saturdayEndPointLastTime").type(STRING).description("토요일 종점 기준 첫차 도착시간(HHmm)").optional(),
+                    fieldWithPath("saturdayIntervalMin").type(NUMBER).description("토요일 최소 배차간격(분)").optional(),
+                    fieldWithPath("saturdayIntervalMax").type(NUMBER).description("토요일 최대 배차간격(분)").optional(),
+                    fieldWithPath("saturdayIntervalCount").type(NUMBER).description("토요일 배차간격(횟수)").optional(),
+                    fieldWithPath("sundayStartPointFirstTime").type(STRING).description("일요일 기점 기준 첫차 출발시간(HHmm)").optional(),
+                    fieldWithPath("sundayStartPointLastTime").type(STRING).description("일요일 기점 기준 첫차 도착시간(HHmm)").optional(),
+                    fieldWithPath("sundayEndPointFirstTime").type(STRING).description("일요일 종점 기준 첫차 출발시간(HHmm)").optional(),
+                    fieldWithPath("sundayEndPointLastTime").type(STRING).description("일요일 종점 기준 첫차 도착시간(HHmm)").optional(),
+                    fieldWithPath("sundayIntervalMin").type(NUMBER).description("일요일 최소 배차간격(분)").optional(),
+                    fieldWithPath("sundayIntervalMax").type(NUMBER).description("일요일 최대 배차간격(분)").optional(),
+                    fieldWithPath("sundayIntervalCount").type(NUMBER).description("일요일 배차간격(횟수)").optional(),
+                    fieldWithPath("nonstepBusYn").type(STRING).description("저상버스 운행여부(Y/N)").optional(),
+                    fieldWithPath("telReservation").type(STRING).description("예약 전화번호").optional(),
+                    fieldWithPath("providerId").type(NUMBER).description("BIS 지역 ID").optional(),
+                    fieldWithPath("localRouteId").type(STRING).description("BIS 노선 ID").optional(),
+                    fieldWithPath("mondayYn").type(STRING).description("[필수]월요일 운행여부(Y/N)"),
+                    fieldWithPath("tuesdayYn").type(STRING).description("[필수]화요일 운행여부(Y/N)"),
+                    fieldWithPath("wednesdayYn").type(STRING).description("[필수]수요일 운행여부(Y/N)"),
+                    fieldWithPath("thursdayYn").type(STRING).description("[필수]목요일 운행여부(Y/N)"),
+                    fieldWithPath("fridayYn").type(STRING).description("[필수]금요일 운행여부(Y/N)"),
+                    fieldWithPath("saturdayYn").type(STRING).description("[필수]토요일 운행여부(Y/N)"),
+                    fieldWithPath("sundayYn").type(STRING).description("[필수]일요일 운행여부(Y/N)"),
+                    fieldWithPath("bypassYn").type(STRING).description("우회노선 여부(Y/N)").optional(),
+                    fieldWithPath("parentRouteId").type(NUMBER).description("본 노선 ID").optional(),
+                    fieldWithPath("bypassStartDateTime").type(STRING).description("우회 시작일시(yyyyMMddHHmm)").optional(),
+                    fieldWithPath("bypassEndDateTime").type(STRING).description("우회 종료일시(yyyyMMddHHmm)").optional(),
+                    fieldWithPath("taskComment").type(STRING).description("[필수]작업내용"),
+                    fieldWithPath("checkUserId").type(STRING).description("[필수]검수자 ID"),
+                    fieldWithPath("companyList[]").type(ARRAY).description("[필수]운수회사 정보"),
+                    fieldWithPath("companyList[].companyId").type(NUMBER).description("[필수]운수회사 ID"),
+                    fieldWithPath("busStopGraphInfo").type(OBJECT).description("[필수]노선 경유정류장 및 그래프 정보"),
+                    fieldWithPath("busStopGraphInfo.type").type(STRING).description("FeatureCollection").optional(),
+                    fieldWithPath("busStopGraphInfo.features[]").type(ARRAY).description("[필수] feature 목록"),
+                    fieldWithPath("busStopGraphInfo.features[].type").type(STRING).description("Feature").optional(),
+                    fieldWithPath("busStopGraphInfo.features[].geometry").type(OBJECT).description("[필수]지오메트리 정보"),
+                    fieldWithPath("busStopGraphInfo.features[].geometry.type").type(STRING).description("LineString").optional(),
+                    fieldWithPath("busStopGraphInfo.features[].geometry.coordinates[]").type(ARRAY).description("[필수]좌표정보"),
+                    fieldWithPath("busStopGraphInfo.features[].geometry.coordinates[].[]").type(ARRAY).description("[필수]좌표목록"),
+                    fieldWithPath("busStopGraphInfo.features[].properties").type(OBJECT).description("[필수]속성 정보"),
+                    fieldWithPath("busStopGraphInfo.features[].properties.graphId").type(NUMBER).description("그래프 ID").optional(),
+                    fieldWithPath("busStopGraphInfo.features[].properties.startStopId").type(NUMBER).description("[필수]출발 정류장ID"),
+                    fieldWithPath("busStopGraphInfo.features[].properties.endStopId").type(NUMBER).description("[필수]도착 정류장ID")
+	            ),
+	            responseFields(
+	            		fieldWithPath("code").type(NUMBER).description("API 응답코드"),
+	             		fieldWithPath("message").type(STRING).description("API 응답 메세지")
+	             )
+ 		));
+
 	}
 
 

@@ -93,4 +93,11 @@
 			(#{taskId}, #{graphId}, #{startStopId}, #{endStopId}, ST_GeomFromText(#{graphInfo}), #{distance})
 	</insert>
 
+	<delete id="deleteBusStopGraphTask" parameterType="long">
+		DELETE FROM
+			tb_stop_graph_task
+		WHERE
+			task_id = #{taskId}
+	</delete>
+
 </mapper>

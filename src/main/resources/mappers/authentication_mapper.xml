@@ -9,14 +9,14 @@
 			(#{userId}, #{loginSuccessYn}, #{accessIp})
 	</insert>
 	
-	<insert id="insertMemberTokenInfo" parameterType="com.naver.pubtrans.itn.api.vo.auth.input.AuthenticationInputVo">
+	<insert id="insertMemberRefreshTokenInfo" parameterType="com.naver.pubtrans.itn.api.vo.auth.input.AuthenticationInputVo">
 		INSERT INTO 
 			tb_z_svc_member_token_info(user_id, refresh_token) 
 		VALUES
 			(#{userId}, #{refreshToken})
 	</insert>
 	
-	<select id="getMemberTokenInfo" parameterType="com.naver.pubtrans.itn.api.vo.auth.input.AuthenticationInputVo" resultType="com.naver.pubtrans.itn.api.vo.auth.output.AuthenticationOutputVo">
+	<select id="getMemberRefreshTokenInfo" parameterType="com.naver.pubtrans.itn.api.vo.auth.input.AuthenticationInputVo" resultType="com.naver.pubtrans.itn.api.vo.auth.output.AuthenticationOutputVo">
 		SELECT
 			refresh_token
 		FROM	
@@ -24,12 +24,5 @@
 		WHERE
 			refresh_token = #{refreshToken}
 	</select>
-	
-	<delete id="deleteMemberTokenInfo" parameterType="com.naver.pubtrans.itn.api.vo.auth.input.AuthenticationInputVo">
-		DELETE FROM
-			tb_z_svc_member_token_info
-		WHERE
-			user_id = #{userId}
-	</delete>
 
 </mapper>

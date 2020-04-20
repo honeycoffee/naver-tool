@@ -62,13 +62,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					.permitAll(); // 회원가입 Post Method API는 누구나 접근가능
 		
 		http
-			.authorizeRequests() // 권한관리 API는 관리자만 가능
-				.antMatchers(HttpMethod.GET, "/**/list/member")
-					.hasRole(CommonConstant.ADMIN) // 
+			.authorizeRequests() // 권한관리 수정 및 삭제는 관리자만 가능
 				.antMatchers(HttpMethod.PUT, "/**/member")
-					.hasRole(CommonConstant.ADMIN) // 
+					.hasRole(CommonConstant.ADMIN)  
 				.antMatchers(HttpMethod.DELETE, "/**/member")
-					.hasRole(CommonConstant.ADMIN) // 
+					.hasRole(CommonConstant.ADMIN)  
 				.anyRequest() // 기타 API는 인증 받은 회원만 가능
 					.hasAnyRole(CommonConstant.USER, CommonConstant.ADMIN)
 			.and()

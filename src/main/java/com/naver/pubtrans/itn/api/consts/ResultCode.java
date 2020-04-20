@@ -33,6 +33,8 @@ public enum ResultCode {
 	BUS_ROUTE_STOPS_NOT_VALID(HttpStatus.INTERNAL_SERVER_ERROR, 514, " 경유정류장 입력 정보가 잘못되었습니다"),
 	BUS_FARE_NOT_MATCH(HttpStatus.INTERNAL_SERVER_ERROR, 515, " 일치하는 요금정보를 찾을 수 없습니다"),
 	BUS_SCHEDULE_NOT_MATCH(HttpStatus.INTERNAL_SERVER_ERROR, 516, " 일치하는 스케줄 정보를 찾을 수 없습니다"),
+	MEMBER_NOT_APPROVED(HttpStatus.INTERNAL_SERVER_ERROR, 517, "아직 승인 되지 않았습니다. 관리자에게 문의해주세요."),
+	BUS_ROUTE_BYPASS_PARAMETER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 518, "우회노선의 입력 파라미터가 잘못되었습니다"),
 	AUTH_TOKEN_EMPTY(HttpStatus.UNAUTHORIZED, 2001, "Token 정보가 없습니다"),
 	AUTH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, 2002, "만료된 Token 입니다"),
 	AUTH_TOKEN_VALID_ERROR(HttpStatus.UNAUTHORIZED, 2003, "Token 검증 오류"),

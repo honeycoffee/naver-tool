@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 버스정류장 등록/수정을 위한 작업 입력정보
+ * 버스정류장 작업 등록/수정을 위한 입력정보
  * @author adtec10
  *
  */

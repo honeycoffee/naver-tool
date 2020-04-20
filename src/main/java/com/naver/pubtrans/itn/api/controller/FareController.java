@@ -52,8 +52,8 @@ public class FareController {
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping("/v1/ntool/api/fare")
-	public CommonOutput getFareRule(@RequestBody FareSearchVo fareSearchVo) throws Exception {
+	@GetMapping("/v1/ntool/api/info/fare")
+	public CommonOutput getBaseFareRule(@Valid FareSearchVo fareSearchVo) throws Exception {
 		CommonResult commonResult = fareService.getFareRule(fareSearchVo);
 		return new CommonOutput(commonResult);
 	}
@@ -65,7 +65,7 @@ public class FareController {
 	 * @throws Exception
 	 */
 	@GetMapping("/v1/ntool/api/list/ignoredFare")
-	public CommonOutput selectIgnoredFareRuleList(@RequestBody FareSearchVo fareSearchVo) throws Exception {
+	public CommonOutput selectIgnoredFareRuleList(@Valid FareSearchVo fareSearchVo) throws Exception {
 		CommonResult commonResult = fareService.selectIgnoredFareRuleList(fareSearchVo);
 		return new CommonOutput(commonResult);
 	}
@@ -76,7 +76,7 @@ public class FareController {
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping("/v1/ntool/api/fare/{fareId}")
+	@GetMapping("/v1/ntool/api/info/fare/{fareId}")
 	public CommonOutput getIgnoredFareRule(@PathVariable int fareId) throws Exception {
 		
 		FareSearchVo fareSearchVo = new FareSearchVo();
@@ -92,7 +92,7 @@ public class FareController {
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping("/v1/ntool/api/fareTask/{taskId}")
+	@GetMapping("/v1/ntool/api/info/fareTask/{taskId}")
 	public CommonOutput getFareTask(@PathVariable long taskId) throws Exception {
 		CommonResult commonResult = fareService.getFareTaskInfo(taskId);
 		return new CommonOutput(commonResult);

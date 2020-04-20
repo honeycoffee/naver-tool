@@ -148,4 +148,19 @@ public class Util {
 		return servletRequestAttribute.getRequest();
 	}
 
+	/**
+	 * 날짜형식의 문자열인지 결과를 리턴한다
+	 * @param pattern - 날짜형식(yyyy-MM-dd HH:mm:ss)
+	 * @param date - 검사 문자열
+	 * @return
+	 */
+	public static boolean isDatePattern(String pattern, String date) {
+		try {
+			LocalDateTime.parse(date, DateTimeFormatter.ofPattern(pattern));
+			return true;
+		} catch(Exception e) {
+			return false;
+		}
+	}
+
 }

@@ -105,6 +105,14 @@ public interface BusRouteRepository {
 	Integer getBaseFareId(BusRouteTaskInputVo busRouteTaskInputVo) throws DataAccessException;
 
 	/**
+	 * 버스노선의 요금ID 목록을 가져온다
+	 * @param routeId - 노선ID
+	 * @return
+	 * @throws DataAccessException
+	 */
+	List<Integer> selectBusRouteFareIdList(int routeId) throws DataAccessException;
+
+	/**
 	 * 버스노선 기본 작업정보를 저장한다
 	 * @param busRouteTaskInputVo - 버스노선 작업정보
 	 * @throws DataAccessException
@@ -152,5 +160,56 @@ public interface BusRouteRepository {
 	 * @throws DataAccessException
 	 */
 	void insertBusRouteStopTask(BusRouteStopTaskInputVo busRouteStopTaskInputVo) throws DataAccessException;
+
+	/**
+	 * 버스노선 기본 작업정보를 업데이트한다
+	 * @param busRouteTaskInputVo - 버스노선 작업정보
+	 * @return
+	 * @throws DataAccessException
+	 */
+	int updateBusRouteTask(BusRouteTaskInputVo busRouteTaskInputVo) throws DataAccessException;
+
+	/**
+	 * 버스노선 부가 작업정보를 업데이트 한다
+	 * @param busRouteTaskInputVo - 버스노선 작업정보
+	 * @return
+	 * @throws DataAccessException
+	 */
+	int updateBusRouteSubTask(BusRouteTaskInputVo busRouteTaskInputVo) throws DataAccessException;
+
+	/**
+	 * 버스노선 BIS 매핑 작업정보를 삭제한다
+	 * @param taskId - 작업ID
+	 * @throws DataAccessException
+	 */
+	void deleteBusRouteMappingTask(long taskId) throws DataAccessException;
+
+	/**
+	 * 버스노선 우회노선 작업정보를 삭제한다
+	 * @param taskId - 작업ID
+	 * @throws DataAccessException
+	 */
+	void deleteBusRouteBypassTask(long taskId) throws DataAccessException;
+
+	/**
+	 * 버스노선 요금 작업정보를 삭제한다
+	 * @param taskId - 작업ID
+	 * @throws DataAccessException
+	 */
+	void deleteBusRouteFareTask(long taskId) throws DataAccessException;
+
+	/**
+	 * 버스노선 운수회사 작업정보를 삭제한다
+	 * @param taskId - 작업ID
+	 * @throws DataAccessException
+	 */
+	void deleteBusRouteCompanyTask(long taskId) throws DataAccessException;
+
+	/**
+	 * 버스노선 경유정류장 작업정보를 삭제한다
+	 * @param taskId - 작업ID
+	 * @throws DataAccessException
+	 */
+	void deleteBusRouteStopTask(long taskId) throws DataAccessException;
 
 }

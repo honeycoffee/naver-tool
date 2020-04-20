@@ -237,7 +237,6 @@ public class BusStopControllerDocumentTest {
 		busStopOutputVo.setLatitude(37.57266);
 		busStopOutputVo.setCityCode(1000);
 		busStopOutputVo.setCityName("서울");
-		busStopOutputVo.setTransportId(1);
 		busStopOutputVo.setLevel(0);
 		busStopOutputVo.setNonstopYn("N");
 		busStopOutputVo.setVirtualStopYn("N");
@@ -319,7 +318,6 @@ public class BusStopControllerDocumentTest {
 	             		fieldWithPath("result.data.latitude").type(JsonFieldType.NUMBER).description("위도"),
 	             		fieldWithPath("result.data.cityCode").type(JsonFieldType.NUMBER).description("도시코드"),
 	             		fieldWithPath("result.data.cityName").type(JsonFieldType.STRING).description("도시코드명"),
-	             		fieldWithPath("result.data.transportId").type(JsonFieldType.NUMBER).description("대중교통 구분코드"),
 	             		fieldWithPath("result.data.level").type(JsonFieldType.NUMBER).description("정류장 위치구분"),
 	             		fieldWithPath("result.data.nonstopYn").type(STRING_OR_NULL).description("미정차정류장 구분(Y/N)"),
 	             		fieldWithPath("result.data.virtualStopYn").type(STRING_OR_NULL).description("가성정류장 구분(Y/N)"),
@@ -367,7 +365,6 @@ public class BusStopControllerDocumentTest {
 		busStopTaskOutputVo.setLatitude(37.57266);
 		busStopTaskOutputVo.setCityCode(1000);
 		busStopTaskOutputVo.setCityName("서울");
-		busStopTaskOutputVo.setTransportId(1);
 		busStopTaskOutputVo.setLevel(0);
 		busStopTaskOutputVo.setNonstopYn("N");
 		busStopTaskOutputVo.setVirtualStopYn("N");
@@ -470,7 +467,6 @@ public class BusStopControllerDocumentTest {
 	             		fieldWithPath("result.data.latitude").type(JsonFieldType.NUMBER).description("위도"),
 	             		fieldWithPath("result.data.cityCode").type(JsonFieldType.NUMBER).description("도시코드"),
 	             		fieldWithPath("result.data.cityName").type(JsonFieldType.STRING).description("도시코드명"),
-	             		fieldWithPath("result.data.transportId").type(JsonFieldType.NUMBER).description("대중교통 구분코드"),
 	             		fieldWithPath("result.data.level").type(JsonFieldType.NUMBER).description("정류장 위치구분"),
 	             		fieldWithPath("result.data.nonstopYn").type(STRING_OR_NULL).description("미정차정류장 구분(Y/N)"),
 	             		fieldWithPath("result.data.virtualStopYn").type(STRING_OR_NULL).description("가성정류장 구분(Y/N)"),
@@ -568,7 +564,7 @@ public class BusStopControllerDocumentTest {
 
 		//when
 		ResultActions result = this.mockMvc.perform(
-                get("/v1/ntool/api/list/busStopTask/{busStopId}", 1)
+                get("/v1/ntool/api/list/busStopTask/summary/{busStopId}", 55000389)
 	                .param("pageNo", "1")
 	            	.param("listSize", "20")
                 	.contentType(MediaType.APPLICATION_FORM_URLENCODED)

@@ -24,6 +24,7 @@ public enum PubTransTable {
 	TB_CALENDAR_DATES("tb_calendar_dates","서비스 날짜 예외 처리"),
 	TB_CITY_CODE("tb_city_code", "도시코드"),
 	TB_FARE_RULE("tb_fare_rule", "요금 룰"),
+	TB_FARE_RULE_INFO("tb_fare_rule_info", "요금 룰 상세"),
 	TB_ROUTE_FARE_MAPPING("tb_route_fare_mapping","요금 매핑"),
 	TB_ROUTE_STOPS("tb_route_stops", "노선별 정류장"),
 	TB_ROUTES("tb_routes", "노선"),

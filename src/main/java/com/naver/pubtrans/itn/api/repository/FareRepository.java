@@ -6,6 +6,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
 import com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteListOutputVo;
+import com.naver.pubtrans.itn.api.vo.fare.FareInfoTaskVo;
+import com.naver.pubtrans.itn.api.vo.fare.FareInfoVo;
 import com.naver.pubtrans.itn.api.vo.fare.FareTaskVo;
 import com.naver.pubtrans.itn.api.vo.fare.FareVo;
 import com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo;
@@ -48,7 +50,7 @@ public interface FareRepository {
 	List<IgnoredFareListOutputVo> selectIgnoredFareRuleList(FareSearchVo fareSearchVo) throws DataAccessException;
 
 	/**
-	 * 요금 룰 변경정보 가져오기
+	 * 요금 룰 작업정보 가져오기
 	 * @param taskId - 작업 ID
 	 * @return
 	 * @throws DataAccessException
@@ -56,7 +58,23 @@ public interface FareRepository {
 	FareTaskVo getFareRuleTask(long taskId) throws DataAccessException;
 
 	/**
-	 * 요금 룰 변경정보 저장
+	 * 요금 룰 상세정보 가져오기
+	 * @param fareSearchVo - 요금 룰 검색 Vo
+	 * @return
+	 * @throws DataAccessException
+	 */
+	FareInfoVo getFareRuleInfo(FareSearchVo fareSearchVo) throws DataAccessException;
+
+	/**
+	 * 요금 룰 상세정보 작업정보 가져오기
+	 * @param fareSearchVo - 요금 룰 검색 Vo
+	 * @return
+	 * @throws DataAccessException
+	 */
+	FareInfoVo getFareRuleInfoTask(long taskId) throws DataAccessException;
+
+	/**
+	 * 요금 룰 작업정보 저장
 	 * @param fareTaskInputVo - 요금 룰 정보
 	 * @return
 	 * @throws DataAccessException
@@ -64,12 +82,28 @@ public interface FareRepository {
 	void insertFareRuleTask(FareTaskInputVo fareTaskInputVo) throws DataAccessException;
 
 	/**
-	 * 요금 룰 변경정보 업데이트
+	 * 요금 룰 작업정보 업데이트
 	 * @param fareTaskInputVo - 요금 룰 정보
 	 * @return
 	 * @throws DataAccessException
 	 */
 	void updateFareRuleTask(FareTaskInputVo fareTaskInputVo) throws DataAccessException;
+
+	/**
+	 * 요금 룰 상세정보 작업정보 저장
+	 * @param fareTaskInputVo - 요금 룰 정보
+	 * @return
+	 * @throws DataAccessException
+	 */
+	void insertFareRuleInfoTask(FareTaskInputVo fareTaskInputVo) throws DataAccessException;
+
+	/**
+	 * 요금 룰 상세정보 작업정보 업데이트
+	 * @param fareTaskInputVo - 요금 룰 정보
+	 * @return
+	 * @throws DataAccessException
+	 */
+	void updateFareRuleInfoTask(FareTaskInputVo fareTaskInputVo) throws DataAccessException;
 
 	/**
 	 * 요금 룰과 노선 매핑 변경정보 저장
@@ -80,10 +114,18 @@ public interface FareRepository {
 
 	/**
 	 * 요금 룰과 매핑된 노선 리스트 가져오기
-	 * @param busStopTaskInputVo - 정류장 정보
+	 * @param fareId - 요금 룰 ID
 	 * @return
 	 * @throws DataAccessException
 	 */
 	List<BusRouteListOutputVo> selectBusRouteFareMappingList(int fareId) throws DataAccessException;
+
+	/**
+	 * 요금 룰과 매핑된 노선 작업정보 리스트 가져오기
+	 * @param taskId - 작업정보 ID 
+	 * @return
+	 * @throws DataAccessException
+	 */
+	List<BusRouteListOutputVo> selectBusRouteFareMappingTaskList(long taskId) throws DataAccessException;
 
 }

@@ -1,10 +1,8 @@
 package com.naver.pubtrans.itn.api.service;
 
-import java.beans.Beans;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,8 +30,9 @@ import com.naver.pubtrans.itn.api.vo.common.output.CommonResult;
 import com.naver.pubtrans.itn.api.vo.common.output.CommonSchema;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo;
 import com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo;
+import com.naver.pubtrans.itn.api.vo.member.input.MemberUpdateVo;
+import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthorityIdCountSummaryVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberAuthorityOutputVo;
-import com.naver.pubtrans.itn.api.vo.member.output.MemberCountOutputVo;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberMeta;
 import com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo;
 
@@ -55,8 +54,8 @@ public class MemberService implements UserDetailsService {
 	private final MemberPasswordEncoder memberPasswordEncoder;
 
 	@Autowired
-	MemberService(OutputFmtUtil outputFmtUtil, CommonService commonService, MemberRepository memberRepository,
-		MemberPasswordEncoder memberPasswordEncoder) {
+	MemberService(OutputFmtUtil outputFmtUtil, CommonService commonService,
+		MemberRepository memberRepository, MemberPasswordEncoder memberPasswordEncoder) {
 		this.outputFmtUtil = outputFmtUtil;
 		this.commonService = commonService;
 		this.memberRepository = memberRepository;
@@ -82,7 +81,7 @@ public class MemberService implements UserDetailsService {
 		memberInputVo.setUserPw(memberPasswordEncoder.encode(memberInputVo.getUserPw()));
 
 		if (StringUtils.isEmpty(memberInputVo.getAuthorityId())) {
-			memberInputVo.setAuthorityId(UserAuthority.ROLE_USER.name());
+			memberInputVo.setAuthorityId(UserAuthority.ROLE_UNAUTHORIZED.name());
 		}
 
 		memberRepository.insertMember(memberInputVo);
@@ -195,18 +194,6 @@ public class MemberService implements UserDetailsService {
 
 		this.verifyPassword(memberInputVo);
 
-		this.updateMember(memberInputVo);
-
-	}
-
-	/**
-	 * 회원 정보를 수정한다
-	 *
-	 * @param memberInputVo - 회원 입력 Vo
-	 * @throws Exception
-	 */
-	public void updateMember(MemberInputVo memberInputVo) throws Exception {
-
 		if (StringUtils.isNotEmpty(memberInputVo.getUserPw())) {
 			memberInputVo.setUserPw(memberPasswordEncoder.encode(memberInputVo.getUserPw()));
 		}
@@ -219,15 +206,34 @@ public class MemberService implements UserDetailsService {
 				ResultCode.UPDATE_FAIL.getDisplayMessage());
 		}
 
-		// 내 정보 수정의 경우, 전달 받은 권한이 존재하면 권한을 업데이트 합니다.
-		if (StringUtils.isNotEmpty(memberInputVo.getAuthorityId())) {
-			memberRepository.updateMemberAuthority(memberInputVo);
+		// 회원 정보 수정시 비밀번호 변경이 이루어졌다면 다른 브라우저에서 사용 중인 로그인을 해제하기 위해 DB에 있는 refresh token 삭제
+		if (StringUtils.isNotEmpty(memberInputVo.getUserPw())) {
+			this.deleteMemberRefreshTokenInfo(memberInputVo.getUserId());
 		}
 
 	}
 
 	/**
-	 * 회원 정보를 삭제한다
+	 * 회원 정보를 수정한다
+	 *
+	 * @param memberUpdateVo - 회원 수정 시 입력 값
+	 * @throws Exception
+	 */
+	public void updateMember(MemberUpdateVo memberUpdateVo) throws Exception {
+
+		// 회원 역할 수정
+		int updateMemberAuthorityCnt = memberRepository.updateMemberAuthority(memberUpdateVo);
+
+		// 저장 오류 처리
+		if (updateMemberAuthorityCnt == 0) {
+			throw new ApiException(ResultCode.UPDATE_FAIL.getApiErrorCode(),
+				ResultCode.UPDATE_FAIL.getDisplayMessage());
+		}
+
+	}
+
+	/**
+	 * 회원을 삭제한다
 	 *
 	 * @param memberSearchVo - 회원 검색조건
 	 * @throws Exception
@@ -242,10 +248,13 @@ public class MemberService implements UserDetailsService {
 				ResultCode.DELETE_FAIL.getDisplayMessage());
 		}
 
+		// 회원 삭제 시 DB에 있는 refresh token 삭제
+		this.deleteMemberRefreshTokenInfo(memberSearchVo.getUserId());
+
 	}
 
 	/**
-	 * 테스트 회원 정보를 삭제한다
+	 * 테스트 회원을 삭제한다
 	 *
 	 * @param memberSearchVo - 회원 검색조건
 	 * @throws Exception
@@ -270,18 +279,24 @@ public class MemberService implements UserDetailsService {
 		 * 1. 페이지 목록 조회
 		 */
 
-		// 전체 목록 수 가져오기
-		MemberCountOutputVo memberCountOutputVo = memberRepository.getMemberListTotalCount(memberSearchVo);
+		// 회원 총 카운트 및 역할 별 카운트 가져오기
+		MemberAuthorityIdCountSummaryVo memberAuthorityIdCountSummaryVo = 
+            memberRepository.getSummarizingCountOfMemberAuthorityId(memberSearchVo);
 
 		// 페이징 정보
-		PagingVo pagingVo = new PagingVo(memberCountOutputVo.getTotalListCount(), memberSearchVo.getPageNo(), memberSearchVo.getListSize());
-		
+		PagingVo pagingVo = new PagingVo(memberAuthorityIdCountSummaryVo.getTotalRoleCount(),
+							             memberSearchVo.getPageNo(),
+							             memberSearchVo.getListSize());
+
 		MemberMeta memberMeta = new MemberMeta();
 		BeanUtils.copyProperties(pagingVo, memberMeta);
 
-		memberMeta.setTotalAdminCount(memberCountOutputVo.getTotalAdminCount());
-		memberMeta.setTotalUserCount(memberCountOutputVo.getTotalUserCount());
-		memberMeta.setTotalAnonymousCount(memberCountOutputVo.getTotalAnonymousCount());
+		// 메타에서 안보이게 하기 위해 페이징 계산 후 0 주입
+		memberMeta.setTotalListCount(0);
+		memberMeta.setTotalRoleCount(memberAuthorityIdCountSummaryVo.getTotalRoleCount());
+		memberMeta.setTotalAdminRoleCount(memberAuthorityIdCountSummaryVo.getTotalAdminRoleCount());
+		memberMeta.setTotalUserRoleCount(memberAuthorityIdCountSummaryVo.getTotalUserRoleCount());
+		memberMeta.setTotalUnauthorizedRoleCount(memberAuthorityIdCountSummaryVo.getTotalUnauthorizedRoleCount());
 
 		// 목록 조회 페이징 정보 set
 		memberSearchVo.setStartPageLimit(pagingVo.getStartPageLimit());
@@ -446,6 +461,38 @@ public class MemberService implements UserDetailsService {
 
 		return memberAuthorityOutputVo;
 
+	}
+
+	/**
+	 * 회원 Refresh Token 정보를 삭제한다.
+	 * 
+	 * @param userId - Token 정보를 삭제할 회원 ID
+	 */
+	public void deleteMemberRefreshTokenInfo(String userId) {
+
+		MemberSearchVo memberSearchVo = new MemberSearchVo();
+		memberSearchVo.setUserId(userId);
+
+		memberRepository.deleteMemberRefreshTokenInfo(memberSearchVo);
+	}
+
+	/**
+	 * 검수자(관리자) 목록을 가져온다.
+	 *
+	 * @param memberSearchVo - 회원 검색조건
+	 * @return
+	 * @throws Exception
+	 */
+	public CommonResult selectAdminMemberList(MemberSearchVo memberSearchVo) throws Exception {
+
+		memberSearchVo.setAuthorityId(UserAuthority.ROLE_ADMIN.name());
+
+		// 관리자 목록 조회
+		List<MemberOutputVo> memberOutputVoList = memberRepository.selectAdminMemberList(memberSearchVo);
+
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(memberOutputVoList);
+
+		return commonResult;
 	}
 
 }

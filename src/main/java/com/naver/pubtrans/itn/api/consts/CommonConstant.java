@@ -70,10 +70,13 @@ public interface CommonConstant {
 	// 노선 ID 이름
 	String KEY_ROUTE = "routeId";
 
+	// 운수사 ID 이름
+	String KEY_COMPANY = "companyId";
+
 	// 작업ID 이름
 	String KEY_TASK = "taskId";
 
-	// 작업ID 이름
+	// 작업ID 이름 목록
 	String KEY_TASK_LIST = "taskIdList";
 
 	// 버스정류장 Task 입력 정보 VO명
@@ -81,6 +84,9 @@ public interface CommonConstant {
 
 	// 버스노선 Task 입력 정보 Vo명
 	String BUS_ROUTE_TASK_INPUT_VO = "BusRouteTaskInputVo";
+
+	// 버스 운수사 Task 입력 정보 Vo명
+	String BUS_COMPANY_TASK_INPUT_VO = "BusCompanyTaskInputVo";
 
 	// 요금 룰 Task 입력 정보 VO명
 	String FARE_TASK_INPUT_VO = "FareTaskInputVo";
@@ -109,8 +115,8 @@ public interface CommonConstant {
 	// 공백
 	String BLANK = " ";
 
-	// access_token 만료 초단위 (3600 = 1시간)
-	int ACCESS_TOKEN_EXPIRE_TIME_SEC = 3600;
+	// access_token 만료 초 단위 (600 = 10분)
+	int ACCESS_TOKEN_EXPIRE_TIME_SEC = 600;
 
 	// refresh_token 만료 초 단위 (86400 = 24시간)
 	int REFRESH_TOKEN_EXPIRE_TIME_SEC = 86400;
@@ -156,5 +162,14 @@ public interface CommonConstant {
 
 	// 예외 요금 명명에 쓰이는 요금 텍스트
 	String FARE_TEXT = "요금";
+
+	// 사용자로부터 입력받는 날짜시간 형식
+	String INPUT_DATE_TIME_PATTERN = "yyyyMMddHHmmss";
+
+	// 초단위 시작(00초)
+	String FIRST_SECONDS = "00";
+
+	// 초단위 마지막(59초)
+	String LAST_SECONDS = "59";
 
 }

@@ -55,4 +55,11 @@ public interface BusGraphRepository {
 	 * @throws DataAccessException
 	 */
 	void insertBusStopGraphTask(BusStopGraphTaskInputVo busStopGraphTaskInputVo) throws DataAccessException;
+
+	/**
+	 * 그래프 작업정보를 삭제한다
+	 * @param taskId - 작업ID
+	 * @throws DataAccessException
+	 */
+	void deleteBusStopGraphTask(long taskId) throws DataAccessException;
 }

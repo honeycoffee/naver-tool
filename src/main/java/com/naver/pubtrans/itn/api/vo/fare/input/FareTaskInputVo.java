@@ -1,9 +1,8 @@
 package com.naver.pubtrans.itn.api.vo.fare.input;
 
-import java.util.List;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -33,31 +32,6 @@ public class FareTaskInputVo {
 	private Integer baseFare;
 
 	/**
-	 * 기본요금(청소년_카드기준)
-	 */
-	private Integer youthFare;
-
-	/**
-	 * 기본요금(어린이_카드기준)
-	 */
-	private Integer childFare;
-
-	/**
-	 * 기본요금(일반_현금기준)
-	 */
-	private Integer baseCashFare;
-
-	/**
-	 * 기본요금(청소년_현금기준)
-	 */
-	private Integer youthCashFare;
-
-	/**
-	 * 기본요금(어린이_현금기준)
-	 */
-	private Integer childCashFare;
-
-	/**
 	 * 기본거리
 	 */
 	private Integer baseDist;
@@ -76,6 +50,22 @@ public class FareTaskInputVo {
 	 * 최대 요금
 	 */
 	private Integer maxFare;
+
+	/**
+	 * 요금 룰의 기본 정보 여부
+	 */
+	@NotNull
+	private String baseYn;
+
+	/**
+	 * 연령별 타입
+	 */
+	private Integer ageId;
+
+	/**
+	 * 지불 방식 식별
+	 */
+	private Integer paymentId;
 
 	/**
 	 * 시작 정류장 Array
@@ -109,21 +99,25 @@ public class FareTaskInputVo {
 	private Integer cityCode;
 
 	/**
-	 * 요금 룰의 기본 정보 여부
-	 */
-	@NotNull
-	private String baseYn;
-
-	/**
 	 * 버스 노선 종류
 	 */
 	@NotNull
 	private Integer busClass;
+	
+	/**
+	 * 출처 명
+	 */
+	private String sourceName;
+	
+	/**
+	 * 출처 URL
+	 */
+	private String sourceUrl;
 
 	/**
 	 * 설명
 	 */
-	private String command;
+	private String comment;
 
 	/**
 	 * 버스노선 ID Array
@@ -131,7 +125,7 @@ public class FareTaskInputVo {
 	private Integer[] routeIds;
 
 	/**
-	 * 버스노선 ID 
+	 * 버스노선 ID
 	 */
 	private Integer routeId;
 

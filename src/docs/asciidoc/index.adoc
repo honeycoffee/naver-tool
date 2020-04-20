@@ -51,13 +51,13 @@ include::common-code.adoc[]
 &#160;
 
 === 데이터 목록 페이징 정보
-페이징이 필요한 데이터 목록을 제공하는 API 중 회원 목록을 제외한 API에는 페이징 정보를 확인할 수 있는 데이터가 포함된다.
+회원 목록 API를 제외한 페이징이 필요한 데이터 목록을 제공하는 API에는 페이징 정보를 확인할 수 있는 데이터가 포함된다.
 include::common-meta.adoc[]
 
 &#160;
 
 === 회원 데이터 목록 페이징 정보
-회원 목록 API는 각 역할 별 수를 포함하여 페이징 정보를 제공한다.
+회원 목록 API는 각 역할 별 합계를 포함하여 페이징 정보를 제공한다.
 include::member-meta.adoc[]
 
 &#160;
@@ -246,7 +246,6 @@ include::{snippets}/member/deleteMember/http-response.adoc[]
 
 &#160;
 
-
 === 회원 List
 회원 목록을 조회한다
 
@@ -263,6 +262,25 @@ include::{snippets}/member/listMember/response-fields.adoc[]
 
 ===== Response HTTP Example
 include::{snippets}/member/listMember/http-response.adoc[]
+
+&#160;
+
+=== 검수자 List
+검수자 목록을 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/member/listAdminMember/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/member/listAdminMember/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/member/listAdminMember/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/member/listAdminMember/http-response.adoc[]
 
 &#160;
 
@@ -537,7 +555,7 @@ include::{snippets}/busStop/busStopRemoveTask/http-response.adoc[]
 === 버스정류장 작업정보 수정
 * 버스정류장 작업정보를 수정한다
 ** 작업 관리 -> 작업 목록 -> 작업 상세 -> 정류장 상세 접근시
-** 작업정보의 진행상태가 "완료", "예외" 인 경우에는 수정 불가능.
+** 작업정보의 진행상태가 "완료", "제외" 인 경우에는 수정 불가능.
 
 ==== Request
 include::{snippets}/busStop/busStopModifyTask/request-fields.adoc[]
@@ -717,5 +735,317 @@ include::{snippets}/busRoute/busRouteEditTask/response-fields.adoc[]
 
 ===== Response HTTP Example
 include::{snippets}/busRoute/busRouteEditTask/http-response.adoc[]
+
+&#160;
+
+[[busRoute-removeTask]]
+=== 버스노선 삭제 작업등록
+버스노선을 삭제하는 작업정보를 등록한다
+
+==== Request
+include::{snippets}/busRoute/busRouteRemoveTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busRoute/busRouteRemoveTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busRoute/busRouteRemoveTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busRoute/busRouteRemoveTask/http-response.adoc[]
+
+&#160;
+
+[[busRoute-modify-task]]
+=== 버스노선 작업정보 수정
+* 버스노선 작업정보를 수정한다
+** 작업 관리 -> 작업 목록 -> 작업 상세 -> 노선 상세 접근시
+** 작업정보의 진행상태가 "완료", "제외" 인 경우에는 수정 불가
+
+==== Request
+include::{snippets}/busRoute/busRouteModifyTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busRoute/busRouteModifyTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busRoute/busRouteModifyTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busRoute/busRouteModifyTask/http-response.adoc[]
+
+&#160;
+
+== [05]버스운수사 API
+
+[[busCompany-list]]
+=== 버스운수사 List
+버스운수사 목록을 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/busCompany/busCompanyList/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busCompany/busCompanyList/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busCompany/busCompanyList/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busCompany/busCompanyList/http-response.adoc[]
+
+&#160;
+
+[[busCompany-info]]
+=== 버스운수사 상세정보
+버스운수사 상세정보를 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/busCompany/busCompanyInfo/path-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busCompany/busCompanyInfo/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busCompany/busCompanyInfo/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busCompany/busCompanyInfo/http-response.adoc[]
+
+&#160;
+
+[[busCompany-task-info]]
+=== 버스운수사 작업 상세정보
+버스운수사 작업 상세정보를 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/busCompany/busCompanyTask/path-parameters.adoc[]
+
+===== Request HTTP Example
+- 작업ID 조회 : /v1/ntool/api/info/busCompanyTask/1
+include::{snippets}/busCompany/busCompanyTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busCompany/busCompanyTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busCompany/busCompanyTask/http-response.adoc[]
+
+&#160;
+
+[[busCompany-task]]
+=== 버스운수사 작업 List
+버스운수사 작업 목록을 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/busCompany/busCompanyTaskList/path-parameters.adoc[]
+include::{snippets}/busCompany/busCompanyTaskList/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busCompany/busCompanyTaskList/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busCompany/busCompanyTaskList/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busCompany/busCompanyTaskList/http-response.adoc[]
+
+&#160;
+
+[[busCompany-schema]]
+=== 버스운수사 기본 스키마
+버스운수사 기본 스키마를 조회한다
+
+==== Request HTTP Example
+include::{snippets}/busCompany/busCompanySchema/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busCompany/busCompanySchema/response-fields.adoc[]
+
+&#160;
+
+[[busCompany-registerTask]]
+=== 버스운수사 생성 작업등록
+버스운수사 생성 작업을 등록한다
+
+==== Request
+include::{snippets}/busCompany/busCompanyAddTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busCompany/busCompanyAddTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busCompany/busCompanyAddTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busCompany/busCompanyAddTask/http-response.adoc[]
+
+&#160;
+
+[[busCompany-modifyTask]]
+=== 버스운수사 수정 작업등록
+* 버스운수사 정보를 수정하는 작업정보를 등록한다
+** 운수사 관리 -> 운수사 목록 -> 운수사 상세 접근시
+
+==== Request
+include::{snippets}/busCompany/busCompanyEditTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busCompany/busCompanyEditTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busCompany/busCompanyEditTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busCompany/busCompanyEditTask/http-response.adoc[]
+
+&#160;
+
+[[busCompany-removeTask]]
+=== 버스운수사 삭제 작업등록
+* 버스운수사를 삭제하는 작업을 등록한다
+
+==== Request
+include::{snippets}/busCompany/busCompanyRemoveTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busCompany/busCompanyRemoveTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busCompany/busCompanyRemoveTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busCompany/busCompanyRemoveTask/http-response.adoc[]
+
+&#160;
+
+[[busCompany-modify]]
+=== 버스운수사 작업정보 수정
+* 버스운수사 작업정보를 수정한다
+** 작업 관리 -> 작업 목록 -> 작업 상세 -> 운수사 상세 접근시
+** 작업정보의 진행상태가 "완료", "제외" 인 경우에는 수정 불가능.
+
+==== Request
+include::{snippets}/busCompany/busCompanyModifyTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busCompany/busCompanyModifyTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busCompany/busCompanyModifyTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busCompany/busCompanyModifyTask/http-response.adoc[]
+
+&#160;
+
+== [06]요금 룰 API
+
+[[baseFareRule-info]]
+=== 기본 요금 룰 상세정보
+기본 요금 룰을 가져온다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/fare/getBaseFare/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/fare/getBaseFare/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/fare/getBaseFare/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/fare/getBaseFare/http-response.adoc[]
+
+&#160;
+
+[[ignoredFarRule-list]]
+=== 예외 요금 룰 List
+예외 요금 룰 목록을 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/fare/selectIgnoredFareRuleList/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/fare/selectIgnoredFareRuleList/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/fare/selectIgnoredFareRuleList/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/fare/selectIgnoredFareRuleList/http-response.adoc[]
+
+&#160;
+
+[[ignoredFareRule-info]]
+=== 예외 요금 룰 상세정보
+예외 요금 룰을 가져온다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/fare/getIgnoredFare/path-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/fare/getIgnoredFare/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/fare/getIgnoredFare/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/fare/getIgnoredFare/http-response.adoc[]
+
+&#160;
+
+[[fare-task-info]]
+=== 요금 룰 작업 상세정보
+요금 룰 작업 상세정보를 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/fare/fareTask/path-parameters.adoc[]
+
+===== Request HTTP Example
+- 작업ID 조회 : /v1/ntool/api/info/fareTask/1
+include::{snippets}/fare/fareTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/fare/fareTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/fare/fareTask/http-response.adoc[]
+
+&#160;
+
+[[fare-schema]]
+=== 요금 룰 기본 스키마
+요금 룰 기본 스키마를 조회한다
+
+==== Request HTTP Example
+include::{snippets}/fare/fareSchema/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/fare/fareSchema/response-fields.adoc[]
 
 &#160;

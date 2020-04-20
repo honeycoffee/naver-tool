@@ -25,6 +25,7 @@ import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.common.Util;
 import com.naver.pubtrans.itn.api.consts.BusDirection;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
+import com.naver.pubtrans.itn.api.consts.PubTransId;
 import com.naver.pubtrans.itn.api.consts.PubTransTable;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.consts.TaskAssignType;
@@ -51,6 +52,7 @@ import com.naver.pubtrans.itn.api.vo.bus.route.BusRouteStopVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.BusRouteTaskVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.BusRouteVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteCompanyTaskInputVo;
+import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteRemoveTaskInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteSearchVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteStopTaskInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo;
@@ -253,7 +255,7 @@ public class BusRouteService {
 	 */
 	private List<CommonSchema> selectBusRouteSchema() throws Exception {
 		ArrayList<String> ignoreColumnNameList = new ArrayList<>();
-		ignoreColumnNameList.add("tranport_id");
+		ignoreColumnNameList.add("transport_id");
 
 		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_ROUTES.getName(), CommonConstant.IGNORE_COLUMN, ignoreColumnNameList);
 		return commonSchemaList;
@@ -572,10 +574,15 @@ public class BusRouteService {
 	@Transactional
 	public CommonResult registerBusRouteTask(String taskType, BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
 
-		// 노선별 경유정류장 그래프 유효성 검사
-		if(!this.verifyBusRouteGraphInfo(busRouteTaskInputVo.getBusStopGraphInfo())) {
-			throw new ApiException(ResultCode.BUS_ROUTE_STOPS_NOT_VALID.getApiErrorCode(), ResultCode.BUS_ROUTE_STOPS_NOT_VALID.getDisplayMessage());
+		// 작업등록 유형이 '신규등록' 이나 "수정'인 경우 노선별 경유정류장 그래프 유효성 검사를 수행한다
+		// 작업등록 유형이 '노선삭제' 인 경우에는 노선별 경유장 그래프 유효성 검사를 수행하지 않는다.
+		if(taskType.equals(TaskType.REGISTER.getCode()) || taskType.equals(TaskType.MODIFY.getCode())) {
+			boolean result = this.verifyBusRouteGraphInfo(busRouteTaskInputVo.getBusStopGraphInfo());
+			 if (result == false) {
+		        throw new ApiException(ResultCode.BUS_ROUTE_STOPS_NOT_VALID.getApiErrorCode(), ResultCode.BUS_ROUTE_STOPS_NOT_VALID.getDisplayMessage());
+		    }
 		}
+
 
 		// 노선 신규등록인 경우
 		if(taskType.equals(TaskType.REGISTER.getCode())) {
@@ -633,82 +640,81 @@ public class BusRouteService {
 
 		// 우회노선 정보 저장 (우회노선인 경우)
 		if(CommonConstant.Y.equals(busRouteTaskInputVo.getBypassYn())) {
+
+			// 우회노선 유효성 검사
+			if(!this.verifyBusRouteBypass(busRouteTaskInputVo)) {
+				throw new ApiException(ResultCode.BUS_ROUTE_BYPASS_PARAMETER_ERROR.getApiErrorCode(), ResultCode.BUS_ROUTE_BYPASS_PARAMETER_ERROR.getDisplayMessage());
+			}
+
 			busRouteRepository.insertBusRouteBypassTask(busRouteTaskInputVo);
 		}
 
 
-		/**
-		 * 요금정보
-		 * 신규 노선 등록이거나, 도시코드 또는 노선코드가 변경되었을경우에는 기본 요금ID를 검색하여 해당 ID를 저장한다
-		 */
+		if(taskType.equals(TaskType.REGISTER.getCode()) || taskType.equals(TaskType.MODIFY.getCode())) {
 
-		// 요금ID 변경여부
-		boolean isBusRouteFareChange = false;
-		if(!taskType.equals(TaskType.REGISTER.getCode())) {
-		    // 노선정보
-		    BusRouteVo busRouteVo = busRouteRepository.getBusRoute(busRouteTaskInputVo.getRouteId());
+			/**
+			 * 요금정보
+			 * 신규 노선 등록이거나, 도시코드 또는 노선코드가 변경되었을경우에는 기본 요금ID를 검색하여 해당 ID를 저장한다
+			 */
 
-		    // 도시코드나 버스 클래스가 변경되면 요금ID도 변경되어야 한다
-		    if(busRouteVo.getCityCode() != busRouteTaskInputVo.getCityCode() || busRouteVo.getBusClass() != busRouteTaskInputVo.getBusClass()) {
-		        isBusRouteFareChange = true;
-		    }
-		}
+			// 요금ID 변경여부
+			boolean isBusRouteFareChange = false;
+			if(taskType.equals(TaskType.MODIFY.getCode())) {
+			    // 노선정보
+			    BusRouteVo busRouteVo = busRouteRepository.getBusRoute(busRouteTaskInputVo.getRouteId());
 
-		if(taskType.equals(TaskType.REGISTER.getCode()) || isBusRouteFareChange) {
-			Integer fareId = busRouteRepository.getBaseFareId(busRouteTaskInputVo);
-			if(fareId == null) {
-				throw new ApiException(ResultCode.BUS_FARE_NOT_MATCH.getApiErrorCode(), ResultCode.BUS_FARE_NOT_MATCH.getDisplayMessage());
+			    // 도시코드나 버스 클래스가 변경되면 요금ID도 변경되어야 한다
+			    if(busRouteVo.getCityCode() != busRouteTaskInputVo.getCityCode() || busRouteVo.getBusClass() != busRouteTaskInputVo.getBusClass()) {
+			        isBusRouteFareChange = true;
+			    }
 			}
 
-			// 요금정보 매핑테이블 Task 저장
-			busRouteTaskInputVo.setFareId(fareId);
+			if(taskType.equals(TaskType.REGISTER.getCode()) || isBusRouteFareChange) {
+				Integer fareId = busRouteRepository.getBaseFareId(busRouteTaskInputVo);
+				if(fareId == null) {
+					throw new ApiException(ResultCode.BUS_FARE_NOT_MATCH.getApiErrorCode(), ResultCode.BUS_FARE_NOT_MATCH.getDisplayMessage());
+				}
 
-			busRouteRepository.insertBusRouteFareTask(busRouteTaskInputVo);
+				// 요금정보 매핑테이블 Task 저장
+				busRouteTaskInputVo.setFareId(fareId);
+
+				busRouteRepository.insertBusRouteFareTask(busRouteTaskInputVo);
+			}
+
+			// 노선 경유정류장과 그래프 정보를 저장한다
+			this.registerBusRouteStopAndBusStopGraphTask(taskType, busRouteTaskInputVo);
+
+
 		}
 
+		if(taskType.equals(TaskType.REMOVE.getCode())) {
 
-		// 사용자 입력 경유정류장 및 그래프 정보 가져오기
-		List<BusStopGraphVo> busStopGraphVoList = this.makeBusStopGraphVoList(busRouteTaskInputVo);
-
-		/**
-		 * 노선 경유정류장 정보가 변경되었을경우 전체 경유정류장 목록을 작업정보로 저장한다
-		 */
-		boolean isSame = false;
-		List<BusRouteStopVo> busRouteStopVoList = null;
-
-		if (taskType.equals(TaskType.MODIFY.getCode())) {
-		   isSame = isTheSameAsBusRouteStopVoListOfDb(taskType, busRouteTaskInputVo.getRouteId(), busStopGraphVoList);
-		} else {
-		  isSame = false;
-		}
-
-		if (isSame == false) {
-		    busRouteStopVoList = buildBusRouteStopVoList(busRouteTaskInputVo.getRouteId(),  busStopGraphVoList);
-		}
-
-		if(!Objects.isNull(busRouteStopVoList) && busRouteStopVoList.size() > 0) {
-			for(BusRouteStopVo busRouteStopVo : busRouteStopVoList) {
+			// 현재 서비스중인 경유정류장 목록을 작업정보로 저장한다
+			List<BusStopGraphVo> busStopGraphVoList = busGraphRepository.selectBusRouteGraphList(busRouteTaskInputVo.getRouteId());
+			for(BusStopGraphVo busStopGraphVo : busStopGraphVoList) {
 				BusRouteStopTaskInputVo busRouteStopTaskInputVo = new BusRouteStopTaskInputVo();
-				BeanUtils.copyProperties(busRouteStopVo, busRouteStopTaskInputVo);
 				busRouteStopTaskInputVo.setTaskId(taskId);
+				busRouteStopTaskInputVo.setRouteId(busRouteTaskInputVo.getRouteId());
+				busRouteStopTaskInputVo.setStopSequence(busStopGraphVo.getStopSequence());
+				busRouteStopTaskInputVo.setStopId(busStopGraphVo.getStartStopId());
+				busRouteStopTaskInputVo.setNextStopId(busStopGraphVo.getEndStopId());
+				busRouteStopTaskInputVo.setUpDown(busStopGraphVo.getUpDown());
+				busRouteStopTaskInputVo.setCumulativeDistance(busStopGraphVo.getCumulativeDistance());
+				busRouteStopTaskInputVo.setGraphId(busStopGraphVo.getGraphId());
 
 				busRouteRepository.insertBusRouteStopTask(busRouteStopTaskInputVo);
 			};
-		}
 
+			// 현재 서비스중인 요금정보를 작업정보를 저장한다
+			List<Integer> busRouteFareIdList = busRouteRepository.selectBusRouteFareIdList(busRouteTaskInputVo.getRouteId());
+			for(Integer fareId : busRouteFareIdList) {
+				BusRouteTaskInputVo busRouteFareTaskInputVo = new BusRouteTaskInputVo();
+				busRouteFareTaskInputVo.setTaskId(taskId);
+				busRouteFareTaskInputVo.setRouteId(busRouteTaskInputVo.getRouteId());
+				busRouteFareTaskInputVo.setFareId(fareId);
 
-		/**
-		 * 그래프 정보가 변경되었을 경우에만 변경된 구간에 대하여 그래프 작업정보를 저장한다
-		 */
-		List<BusStopGraphVo> busStopGraphVoChangeList = this.extractChangedBusStopGraphVoList(busStopGraphVoList);
-		if(!Objects.isNull(busStopGraphVoChangeList) && busStopGraphVoChangeList.size() > 0) {
-			for(BusStopGraphVo busStopGraphVo : busStopGraphVoChangeList) {
-				BusStopGraphTaskInputVo busStopGraphTaskInputVo = new BusStopGraphTaskInputVo();
-				BeanUtils.copyProperties(busStopGraphVo, busStopGraphTaskInputVo);
-				busStopGraphTaskInputVo.setTaskId(taskId);
-
-				busGraphRepository.insertBusStopGraphTask(busStopGraphTaskInputVo);
-			};
+				busRouteRepository.insertBusRouteFareTask(busRouteFareTaskInputVo);
+			}
 
 		}
 
@@ -1136,4 +1142,282 @@ public class BusRouteService {
 		return busStopGraphVoList;
 	}
 
+	/**
+	 * 버스노선을 삭제하는 작업정보를 등록한다
+	 * @param busRouteRemoveTaskInputVo - 노선 삭제 입력정보
+	 * @throws Exception
+	 */
+	public CommonResult registerBusRouteRemoveTask(BusRouteRemoveTaskInputVo busRouteRemoveTaskInputVo) throws Exception {
+
+		int routeId = busRouteRemoveTaskInputVo.getRouteId();
+
+		// 노선ID 체크
+		if(routeId < PubTransId.ROUTE_MIN.getId() || routeId > PubTransId.ROUTE_MAX.getId()) {
+			throw new ApiException(ResultCode.NOT_MATCH.getApiErrorCode(), ResultCode.NOT_MATCH.getDisplayMessage());
+		}
+
+
+		// 기본정보 가져오기
+		BusRouteVo busRouteVo = busRouteRepository.getBusRoute(routeId);
+
+		if(Objects.isNull(busRouteVo)) {
+			throw new ApiException(ResultCode.NOT_MATCH.getApiErrorCode(), ResultCode.NOT_MATCH.getDisplayMessage());
+		}
+
+		BusRouteTaskInputVo busRouteTaskInputVo = new BusRouteTaskInputVo();
+		BeanUtils.copyProperties(busRouteVo, busRouteTaskInputVo);
+
+		busRouteTaskInputVo.setTaskComment(busRouteRemoveTaskInputVo.getTaskComment());
+		busRouteTaskInputVo.setCheckUserId(busRouteRemoveTaskInputVo.getCheckUserId());
+
+		// 운수회사 정보 가져오기
+		List<BusRouteCompanyOutputVo> busRouteCompanyOutputVo = busRouteRepository.selectBusRouteCompanyList(routeId);
+		List<BusRouteCompanyTaskInputVo> busRouteCompanyTaskInputVoList = busRouteCompanyOutputVo.stream().map(o -> {
+			BusRouteCompanyTaskInputVo busRouteCompanyTaskInputVo = new BusRouteCompanyTaskInputVo();
+			busRouteCompanyTaskInputVo.setRouteId(routeId);
+			busRouteCompanyTaskInputVo.setCompanyId(o.getCompanyId());
+			return busRouteCompanyTaskInputVo;
+		}).collect(Collectors.toList());
+
+		busRouteTaskInputVo.setCompanyList(busRouteCompanyTaskInputVoList);;
+
+		// 노선 삭제요청 Task 등록
+		CommonResult commonResult = this.registerBusRouteTask(TaskType.REMOVE.getCode(), busRouteTaskInputVo);
+		return commonResult;
+	}
+
+
+	/**
+	 * 버스노선 작업정보를 수정한다
+	 * @param busRouteTaskInputVo - 노선 작업정보
+	 * @throws Exception
+	 */
+	@Transactional
+	public void modifyBusRouteTask(BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
+
+		long taskId = busRouteTaskInputVo.getTaskId();
+
+		// Task 정보
+		TaskOutputVo taskOutputVo = taskService.getTaskInfo(taskId);
+
+		TaskInputVo taskInputVo = this.createTaskInputInfo(taskOutputVo.getTaskType(), taskOutputVo.getTaskStatus(), busRouteTaskInputVo);
+		taskInputVo.setTaskId(taskId);
+
+		/**
+		 * Task를 구성하는 전체 정보를 수정한다
+		 *
+		 * 1. Task 기본정보 수정
+		 * 2. Task 할당정보 저장
+		 */
+		int updateTaskInfoCnt = taskService.modifyTaskInfoAll(taskInputVo);
+
+
+		// 스케줄 ID 정보 가져오기
+		Integer calendarServiceId = busRouteRepository.getCalendarServiceId(busRouteTaskInputVo);
+		if(calendarServiceId == null) {
+			throw new ApiException(ResultCode.BUS_SCHEDULE_NOT_MATCH.getApiErrorCode(), ResultCode.BUS_SCHEDULE_NOT_MATCH.getDisplayMessage());
+		}
+
+		busRouteTaskInputVo.setServiceId(calendarServiceId);
+
+		// 정류장 연관 Task 데이터 업데이트
+		int updateBusRouteTaskCnt = busRouteRepository.updateBusRouteTask(busRouteTaskInputVo);
+		int updateBusRouteSubTaskCnt = busRouteRepository.updateBusRouteSubTask(busRouteTaskInputVo);
+
+
+		/**
+		 * 운수회사 정보 업데이트
+		 * 노선별 운수회사 Task 전체 삭제후 추가
+		 */
+		busRouteRepository.deleteBusRouteCompanyTask(taskId);
+
+		List<BusRouteCompanyTaskInputVo> busRouteCompanyTaskInputVoList = busRouteTaskInputVo.getCompanyList();
+		if(busRouteCompanyTaskInputVoList != null && busRouteCompanyTaskInputVoList.size() > 0) {
+			for(BusRouteCompanyTaskInputVo busRouteCompanyTaskInputVo : busRouteCompanyTaskInputVoList) {
+				busRouteCompanyTaskInputVo.setTaskId(taskId);
+				busRouteRepository.insertBusRouteCompanyTask(busRouteCompanyTaskInputVo);
+			}
+		}
+
+		/**
+		 * BIS 매핑정보 업데이트
+		 *  - BIS 매핑정보 Task 삭제후 추가
+		 */
+		busRouteRepository.deleteBusRouteMappingTask(taskId);
+		if(StringUtils.isNotEmpty(busRouteTaskInputVo.getLocalRouteId())) {
+			busRouteRepository.insertBusRouteMappingTask(busRouteTaskInputVo);
+		}
+
+		/**
+		 * 우회노선 정보 업데이트
+		 *  - 우회노선 정보 Task 삭제후 추가
+		 */
+		busRouteRepository.deleteBusRouteBypassTask(taskId);
+		if(CommonConstant.Y.equals(busRouteTaskInputVo.getBypassYn())) {
+
+			// 우회노선 유효성 검사
+			if(!this.verifyBusRouteBypass(busRouteTaskInputVo)) {
+				throw new ApiException(ResultCode.BUS_ROUTE_BYPASS_PARAMETER_ERROR.getApiErrorCode(), ResultCode.BUS_ROUTE_BYPASS_PARAMETER_ERROR.getDisplayMessage());
+			}
+
+			busRouteRepository.insertBusRouteBypassTask(busRouteTaskInputVo);
+		}
+
+		/**
+		 * 버스노선 기본요금 업데이트
+		 *  - 도시코드 또는 버스타입이 변경되었을경우 기존 Task 정보 삭제후 신규 정보를 추가한다
+		 */
+		// 버스노선 기본 작업정보
+		BusRouteTaskVo busRouteTaskVo = busRouteRepository.getBusRouteTask(taskId);
+		if(busRouteTaskVo.getCityCode() != busRouteTaskInputVo.getCityCode() || busRouteTaskVo.getBusClass() != busRouteTaskInputVo.getBusClass()) {
+			Integer fareId = busRouteRepository.getBaseFareId(busRouteTaskInputVo);
+			if(fareId == null) {
+				throw new ApiException(ResultCode.BUS_FARE_NOT_MATCH.getApiErrorCode(), ResultCode.BUS_FARE_NOT_MATCH.getDisplayMessage());
+			}
+
+			// 요금정보 매핑테이블 Task 저장
+			busRouteTaskInputVo.setFareId(fareId);
+
+			// 삭제
+			busRouteRepository.deleteBusRouteFareTask(taskId);
+
+
+			// TaskId, fareId 체크
+			if(busRouteTaskInputVo.getTaskId() <= 0 || (busRouteTaskInputVo.getFareId() == null || busRouteTaskInputVo.getFareId() <= 0)) {
+				throw new ApiException(ResultCode.SAVE_FAIL.getApiErrorCode(), ResultCode.SAVE_FAIL.getDisplayMessage());
+			}
+
+			// 노선 수정인경우 routeId 체크
+			if(TaskType.MODIFY.getCode().equals(taskOutputVo.getTaskType())) {
+				Integer tempRouteId = busRouteTaskInputVo.getRouteId();
+
+				if (tempRouteId == null || tempRouteId < PubTransId.ROUTE_MIN.getId() || tempRouteId > PubTransId.ROUTE_MAX.getId()) {
+					throw new ApiException(ResultCode.SAVE_FAIL.getApiErrorCode(), ResultCode.SAVE_FAIL.getDisplayMessage());
+				}
+			}
+
+
+			// 추가
+			busRouteRepository.insertBusRouteFareTask(busRouteTaskInputVo);
+		}
+
+		/**
+		 * 경유정류장 정보 업데이트
+		 *  - 경유정류장 작업정보가 있는경우 Task 전체 삭제 후 추가한다
+		 *
+		 */
+		busRouteRepository.deleteBusRouteStopTask(taskId);
+		busGraphRepository.deleteBusStopGraphTask(taskId);
+
+		// 노선 경유정류장과 그래프 정보를 저장한다
+		this.registerBusRouteStopAndBusStopGraphTask(taskOutputVo.getTaskType(), busRouteTaskInputVo);
+
+
+		// 저장 오류 처리
+		if(!(updateTaskInfoCnt == 1 && updateBusRouteTaskCnt == 1 && updateBusRouteSubTaskCnt == 1)) {
+			throw new ApiException(ResultCode.SAVE_FAIL.getApiErrorCode(), ResultCode.SAVE_FAIL.getDisplayMessage());
+		}
+
+	}
+
+	/**
+	 * 노선 정류장과 정류장 그래프 작업정보를 저장한다
+	 * @param taskType - 작업 등록구분
+	 * @param busRouteTaskInputVo - 노선 작업정보
+	 * @throws Exception
+	 */
+	public void registerBusRouteStopAndBusStopGraphTask(String taskType, BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
+
+		// 사용자 입력 경유정류장 및 그래프 정보 가져오기
+		List<BusStopGraphVo> busStopGraphVoList = this.makeBusStopGraphVoList(busRouteTaskInputVo);
+
+
+		/**
+		 * 노선 경유정류장 정보가 변경되었을경우 전체 경유정류장 목록을 작업정보로 저장한다
+		 */
+		boolean isSame = false;
+		List<BusRouteStopVo> busRouteStopVoList = null;
+
+		// 원본 노선별 경유정류장 목록과 사용자 입력 경유 정류장이 동일한지 확인한다
+		if (taskType.equals(TaskType.MODIFY.getCode())) {
+		   isSame = isTheSameAsBusRouteStopVoListOfDb(taskType, busRouteTaskInputVo.getRouteId(), busStopGraphVoList);
+		} else {
+		  isSame = false;
+		}
+
+		if (isSame == false) {
+		    busRouteStopVoList = buildBusRouteStopVoList(busRouteTaskInputVo.getRouteId(),  busStopGraphVoList);
+		}
+
+		if(!Objects.isNull(busRouteStopVoList) && busRouteStopVoList.size() > 0) {
+			for(BusRouteStopVo busRouteStopVo : busRouteStopVoList) {
+				BusRouteStopTaskInputVo busRouteStopTaskInputVo = new BusRouteStopTaskInputVo();
+				BeanUtils.copyProperties(busRouteStopVo, busRouteStopTaskInputVo);
+				busRouteStopTaskInputVo.setTaskId(busRouteTaskInputVo.getTaskId());
+
+				busRouteRepository.insertBusRouteStopTask(busRouteStopTaskInputVo);
+			};
+		}
+
+
+		/**
+		 * 그래프 정보가 변경되었을 경우에만 변경된 구간에 대하여 그래프 작업정보를 저장한다
+		 */
+		List<BusStopGraphVo> busStopGraphVoChangeList = this.extractChangedBusStopGraphVoList(busStopGraphVoList);
+		if(!Objects.isNull(busStopGraphVoChangeList) && busStopGraphVoChangeList.size() > 0) {
+			for(BusStopGraphVo busStopGraphVo : busStopGraphVoChangeList) {
+				BusStopGraphTaskInputVo busStopGraphTaskInputVo = new BusStopGraphTaskInputVo();
+				BeanUtils.copyProperties(busStopGraphVo, busStopGraphTaskInputVo);
+				busStopGraphTaskInputVo.setTaskId(busRouteTaskInputVo.getTaskId());
+
+				busGraphRepository.insertBusStopGraphTask(busStopGraphTaskInputVo);
+			};
+
+		}
+	}
+
+
+	/**
+	 * 우회노선 입력값의 유효성 검사를 진행한다
+	 * @param busRouteTaskInputVo - 노선 작업정보
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean verifyBusRouteBypass(BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
+
+		// 본노선 유효성 확인
+		Integer parentRouteId = busRouteTaskInputVo.getParentRouteId();
+		if (parentRouteId == null || parentRouteId < PubTransId.ROUTE_MIN.getId() || parentRouteId > PubTransId.ROUTE_MAX.getId()) {
+			return false;
+		}
+
+		// 본 노선과 우회노선의 노선ID가 동일하면 오류
+		if(parentRouteId == busRouteTaskInputVo.getRouteId()) {
+			return false;
+		}
+
+
+		// 우회 시작일 종료일 유효성 검사
+		if(StringUtils.isEmpty(busRouteTaskInputVo.getBypassStartDateTime()) || StringUtils.isEmpty(busRouteTaskInputVo.getBypassEndDateTime())) {
+			return false;
+		}
+
+		// 사용자 입력은 '분' 단위까지만 입력받으므로 '초'단위를 임의로 삽입한다
+		// 시작일에는 00초를 붙인다
+		busRouteTaskInputVo.setBypassStartDateTime(busRouteTaskInputVo.getBypassStartDateTime() + CommonConstant.FIRST_SECONDS);
+
+		// 종료일에는 59초를 붙인다
+		busRouteTaskInputVo.setBypassEndDateTime(busRouteTaskInputVo.getBypassEndDateTime() + CommonConstant.LAST_SECONDS);
+
+
+		// 입력받은 날짜형식이 포맷과 다른경우 확인
+		if(!Util.isDatePattern(CommonConstant.INPUT_DATE_TIME_PATTERN, busRouteTaskInputVo.getBypassStartDateTime())
+				|| !Util.isDatePattern(CommonConstant.INPUT_DATE_TIME_PATTERN, busRouteTaskInputVo.getBypassEndDateTime())) {
+
+			return false;
+		}
+
+
+		return true;
+	}
 }

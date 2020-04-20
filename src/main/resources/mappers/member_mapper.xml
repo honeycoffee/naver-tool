@@ -79,12 +79,12 @@
 			member.user_id = #{userId}
     </select>
 	
-	<select id="getMemberListTotalCount" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberCountOutputVo">
+	<select id="getSummarizingCountOfMemberAuthorityId" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberAuthorityIdCountSummaryVo">
 		SELECT
-			count(*) as total_list_count
-			, SUM(if(auth.authority_id='ROLE_ADMIN', 1, 0)) as total_admin_count
-			, SUM(if(auth.authority_id='ROLE_USER', 1, 0)) as total_user_count
-			, SUM(if(auth.authority_id='ROLE_ANONYMOUS', 1, 0)) as total_anonymous_count
+			count(*) as total_role_count
+			, SUM(if(auth.authority_id='ROLE_ADMIN', 1, 0)) as total_admin_role_count
+			, SUM(if(auth.authority_id='ROLE_USER', 1, 0)) as total_user_role_count
+			, SUM(if(auth.authority_id='ROLE_UNAUTHORIZED', 1, 0)) as total_unauthorized_role_count
 		FROM
 			tb_z_svc_member `member`
 			, tb_z_svc_member_authority `auth`
@@ -130,15 +130,15 @@
 							member.reg_date ${sortType}
 						</when>
 						<when test="sortKey.equals('authority_id')">
-							FIELD(auth.authority_id, 'ROLE_ADMIN', 'ROLE_USER') ${sortType}
+							FIELD(auth.authority_id, 'ROLE_UNAUTHORIZED', 'ROLE_USER', 'ROLE_ADMIN') ${sortType}
 						</when>
 						<otherwise>
-							FIELD(auth.authority_id, 'ROLE_ADMIN', 'ROLE_USER') asc, member.reg_date asc
+							FIELD(auth.authority_id, 'ROLE_UNAUTHORIZED', 'ROLE_USER', 'ROLE_ADMIN') desc, member.reg_date desc
 						</otherwise>
 					</choose>
 				</when>
 				<otherwise>
-					FIELD(auth.authority_id, 'ROLE_ADMIN', 'ROLE_USER') asc, member.reg_date asc 
+					FIELD(auth.authority_id, 'ROLE_UNAUTHORIZED', 'ROLE_USER', 'ROLE_ADMIN') desc, member.reg_date desc 
 				</otherwise>
 			</choose>
 
@@ -146,8 +146,8 @@
 			#{startPageLimit}, #{endPageLimit}
 	</select>
 
-
 	<sql id="whereMemberList">
+		AND member.delete_yn = 'N'
 
 		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(userName)">
 			AND member.user_name LIKE CONCAT(#{userName}, '%')
@@ -166,7 +166,7 @@
 			(#{userId}, #{authorityId})
 	</insert>
     
-	<update id="updateMemberAuthority" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberInputVo">
+	<update id="updateMemberAuthority" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberUpdateVo">
 		UPDATE
 			tb_z_svc_member_authority
 		SET
@@ -186,6 +186,33 @@
 			auth.authority_id = info.authority_id
 		AND
 			auth.user_id = #{userId}
+	</select>
+	
+	<delete id="deleteMemberRefreshTokenInfo" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo">
+		DELETE FROM
+			tb_z_svc_member_token_info
+		WHERE
+			user_id = #{userId}
+	</delete>
+
+	<select id="selectAdminMemberList" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo" resultType="com.naver.pubtrans.itn.api.vo.member.output.MemberOutputVo">
+		SELECT
+			member.user_id
+			, member.user_name
+			, member.company
+		FROM
+			tb_z_svc_member `member`
+			, tb_z_svc_member_authority `auth`
+		WHERE
+			member.user_id = auth.user_id
+		AND 
+			auth.authority_id = #{authorityId}
+		AND
+			delete_yn = 'N'
+
+		<if test="@org.apache.commons.lang3.StringUtils@isNotEmpty(userName)">
+			AND member.user_name LIKE CONCAT(#{userName}, '%')
+		</if>
 	</select>
 
 </mapper>

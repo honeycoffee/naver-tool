@@ -23,27 +23,19 @@ public interface AuthenticationRepository {
 	void insertMemberLoginLog(AuthenticationInputVo authenticationInputVo) throws DataAccessException;
 
 	/**
-	 * 회원 토큰 정보를 등록한다.
+	 * 회원 Refresh Token 정보를 등록한다.
 	 * @param authenticationInputVo - 인증 입력 값
 	 * @return
 	 * @throws DataAccessException
 	 */
-	void insertMemberTokenInfo(AuthenticationInputVo authenticationInputVo) throws DataAccessException;
+	void insertMemberRefreshTokenInfo(AuthenticationInputVo authenticationInputVo) throws DataAccessException;
 
 	/**
-	 * 회원 토큰 정보를 가져온다.
+	 * 회원 Refresh Token 정보를 가져온다.
 	 * @param authenticationInputVo - 인증 입력 값
 	 * @return
 	 * @throws DataAccessException
 	 */
-	AuthenticationOutputVo getMemberTokenInfo(AuthenticationInputVo authenticationInputVo) throws DataAccessException;
-
-	/**
-	 * 회원 토큰 정보를 삭제한다.
-	 * @param authenticationInputVo - 인증 입력 값
-	 * @return
-	 * @throws DataAccessException
-	 */
-	void deleteMemberTokenInfo(AuthenticationInputVo authenticationInputVo) throws DataAccessException;
+	AuthenticationOutputVo getMemberRefreshTokenInfo(AuthenticationInputVo authenticationInputVo) throws DataAccessException;
 
 }

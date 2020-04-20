@@ -250,7 +250,18 @@
 	</select>
 
 	<select id="getBaseFareId" resultType="int" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo">
-		SELECT fare_id FROM tb_fare_rule WHERE city_code = #{cityCode} AND bus_class = #{busClass} AND base_yn = 'Y'
+		SELECT
+		    rule.fare_id
+		FROM
+		    tb_fare_rule rule, tb_fare_rule_info sub
+		WHERE
+		    rule.city_code = #{cityCode} AND rule.bus_class = #{busClass}
+		    AND rule.fare_id = sub.fare_id
+		    AND sub.base_yn = 'Y' AND sub.age_id = 1 AND sub.payment_id = 1
+	</select>
+
+	<select id="selectBusRouteFareIdList" resultType="int" parameterType="int">
+		SELECT fare_id FROM tb_route_fare_mapping WHERE route_id = #{routeId}
 	</select>
 
 	<insert id="insertBusRouteTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo">
@@ -297,7 +308,7 @@
 		INSERT INTO tb_bus_route_bypass_mapping_task
 			(task_id, bypass_route_id, parent_route_id, bypass_start_date, bypass_end_date)
 		VALUES
-			(#{taskId}, #{bypassRouteId}, #{parentRouteId}, #{bypassStartDateTime}, #{bypassEndDateTime})
+			(#{taskId}, #{routeId}, #{parentRouteId}, #{bypassStartDateTime}, #{bypassEndDateTime})
 	</insert>
 
 	<insert id="insertBusRouteFareTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo">
@@ -313,5 +324,90 @@
 		VALUES
 			(#{taskId}, #{routeId}, #{stopSequence}, #{stopId}, #{nextStopId}, #{upDown}, #{cumulativeDistance}, #{graphId})
 	</insert>
+
+	<update id="updateBusRouteTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo">
+		UPDATE
+			tb_routes_task
+		SET
+			route_name = #{routeName}
+			, city_code = #{cityCode}
+		WHERE
+			task_id = #{taskId}
+	</update>
+
+	<update id="updateBusRouteSubTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.route.input.BusRouteTaskInputVo">
+		UPDATE
+			tb_bus_routes_info_task
+		SET
+			 bus_class = #{busClass}
+			, bus_additional_name = #{busAdditionalName}
+			, start_point_name = #{startPointName}
+			, end_point_name = #{endPointName}
+			, turning_point_sequence = #{turningPointSequence}
+			, weekday_start_point_first_time = #{weekdayStartPointFirstTime}
+			, weekday_start_point_last_time = #{weekdayStartPointLastTime}
+			, weekday_end_point_first_time = #{weekdayEndPointFirstTime}
+			, weekday_end_point_last_time = #{weekdayEndPointLastTime}
+			, weekday_interval_min = #{weekdayIntervalMin}
+			, weekday_interval_max = #{weekdayIntervalMax}
+			, weekday_interval_count = #{weekdayIntervalCount}
+			, saturday_start_point_first_time = #{saturdayStartPointFirstTime}
+			, saturday_start_point_last_time = #{saturdayStartPointLastTime}
+			, saturday_end_point_first_time = #{saturdayEndPointFirstTime}
+			, saturday_end_point_last_time = #{saturdayEndPointLastTime}
+			, saturday_interval_min = #{saturdayIntervalMin}
+			, saturday_interval_max = #{saturdayIntervalMax}
+			, saturday_interval_count = #{saturdayIntervalCount}
+			, sunday_start_point_first_time = #{sundayStartPointFirstTime}
+			, sunday_start_point_last_time = #{sundayStartPointLastTime}
+			, sunday_end_point_first_time = #{sundayEndPointFirstTime}
+			, sunday_end_point_last_time = #{sundayEndPointLastTime}
+			, sunday_interval_min = #{sundayIntervalMin}
+			, sunday_interval_max =  #{sundayIntervalMax}
+			, sunday_interval_count = #{sundayIntervalCount}
+			, nonstep_bus_yn = #{nonstepBusYn}
+			, tel_reservation = #{telReservation}
+			, provider_id = #{providerId}
+			, service_id = #{serviceId}
+			, bypass_yn = #{bypassYn}
+		WHERE
+			task_id = #{taskId}
+	</update>
+
+	<delete id="deleteBusRouteMappingTask" parameterType="long">
+		DELETE FROM
+			tb_bus_route_mapping_task
+		WHERE
+			task_id = #{taskId}
+	</delete>
+
+	<delete id="deleteBusRouteBypassTask" parameterType="long">
+		DELETE FROM
+			tb_bus_route_bypass_mapping_task
+		WHERE
+			task_id = #{taskId}
+	</delete>
+
+	<delete id="deleteBusRouteFareTask" parameterType="long">
+		DELETE FROM
+			tb_route_fare_mapping_task
+		WHERE
+			task_id = #{taskId}
+	</delete>
+
+	<delete id="deleteBusRouteCompanyTask" parameterType="long">
+		DELETE FROM
+			tb_bus_company_mapping_task
+		WHERE
+			task_id = #{taskId}
+	</delete>
+
+	<delete id="deleteBusRouteStopTask" parameterType="long">
+		DELETE FROM
+			tb_route_stops_task
+		WHERE
+			task_id = #{taskId}
+	</delete>
+
 
 </mapper>

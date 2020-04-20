@@ -42,12 +42,6 @@ public class BusStopVo {
 	 */
 	private String cityName;
 
-
-	/**
-	 * 정류장 유형
-	 */
-	private Integer transportId;
-
 	/**
 	 * 정류장 위치 구분
 	 */

@@ -262,8 +262,11 @@ public class BusStopService {
 	 */
 	private List<CommonSchema> selectBusStopSchema() throws Exception {
 
+		ArrayList<String> ignoreColumnNameList = new ArrayList<>();
+		ignoreColumnNameList.add("transport_id");
+
 		// 검색 폼 데이터 구조
-		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_STOPS.getName(), null, null);
+		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_STOPS.getName(), CommonConstant.IGNORE_COLUMN, ignoreColumnNameList);
 
 		return commonSchemaList;
 	}

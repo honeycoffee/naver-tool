@@ -10,9 +10,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class FareTaskVo extends FareVo {
+public class FareTaskVo extends FareVo{
 
 	// 작업ID
 	private long taskId;
-
+	
 }
