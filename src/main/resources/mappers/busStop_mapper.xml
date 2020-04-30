@@ -155,9 +155,9 @@
 
 	<insert id="insertBusStopTask" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopTaskInputVo">
 		INSERT INTO tb_stops_task
-			(task_id, stop_id, stop_name, transport_id, x, y, level, nonstop_yn, city_code)
+			(task_id, stop_id, stop_name, transport_id, x, y, coordinates, level, nonstop_yn, city_code)
 		VALUES
-			(#{taskId}, #{stopId}, #{stopName}, 1, #{longitude}, #{latitude}, #{level}, #{nonstopYn}, #{cityCode})
+			(#{taskId}, #{stopId}, #{stopName}, 1, #{longitude}, #{latitude}, ST_GeomFromText(concat('point(',cast(#{longitude} as char),' ',cast(#{latitude} as char),')')), #{level}, #{nonstopYn}, #{cityCode})
 	</insert>
 
 
@@ -184,6 +184,7 @@
 			stop_name = #{stopName}
 			, x = #{longitude}
 			, y = #{latitude}
+			, coordinates = ST_GeomFromText(concat('point(',cast(#{longitude} as char),' ',cast(#{latitude} as char),')'))
 			, level = #{level}
 			, nonstop_yn = #{nonstopYn}
 			, city_code = #{cityCode}
@@ -230,6 +231,26 @@
 			tb_bus_stop_mapping
 		WHERE
 			local_stop_id = #{localStopId} AND provider_id = #{providerId}
+	</select>
+
+
+	<select id="selectBusStopListFromMapBounds" parameterType="com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopSearchVo" resultType="com.naver.pubtrans.itn.api.vo.bus.stop.output.BusStopListOutputVo">
+		SELECT
+			stop.stop_id
+			, stop.stop_name
+			, stop.x as longitude
+			, stop.y as latitude
+			, stop.city_code
+			, city.city_name
+		FROM
+			tb_stops stop, tb_city_code city
+		WHERE
+			stop.city_code = city.city_code
+			AND MBRContains(
+	            	LineString(
+	            		Point(#{rightTopCoordinates[0]}, #{rightTopCoordinates[1]})
+	            		, Point(#{leftBottomCoordinates[0]}, #{leftBottomCoordinates[1]})
+	            	), coordinates)
 	</select>
 
 </mapper>

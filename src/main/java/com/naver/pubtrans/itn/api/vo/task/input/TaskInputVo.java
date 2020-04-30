@@ -4,6 +4,12 @@ package com.naver.pubtrans.itn.api.vo.task.input;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.naver.pubtrans.itn.api.consts.PubTransType;
+import com.naver.pubtrans.itn.api.consts.TaskCheckRequestType;
+import com.naver.pubtrans.itn.api.consts.TaskDataSourceType;
+import com.naver.pubtrans.itn.api.consts.TaskStatusType;
+import com.naver.pubtrans.itn.api.consts.TaskType;
+
 /**
  * 작업 입력 정보
  * @author adtec10
@@ -16,32 +22,38 @@ public class TaskInputVo {
 	// Task ID
 	private long taskId;
 
+	// 도시코드
+	private int cityCode;
+
 	// BIS 지자체 ID
 	private Integer providerId;
 
 	// 작업구분
-	private String taskType;
+	private TaskType taskType;
 
 	// 진행상태
-	private String taskStatus;
+	private TaskStatusType taskStatusType;
+
+	// 검수요청 구분
+	private TaskCheckRequestType taskCheckRequestType = TaskCheckRequestType.CHECK_REQUEST;
+
+	// 데이터 출처
+	private TaskDataSourceType taskDataSourceType = TaskDataSourceType.ETC;
 
 	// 대중교통 ID
 	private int pubTransId;
 
 	// 데이터 구분
-	private String taskDataType;
+	private PubTransType pubTransType;
 
 	// 데이터 이름
-	private String taskDataName;
+	private String pubTransName;
 
 	// 작업내용
 	private String taskComment;
 
 	// BIS 자동 변경내용
 	private String bisAutoChangeData;
-
-	// 등록부분
-	private String taskRegisterType;
 
 	//등록자명
 	private String regUserName;
@@ -60,6 +72,5 @@ public class TaskInputVo {
 
 	// 검수자 ID
 	private String checkUserId;
-
 
 }

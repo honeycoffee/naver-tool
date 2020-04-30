@@ -12,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -22,8 +23,8 @@ import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.PubTransTable;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.consts.TaskAssignType;
-import com.naver.pubtrans.itn.api.consts.TaskDataType;
-import com.naver.pubtrans.itn.api.consts.TaskStatus;
+import com.naver.pubtrans.itn.api.consts.PubTransType;
+import com.naver.pubtrans.itn.api.consts.TaskStatusType;
 import com.naver.pubtrans.itn.api.consts.TaskType;
 import com.naver.pubtrans.itn.api.exception.ApiException;
 import com.naver.pubtrans.itn.api.repository.BusStopRepository;
@@ -140,7 +141,7 @@ public class BusStopService {
 	 */
 	public CommonResult getBusStopTaskSummaryList(int busStopId, SearchVo searchVo) throws Exception {
 
-		CommonResult commonResult = taskService.getTaskSummaryList(busStopId, TaskDataType.STOP.getCode(), searchVo);
+		CommonResult commonResult = taskService.getTaskSummaryList(busStopId, PubTransType.STOP, searchVo);
 		return commonResult;
 	}
 
@@ -262,11 +263,12 @@ public class BusStopService {
 	 */
 	private List<CommonSchema> selectBusStopSchema() throws Exception {
 
-		ArrayList<String> ignoreColumnNameList = new ArrayList<>();
-		ignoreColumnNameList.add("transport_id");
+		ArrayList<String> exceptionColumnNameList = new ArrayList<>();
+		exceptionColumnNameList.add("transport_id");
+		exceptionColumnNameList.add("coordinates");
 
 		// 검색 폼 데이터 구조
-		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_STOPS.getName(), CommonConstant.IGNORE_COLUMN, ignoreColumnNameList);
+		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_STOPS.getName(), CommonConstant.EXCEPTION_COLUMN, exceptionColumnNameList);
 
 		return commonSchemaList;
 	}
@@ -280,11 +282,11 @@ public class BusStopService {
 	private List<CommonSchema> selectBusStopInfoSchema() throws Exception {
 
 
-		ArrayList<String> ignoreColumnNameList = new ArrayList<>();
-		ignoreColumnNameList.add("alias_kor");
-		ignoreColumnNameList.add("mscode");
+		ArrayList<String> exceptionColumnNameList = new ArrayList<>();
+		exceptionColumnNameList.add("alias_kor");
+		exceptionColumnNameList.add("mscode");
 
-		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_BUS_STOPS_INFO.getName(), CommonConstant.IGNORE_COLUMN, ignoreColumnNameList);
+		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_BUS_STOPS_INFO.getName(), CommonConstant.EXCEPTION_COLUMN, exceptionColumnNameList);
 
 		return commonSchemaList;
 	}
@@ -334,11 +336,11 @@ public class BusStopService {
 	 * @throws Exception
 	 */
 	@Transactional
-	public CommonResult registerBusStopTask(String taskType, BusStopTaskInputVo busStopTaskInputVo) throws Exception {
+	public CommonResult registerBusStopTask(TaskType taskType, BusStopTaskInputVo busStopTaskInputVo) throws Exception {
 
 
 		// 정류장 신규등록
-		if(taskType.equals(TaskType.REGISTER.getCode())) {
+		if(taskType.equals(TaskType.REGISTER)) {
 
 			/**
 			 * 정류장 임시 ID 설정
@@ -355,24 +357,25 @@ public class BusStopService {
 		TaskInputVo taskInputVo = new TaskInputVo();
 		taskInputVo.setTaskType(taskType);
 		taskInputVo.setPubTransId(busStopTaskInputVo.getStopId());
-
+		taskInputVo.setCityCode(busStopTaskInputVo.getCityCode());
 		taskInputVo.setProviderId(busStopTaskInputVo.getProviderId());
-		taskInputVo.setTaskStatus(TaskStatus.PROGRESS.getCode());
-		taskInputVo.setTaskDataType(TaskDataType.STOP.getCode());
-		taskInputVo.setTaskDataName(busStopTaskInputVo.getStopName());
+		taskInputVo.setTaskStatusType(TaskStatusType.CHECKING);
+		taskInputVo.setPubTransType(PubTransType.STOP);
+		taskInputVo.setPubTransName(busStopTaskInputVo.getStopName());
 		taskInputVo.setTaskComment(busStopTaskInputVo.getTaskComment());
-		taskInputVo.setTaskRegisterType(CommonConstant.MANUAL);
 		taskInputVo.setCheckUserId(busStopTaskInputVo.getCheckUserId());
+		taskInputVo.setTaskCheckRequestType(busStopTaskInputVo.getTaskCheckRequestType());
+		taskInputVo.setTaskDataSourceType(busStopTaskInputVo.getTaskDataSourceType());
 
 		/*
 		 * 등록자, 작업자 정보
 		 * 작업 등록시  등록자,작업자는 본인 자신이다.
 		 */
-		taskService.addTaskMemberInfo(TaskAssignType.REGISTER.getCode(), taskInputVo);
-		taskService.addTaskMemberInfo(TaskAssignType.WORK.getCode(), taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.REGISTER, taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.WORK, taskInputVo);
 
 		// 검수자 정보
-		taskService.addTaskMemberInfo(TaskAssignType.CHECK.getCode(), taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.CHECK, taskInputVo);
 
 
 
@@ -419,16 +422,19 @@ public class BusStopService {
 		TaskInputVo taskInputVo = new TaskInputVo();
 		taskInputVo.setTaskId(busStopTaskInputVo.getTaskId());
 		taskInputVo.setProviderId(busStopTaskInputVo.getProviderId());
-		taskInputVo.setTaskStatus(TaskStatus.PROGRESS.getCode());
-		taskInputVo.setTaskDataName(busStopTaskInputVo.getStopName());
+		taskInputVo.setTaskStatusType(TaskStatusType.CHECKING);
+		taskInputVo.setPubTransName(busStopTaskInputVo.getStopName());
 		taskInputVo.setTaskComment(busStopTaskInputVo.getTaskComment());
 		taskInputVo.setCheckUserId(busStopTaskInputVo.getCheckUserId());
+		taskInputVo.setTaskCheckRequestType(busStopTaskInputVo.getTaskCheckRequestType());
+		taskInputVo.setTaskDataSourceType(busStopTaskInputVo.getTaskDataSourceType());
+		taskInputVo.setCityCode(busStopTaskInputVo.getCityCode());
 
 		// 등록자 정보
-		taskService.addTaskMemberInfo(TaskAssignType.REGISTER.getCode(), taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.REGISTER, taskInputVo);
 
 		// 검수자 정보
-		taskService.addTaskMemberInfo(TaskAssignType.CHECK.getCode(), taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.CHECK, taskInputVo);
 
 
 		/**
@@ -486,13 +492,52 @@ public class BusStopService {
 		BusStopTaskInputVo busStopTaskInputVo = new BusStopTaskInputVo();
 		BeanUtils.copyProperties(busStopVo, busStopTaskInputVo);
 
+		busStopTaskInputVo.setTaskCheckRequestType(busStopRemoveTaskInputVo.getTaskCheckRequestType());
+		busStopTaskInputVo.setTaskDataSourceType(busStopRemoveTaskInputVo.getTaskDataSourceType());
 		busStopTaskInputVo.setTaskComment(busStopRemoveTaskInputVo.getTaskComment());
 		busStopTaskInputVo.setCheckUserId(busStopRemoveTaskInputVo.getCheckUserId());
 
 
 		// 정류장 삭제요청 Task 등록
-		return this.registerBusStopTask(TaskType.REMOVE.getCode(), busStopTaskInputVo);
+		return this.registerBusStopTask(TaskType.REMOVE, busStopTaskInputVo);
 
+	}
+
+
+	/**
+	 * 지도 영역에 속하는 버스정류장 목록을 가져온다
+	 * @param busStopSearchVo - 검색조건
+	 * @return
+	 * @throws Exception
+	 */
+	public CommonResult getBusStopListFromMapBounds(BusStopSearchVo busStopSearchVo) throws Exception {
+
+		// 파라미터 체크
+		if(Objects.isNull(busStopSearchVo)) {
+			throw new MissingServletRequestParameterException(String.valueOf(ResultCode.PARAMETER_ERROR.getApiErrorCode()),
+				ResultCode.PARAMETER_ERROR.getDisplayMessage());
+		}
+
+		List<Double> rightTopCoordinates = busStopSearchVo.getRightTopCoordinates();
+		List<Double> leftBottomCoordinates = busStopSearchVo.getLeftBottomCoordinates();
+
+		if(Objects.isNull(rightTopCoordinates) || Objects.isNull(leftBottomCoordinates)) {
+			throw new MissingServletRequestParameterException(String.valueOf(ResultCode.PARAMETER_ERROR.getApiErrorCode()),
+				ResultCode.PARAMETER_ERROR.getDisplayMessage());
+		}
+
+		if(rightTopCoordinates.size() != CommonConstant.MAP_BOUNDS_SEARCH_COORDINATES_LENGTH
+			|| leftBottomCoordinates.size() != CommonConstant.MAP_BOUNDS_SEARCH_COORDINATES_LENGTH) {
+			throw new ApiException(ResultCode.PARAMETER_RULE_ERROR.getApiErrorCode(), ResultCode.PARAMETER_RULE_ERROR.getDisplayMessage());
+		}
+
+
+		// 목록 조회
+		List<BusStopListOutputVo> busStopListOutputVoList = busStopRepository.selectBusStopListFromMapBounds(busStopSearchVo);
+
+		// 출력포맷 생성
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(busStopListOutputVoList);
+		return commonResult;
 	}
 
 }

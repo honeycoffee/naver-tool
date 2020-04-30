@@ -298,15 +298,15 @@ public class OutputFmtUtil {
 	}
 
 	/**
-	 * 제외하고자 하는 컬럼 목록을 이용하여 데이터 구조 컬럼 목록을 재정의한다.
+	 * 예외처리 하고자 하는 컬럼 목록을 이용하여 데이터 구조 컬럼 목록을 재정의한다.
 	 * @param schemaVoList - 데이터 구조 컬럼 목록
-	 * @param ignoreColumnNameList - 제외하고자 하는 컬럼 목록
+	 * @param exceptionColumnNameList - 예외처리 하고자 하는 컬럼 목록
 	 * @return
 	 */
-	public List<SchemaVo> refineSchemaVoWithIgnoreColumns(List<SchemaVo> schemaVoList, ArrayList<String> ignoreColumnNameList) {
+	public List<SchemaVo> refineSchemaVoWithExceptionColumns(List<SchemaVo> schemaVoList, ArrayList<String> exceptionColumnNameList) {
 
 		List<SchemaVo> refinedSchemaVoList = new ArrayList<>();
-		schemaVoList.stream().filter(o -> !ignoreColumnNameList.contains(o.getColumnName())).forEach(o -> {
+		schemaVoList.stream().filter(o -> !exceptionColumnNameList.contains(o.getColumnName())).forEach(o -> {
 			refinedSchemaVoList.add(o);
 		});
 

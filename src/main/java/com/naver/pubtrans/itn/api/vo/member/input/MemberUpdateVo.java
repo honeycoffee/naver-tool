@@ -1,5 +1,7 @@
 package com.naver.pubtrans.itn.api.vo.member.input;
 
+import java.util.List;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
@@ -30,5 +32,30 @@ public class MemberUpdateVo {
 	@NotEmpty
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String authorityId;
+
+	/**
+	 * 대중교통 구분
+	 */
+	private String pubTransType;
+
+	/**
+	 * 도시코드
+	 */
+	private List<Integer> cityCodes;
+	
+	/**
+	 * 할당 타입
+	 */
+	private String taskAssignType;
+	
+	/**
+	 * 등록자 ID
+	 */
+	private String regUserId;
+	
+	/**
+	 * 등록자 이름
+	 */
+	private String regUserName;
 
 }

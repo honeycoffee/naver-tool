@@ -1,6 +1,6 @@
 plugins {
 	id 'org.springframework.boot' version '2.2.4.RELEASE'
-	id "org.asciidoctor.convert" version "1.5.9.2"
+	id "org.asciidoctor.convert" version "1.5.10"
 }
 
 
@@ -73,6 +73,10 @@ dependencies {
 
 }
 
+
+test {
+    useJUnitPlatform()
+}
 
 tasks.withType(Test) {
 	systemProperty "file.encoding", "UTF-8"

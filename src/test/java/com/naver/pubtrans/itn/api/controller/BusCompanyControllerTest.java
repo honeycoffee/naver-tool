@@ -29,8 +29,10 @@ import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.ApiUtils;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
-import com.naver.pubtrans.itn.api.consts.TaskDataType;
-import com.naver.pubtrans.itn.api.consts.TaskStatus;
+import com.naver.pubtrans.itn.api.consts.TaskCheckRequestType;
+import com.naver.pubtrans.itn.api.consts.TaskDataSourceType;
+import com.naver.pubtrans.itn.api.consts.PubTransType;
+import com.naver.pubtrans.itn.api.consts.TaskStatusType;
 import com.naver.pubtrans.itn.api.repository.BusCompanyRepository;
 import com.naver.pubtrans.itn.api.service.TaskService;
 import com.naver.pubtrans.itn.api.vo.bus.company.input.BusCompanyRemoveTaskInputVo;
@@ -254,6 +256,9 @@ public class BusCompanyControllerTest {
 		busCompanyTaskInputVo.setComment("테스트 등록");
 		busCompanyTaskInputVo.setTaskComment("운수사 등록");
 		busCompanyTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busCompanyTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busCompanyTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
+
 
 		MvcResult mvcResult = mockMvc.perform(post("/v1/ntool/api/busCompanyTask/addTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -315,6 +320,8 @@ public class BusCompanyControllerTest {
 		busCompanyTaskInputVo.setComment("테스트 등록");
 		busCompanyTaskInputVo.setTaskComment("운수사 등록");
 		busCompanyTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busCompanyTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busCompanyTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		mockMvc.perform(post("/v1/ntool/api/busCompanyTask/editTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -347,6 +354,8 @@ public class BusCompanyControllerTest {
 		busCompanyTaskInputVo.setComment("테스트 등록");
 		busCompanyTaskInputVo.setTaskComment("운수사 등록");
 		busCompanyTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busCompanyTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busCompanyTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 
 		mockMvc.perform(put("/v1/ntool/api/modify/busCompanyTask")
@@ -379,7 +388,9 @@ public class BusCompanyControllerTest {
 		busCompanyTaskInputVo.setComment("테스트 등록");
 		busCompanyTaskInputVo.setTaskComment("운수사 등록");
 		busCompanyTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
-		
+		busCompanyTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busCompanyTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
+
 		mockMvc.perform(put("/v1/ntool/api/modify/busCompanyTask")
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
             .content(objectMapper.writeValueAsString(busCompanyTaskInputVo))
@@ -400,6 +411,8 @@ public class BusCompanyControllerTest {
 		busCompanyRemoveInputVo.setCompanyId(1);
 		busCompanyRemoveInputVo.setTaskComment("테스트 삭제 처리");
 		busCompanyRemoveInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busCompanyRemoveInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busCompanyRemoveInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		mockMvc.perform(post("/v1/ntool/api/busCompanyTask/removeTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -422,6 +435,8 @@ public class BusCompanyControllerTest {
 		busCompanyRemoveInputVo.setCompanyId(-1);
 		busCompanyRemoveInputVo.setTaskComment("테스트 삭제 처리");
 		busCompanyRemoveInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busCompanyRemoveInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busCompanyRemoveInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		mockMvc.perform(post("/v1/ntool/api/busCompanyTask/removeTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))

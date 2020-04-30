@@ -42,7 +42,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
+import com.naver.pubtrans.itn.api.consts.CodeType;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
+import com.naver.pubtrans.itn.api.consts.PubTransType;
+import com.naver.pubtrans.itn.api.consts.TaskCheckRequestType;
+import com.naver.pubtrans.itn.api.consts.TaskDataSourceType;
+import com.naver.pubtrans.itn.api.consts.TaskStatusType;
+import com.naver.pubtrans.itn.api.consts.TaskType;
 import com.naver.pubtrans.itn.api.controller.BusStopController;
 import com.naver.pubtrans.itn.api.handler.MemberAccessDeniedHandler;
 import com.naver.pubtrans.itn.api.service.BusStopService;
@@ -379,13 +385,13 @@ public class BusStopControllerDocumentTest {
 		taskOutputVo.setTaskId(1);
 		taskOutputVo.setProviderId(4);
 		taskOutputVo.setProviderName("서울");
-		taskOutputVo.setTaskType("modify");
-		taskOutputVo.setTaskStatus("01");
+		taskOutputVo.setTaskType(TaskType.MODIFY);
+		taskOutputVo.setTaskStatusType(TaskStatusType.PROGRESS);
 		taskOutputVo.setPubTransId(1);
-		taskOutputVo.setTaskDataType("stop");
-		taskOutputVo.setTaskDataName("세종문화회관");
+		taskOutputVo.setPubTransType(PubTransType.STOP);
+		taskOutputVo.setPubTransName("세종문화회관");
 		taskOutputVo.setTaskComment("정류장 이름변경");
-		taskOutputVo.setTaskRegisterType("M");
+		taskOutputVo.setAutoRegisterYn("N");
 		taskOutputVo.setRegUserName("안경현");
 		taskOutputVo.setRegUserId("kr94666");
 		taskOutputVo.setRegDate("2020-03-06 13:45:49");
@@ -393,6 +399,8 @@ public class BusStopControllerDocumentTest {
 		taskOutputVo.setWorkUserId("kr94666");
 		taskOutputVo.setWorkAssignDate("2020-03-06 13:45:14");
 		taskOutputVo.setWorkCompleteDate("2020-03-06 13:45:29");
+		taskOutputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		taskOutputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 
 
@@ -486,14 +494,16 @@ public class BusStopControllerDocumentTest {
 	             		fieldWithPath("result.data.taskInfo.taskId").type(NUMBER_OR_NULL).description("작업ID (작업정보 존재시)"),
 	             		fieldWithPath("result.data.taskInfo.providerId").type(JsonFieldType.NUMBER).description("BIS 지역코드"),
 	             		fieldWithPath("result.data.taskInfo.providerName").type(STRING_OR_NULL).description("BIS 지역명"),
-	             		fieldWithPath("result.data.taskInfo.taskType").type(STRING_OR_NULL).description("작업구분(register:등록, modify:수정, remove:삭제)"),
-	             		fieldWithPath("result.data.taskInfo.taskStatus").type(STRING_OR_NULL).description("작업 진행상태(00:대기, 01:진행, 02:완료, 03:예외)"),
+	             		fieldWithPath("result.data.taskInfo.taskType").type(JsonFieldType.STRING).description(CodeType.TASK_TYPE.getCodeDescription() + TaskType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data.taskInfo.taskStatusType").type(JsonFieldType.STRING).description(CodeType.TASK_STATUS_TYPE.getCodeDescription() + TaskStatusType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data.taskInfo.pubTransType").type(JsonFieldType.STRING).description(CodeType.PUB_TRANS_TYPE.getCodeDescription() + PubTransType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data.taskInfo.taskCheckRequestType").type(JsonFieldType.STRING).description(CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
+	             		fieldWithPath("result.data.taskInfo.taskDataSourceType").type(JsonFieldType.NUMBER).description(CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
 	             		fieldWithPath("result.data.taskInfo.pubTransId").type(JsonFieldType.NUMBER).description("대중교통 ID"),
-	             		fieldWithPath("result.data.taskInfo.taskDataType").type(STRING_OR_NULL).description("데이터 종류(stop:정류장, route:노선, company:운수사)"),
-	             		fieldWithPath("result.data.taskInfo.taskDataName").type(STRING_OR_NULL).description("데이터 이름"),
+	             		fieldWithPath("result.data.taskInfo.pubTransName").type(STRING_OR_NULL).description("데이터 이름"),
 	             		fieldWithPath("result.data.taskInfo.taskComment").type(STRING_OR_NULL).description("작업내용"),
 	             		fieldWithPath("result.data.taskInfo.bisChangeDataInfo").type(OBJECT_OR_NULL).description("BIS 자동등록 변경내용 - Null이 아닌경우 변경된 데이터 컬럼 정보만 하위 요소로 표출"),
-	             		fieldWithPath("result.data.taskInfo.taskRegisterType").type(STRING_OR_NULL).description("작업 등록구분(A:자동, M:수동)"),
+	             		fieldWithPath("result.data.taskInfo.autoRegisterYn").type(JsonFieldType.STRING).description("자동 등록여부(Y/N)"),
 	             		fieldWithPath("result.data.taskInfo.regUserName").type(STRING_OR_NULL).description("등록자명"),
 	             		fieldWithPath("result.data.taskInfo.regUserId").type(STRING_OR_NULL).description("등록자ID"),
 	             		fieldWithPath("result.data.taskInfo.regDate").type(STRING_OR_NULL).description("등록일"),
@@ -532,18 +542,18 @@ public class BusStopControllerDocumentTest {
 
 		TaskSummaryOutputVo taskSummaryOuputVo1 = new TaskSummaryOutputVo();
 		taskSummaryOuputVo1.setTaskId(1);
-		taskSummaryOuputVo1.setTaskType("modify");
-		taskSummaryOuputVo1.setTaskStatus("01");
-		taskSummaryOuputVo1.setTaskDataType("stop");
+		taskSummaryOuputVo1.setTaskType(TaskType.MODIFY);
+		taskSummaryOuputVo1.setTaskStatusType(TaskStatusType.PROGRESS);
+		taskSummaryOuputVo1.setPubTransType(PubTransType.STOP);
 		taskSummaryOuputVo1.setTaskComment("정류장 이름변경");
 		taskSummaryOuputVo1.setRegDate("2020-03-06");
 		taskSummaryOuputVo1.setWorkUserName("안경현");
 
 		TaskSummaryOutputVo taskSummaryOuputVo2 = new TaskSummaryOutputVo();
 		taskSummaryOuputVo2.setTaskId(2);
-		taskSummaryOuputVo2.setTaskType("modify");
-		taskSummaryOuputVo2.setTaskStatus("00");
-		taskSummaryOuputVo2.setTaskDataType("stop");
+		taskSummaryOuputVo2.setTaskType(TaskType.MODIFY);
+		taskSummaryOuputVo2.setTaskStatusType(TaskStatusType.WAIT);
+		taskSummaryOuputVo2.setPubTransType(PubTransType.STOP);
 		taskSummaryOuputVo2.setTaskComment("DCC 정류장 이름변경");
 		taskSummaryOuputVo2.setRegDate("2020-03-09");
 		taskSummaryOuputVo2.setWorkUserName("안경현");
@@ -593,9 +603,9 @@ public class BusStopControllerDocumentTest {
 
 	             		fieldWithPath("result.data[]").type(JsonFieldType.ARRAY).description("작업 정보"),
 	             		fieldWithPath("result.data[].taskId").type(JsonFieldType.NUMBER).description("작업ID"),
-	             		fieldWithPath("result.data[].taskType").type(JsonFieldType.STRING).description("작업구분(register:등록, modify:수정, remove:삭제)"),
-	             		fieldWithPath("result.data[].taskStatus").type(JsonFieldType.STRING).description("작업 진행상태(00:대기, 01:진행, 02:완료, 03:예외)"),
-	             		fieldWithPath("result.data[].taskDataType").type(JsonFieldType.STRING).description("데이터 종류(stop:정류장, route:노선, company:운수사)"),
+	             		fieldWithPath("result.data[].taskType").type(JsonFieldType.STRING).description(CodeType.TASK_TYPE.getCodeDescription() + TaskType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data[].taskStatusType").type(JsonFieldType.STRING).description(CodeType.TASK_STATUS_TYPE.getCodeDescription() + TaskStatusType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data[].pubTransType").type(JsonFieldType.STRING).description(CodeType.PUB_TRANS_TYPE.getCodeDescription() + PubTransType.getCodeAndDescriptionWithColon()),
 	             		fieldWithPath("result.data[].taskComment").type(JsonFieldType.STRING).description("작업내용"),
 	             		fieldWithPath("result.data[].regDate").type(JsonFieldType.STRING).description("등록일"),
 	             		fieldWithPath("result.data[].workUserName").type(JsonFieldType.STRING).description("작업자")
@@ -682,6 +692,8 @@ public class BusStopControllerDocumentTest {
 		busStopInputVo.setDisplayId("01123");
 		busStopInputVo.setTaskComment("정류장 등록");
 		busStopInputVo.setCheckUserId("kr94666");
+		busStopInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busStopInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 
 		Map<String, Object> resultMap = new HashMap<>();
@@ -690,7 +702,7 @@ public class BusStopControllerDocumentTest {
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(resultMap);
 
 		//given
-		given(busStopService.registerBusStopTask(ArgumentMatchers.anyString(), any()))
+		given(busStopService.registerBusStopTask(ArgumentMatchers.eq(TaskType.REGISTER), any()))
 				.willReturn(commonResult) ;
 
 
@@ -728,6 +740,8 @@ public class BusStopControllerDocumentTest {
                         fieldWithPath("localStopId").type(JsonFieldType.STRING).description("지자체 정류장ID"),
                         fieldWithPath("providerId").type(JsonFieldType.NUMBER).description("지자체 BIS ID"),
                         fieldWithPath("displayId").type(JsonFieldType.STRING).description("정류장 표기 ID"),
+                        fieldWithPath("taskDataSourceType").type(JsonFieldType.NUMBER).description("[필수]" + CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+                        fieldWithPath("taskCheckRequestType").type(JsonFieldType.STRING).description("[필수]" + CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
                         fieldWithPath("taskComment").type(JsonFieldType.STRING).description("[필수]변경내용"),
                         fieldWithPath("checkUserId").type(JsonFieldType.STRING).description("[필수]검수자ID")
                 ),
@@ -776,6 +790,8 @@ public class BusStopControllerDocumentTest {
 		busStopInputVo.setDisplayId("01123");
 		busStopInputVo.setTaskComment("정류장 등록");
 		busStopInputVo.setCheckUserId("kr94666");
+		busStopInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busStopInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 
 		// 성공시 작업ID 리턴
@@ -785,7 +801,7 @@ public class BusStopControllerDocumentTest {
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(resultMap);
 
 		//given
-		given(busStopService.registerBusStopTask(ArgumentMatchers.anyString(), any()))
+		given(busStopService.registerBusStopTask(ArgumentMatchers.eq(TaskType.MODIFY), any()))
 				.willReturn(commonResult) ;
 
 
@@ -824,6 +840,8 @@ public class BusStopControllerDocumentTest {
                         fieldWithPath("localStopId").type(JsonFieldType.STRING).description("지자체 정류장ID"),
                         fieldWithPath("providerId").type(JsonFieldType.NUMBER).description("지자체 BIS ID"),
                         fieldWithPath("displayId").type(JsonFieldType.STRING).description("정류장 표기 ID"),
+                        fieldWithPath("taskDataSourceType").type(JsonFieldType.NUMBER).description("[필수]" + CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+                        fieldWithPath("taskCheckRequestType").type(JsonFieldType.STRING).description("[필수]" + CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
                         fieldWithPath("taskComment").type(JsonFieldType.STRING).description("[필수]변경내용"),
                         fieldWithPath("checkUserId").type(JsonFieldType.STRING).description("[필수]검수자ID")
                 ),
@@ -870,6 +888,8 @@ public class BusStopControllerDocumentTest {
 		busStopInputVo.setDisplayId("01123");
 		busStopInputVo.setTaskComment("정류장 등록");
 		busStopInputVo.setCheckUserId("kr94666");
+		busStopInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busStopInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 
 
@@ -909,6 +929,8 @@ public class BusStopControllerDocumentTest {
                         fieldWithPath("localStopId").type(JsonFieldType.STRING).description("지자체 정류장ID"),
                         fieldWithPath("providerId").type(JsonFieldType.NUMBER).description("지자체 BIS ID"),
                         fieldWithPath("displayId").type(JsonFieldType.STRING).description("정류장 표기 ID"),
+                        fieldWithPath("taskDataSourceType").type(JsonFieldType.NUMBER).description("[필수]" + CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+                        fieldWithPath("taskCheckRequestType").type(JsonFieldType.STRING).description("[필수]" + CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
                         fieldWithPath("taskComment").type(JsonFieldType.STRING).description("[필수]변경내용"),
                         fieldWithPath("checkUserId").type(JsonFieldType.STRING).description("[필수]검수자ID")
 
@@ -935,6 +957,8 @@ public class BusStopControllerDocumentTest {
 		busStopRemoveInputVo.setStopId(3);
 		busStopRemoveInputVo.setTaskComment("미존재 정류장 - 삭제 처리");
 		busStopRemoveInputVo.setCheckUserId("kr94666");
+		busStopRemoveInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busStopRemoveInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		// 성공시 작업ID 리턴
 		Map<String, Object> resultMap = new HashMap<>();
@@ -964,6 +988,8 @@ public class BusStopControllerDocumentTest {
 	            getDocumentResponse(),
 	            requestFields(
 	            		fieldWithPath("stopId").type(JsonFieldType.NUMBER).description("[필수]정류장ID"),
+	            		fieldWithPath("taskDataSourceType").type(JsonFieldType.NUMBER).description("[필수]" + CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+                        fieldWithPath("taskCheckRequestType").type(JsonFieldType.STRING).description("[필수]" + CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
                         fieldWithPath("taskComment").type(JsonFieldType.STRING).description("[필수]변경내용"),
                         fieldWithPath("checkUserId").type(JsonFieldType.STRING).description("[필수]검수자ID")
                 ),
@@ -973,6 +999,83 @@ public class BusStopControllerDocumentTest {
 	             		fieldWithPath("result").type(JsonFieldType.OBJECT).description("결과 정보"),
 	             		fieldWithPath("result.data").type(JsonFieldType.OBJECT).description("상세 정보"),
 	             		fieldWithPath("result.data.taskId").type(JsonFieldType.NUMBER).description("등록 성공한 작업 ID")
+	             )
+ 		));
+
+	}
+
+
+
+	/**
+	 * 지도영역의 버스 정류장 목록 rest docs 생성
+	 * @throws Exception
+	 */
+	@Test
+	public void listBusStopFromMapBounds() throws Exception {
+
+		OutputFmtUtil outputFmtUtil = new OutputFmtUtil() ;
+
+
+		// 목록
+		BusStopListOutputVo busStopListOutputVoOne = new BusStopListOutputVo();
+		busStopListOutputVoOne.setStopId(55000049);
+		busStopListOutputVoOne.setStopName("종로4가.종묘");
+		busStopListOutputVoOne.setLongitude(126.995296);
+		busStopListOutputVoOne.setLatitude(37.570619);
+		busStopListOutputVoOne.setCityCode(1000);
+		busStopListOutputVoOne.setCityName("서울");
+
+		BusStopListOutputVo busStopListOutputVoTwo = new BusStopListOutputVo();
+		busStopListOutputVoTwo.setStopId(55000053);
+		busStopListOutputVoTwo.setStopName("종로2가");
+		busStopListOutputVoTwo.setLongitude(126.986245);
+		busStopListOutputVoTwo.setLatitude(37.570217);
+		busStopListOutputVoTwo.setCityCode(1000);
+		busStopListOutputVoTwo.setCityName("서울");
+
+		List<BusStopListOutputVo> busStopListOutputVoList = new ArrayList<>();
+		busStopListOutputVoList.add(busStopListOutputVoOne) ;
+		busStopListOutputVoList.add(busStopListOutputVoTwo) ;
+
+
+		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(busStopListOutputVoList) ;
+
+
+		//given
+		given(busStopService.getBusStopListFromMapBounds(any(BusStopSearchVo.class)))
+				.willReturn(commonResult) ;
+
+
+		//when
+		ResultActions result = this.mockMvc.perform(
+                get("/v1/ntool/api/list/busStopFromMapBounds")
+	                .param("rightTopCoordinates", "126.982676,37.575861")
+	            	.param("leftBottomCoordinates", "126.983191,37.569500")
+                	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+	                .characterEncoding("UTF-8")
+        );
+
+
+		//then
+		result.andExpect(status().isOk())
+	 		.andDo(document("busStop/busStopListFromMapBounds",
+	 			getDocumentRequest(),
+	            getDocumentResponse(),
+	            requestParameters(
+	            		parameterWithName("rightTopCoordinates").description("지도 우측상단 좌표(예:126.982676,37.575861)"),
+	            		parameterWithName("leftBottomCoordinates").description("지도 좌측하단 좌표(예:126.983191,37.569500)")
+	            ),
+	            responseFields(
+	            		fieldWithPath("code").type(JsonFieldType.NUMBER).description("API 응답코드"),
+	             		fieldWithPath("message").type(JsonFieldType.STRING).description("API 응답 메세지"),
+	             		fieldWithPath("result").type(JsonFieldType.OBJECT).description("결과 정보"),
+	             		fieldWithPath("result.data[]").type(JsonFieldType.ARRAY).description("정류장 목록"),
+	             		fieldWithPath("result.data[].stopId").type(JsonFieldType.NUMBER).description("정류장ID"),
+	             		fieldWithPath("result.data[].stopName").type(JsonFieldType.STRING).description("정류장명"),
+	             		fieldWithPath("result.data[].longitude").type(JsonFieldType.NUMBER).description("경도"),
+	             		fieldWithPath("result.data[].latitude").type(JsonFieldType.NUMBER).description("위도"),
+	             		fieldWithPath("result.data[].cityCode").type(JsonFieldType.NUMBER).description("도시코드"),
+	             		fieldWithPath("result.data[].cityName").type(JsonFieldType.STRING).description("도시코드명")
 	             )
  		));
 

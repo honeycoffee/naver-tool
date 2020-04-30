@@ -127,7 +127,7 @@ public class BusRouteController {
 	 */
 	@PostMapping("/v1/ntool/api/busRouteTask/addTask")
 	public CommonOutput registerBusRouteAddTask(@RequestBody @Valid BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
-		CommonResult commonResult = busRouteService.registerBusRouteTask(TaskType.REGISTER.getCode(), busRouteTaskInputVo);
+		CommonResult commonResult = busRouteService.registerBusRouteTask(TaskType.REGISTER, busRouteTaskInputVo);
 		return new CommonOutput(commonResult);
 	}
 
@@ -146,7 +146,7 @@ public class BusRouteController {
     		throw new MethodArgumentNotValidException(null, bindingResult);
 		}
 
-		CommonResult commonResult = busRouteService.registerBusRouteTask(TaskType.MODIFY.getCode(), busRouteTaskInputVo);
+		CommonResult commonResult = busRouteService.registerBusRouteTask(TaskType.MODIFY, busRouteTaskInputVo);
 		return new CommonOutput(commonResult);
 	}
 

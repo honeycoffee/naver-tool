@@ -25,6 +25,9 @@ public class DataSourceConfig {
     private String mybatisConfigLocaton;
     @Value("${mybatis.mapper-locations}")
     private String mybatisMapperLocaton;
+    @Value("${mybatis.type-handlers-package}")
+    private String mybatisTypeHandlerPackage;
+
 	@Autowired
 	private DataSource dataSource;
 
@@ -34,6 +37,7 @@ public class DataSourceConfig {
         sqlSessionFactoryBean.setDataSource(dataSource);
         sqlSessionFactoryBean.setConfigLocation(context.getResource(mybatisConfigLocaton));
         sqlSessionFactoryBean.setMapperLocations(context.getResources(mybatisMapperLocaton));
+        sqlSessionFactoryBean.setTypeHandlersPackage(mybatisTypeHandlerPackage);
 
         return sqlSessionFactoryBean.getObject();
 	}

@@ -12,9 +12,11 @@ public enum CodeType {
 
 	Y_N("Y_N", "Y/N"),
 	TASK_TYPE("task_type", "Task 작업 구분"),
-	TASK_STATUS("task_status", "Task 상태"),
+	TASK_STATUS_TYPE("task_status_type", "Task 상태 구분"),
 	TASK_ASSIGN_TYPE("task_assign_type", "Task 할당 구분"),
-	TASK_DATA_TYPE("task_data_type", "Task 데이터 구분"),
+	PUB_TRANS_TYPE("pub_trans_type", "대중교통 구분"),
+	TASK_CHECK_REQUEST_TYPE("task_check_request_type", "Task 검수요청 구분"),
+	TASK_DATA_SOURCE_TYPE("task_data_source_type", "데이터 출처 구분"),
 	CITYCODE("city_code", "도시코드"),
 	BUS_PROVIDER("provider_id", "BIS 데이터 공급지역"),
 	BUS_ROUTE_CLASS("bus_route_class", "버스 노선 클래스"),

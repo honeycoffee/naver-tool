@@ -119,4 +119,12 @@ public interface BusStopRepository {
 	 */
 	Integer getBusStopIdMappedToBisStopId(BusStopMappingVo busStopMappingVo) throws DataAccessException;
 
+	/**
+	 * 영역내 버스정류장 목록을 가져온다
+	 * @param busStopSearchVo - 검색조건
+	 * @return
+	 * @throws DataAccessException
+	 */
+	List<BusStopListOutputVo> selectBusStopListFromMapBounds(BusStopSearchVo busStopSearchVo) throws DataAccessException;
+
 }

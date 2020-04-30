@@ -34,7 +34,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
+import com.naver.pubtrans.itn.api.consts.CodeType;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
+import com.naver.pubtrans.itn.api.consts.PubTransType;
+import com.naver.pubtrans.itn.api.consts.TaskCheckRequestType;
+import com.naver.pubtrans.itn.api.consts.TaskDataSourceType;
+import com.naver.pubtrans.itn.api.consts.TaskStatusType;
+import com.naver.pubtrans.itn.api.consts.TaskType;
 import com.naver.pubtrans.itn.api.controller.BusCompanyController;
 import com.naver.pubtrans.itn.api.handler.MemberAccessDeniedHandler;
 import com.naver.pubtrans.itn.api.service.BusCompanyService;
@@ -70,8 +76,8 @@ public class BusCompanyControllerDocumentTest {
     private ObjectMapper objectMapper;
 
 	@MockBean
-	private BusCompanyService busCompanyService ; 
-	
+	private BusCompanyService busCompanyService ;
+
 
 	@MockBean
 	private OutputFmtUtil outputFmtUtil ;
@@ -224,7 +230,7 @@ public class BusCompanyControllerDocumentTest {
 		busCompanyVo.setSourceName("아로정보기술");
 		busCompanyVo.setSourceUrl("http://www.arointech.co.kr");
 		busCompanyVo.setComment("비고");
-		
+
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(busCompanyVo) ;
 
 		//given
@@ -296,13 +302,15 @@ public class BusCompanyControllerDocumentTest {
 		taskOutputVo.setTaskId(1);
 		taskOutputVo.setProviderId(4);
 		taskOutputVo.setProviderName("서울");
-		taskOutputVo.setTaskType("register");
-		taskOutputVo.setTaskStatus("01");
+		taskOutputVo.setTaskType(TaskType.REGISTER);
+		taskOutputVo.setTaskStatusType(TaskStatusType.PROGRESS);
 		taskOutputVo.setPubTransId(1);
-		taskOutputVo.setTaskDataType("company");
-		taskOutputVo.setTaskDataName("서울운수");
+		taskOutputVo.setPubTransType(PubTransType.COMPANY);
+		taskOutputVo.setPubTransName("서울운수");
+		taskOutputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		taskOutputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 		taskOutputVo.setTaskComment("주소 변경");
-		taskOutputVo.setTaskRegisterType("M");
+		taskOutputVo.setAutoRegisterYn("N");
 		taskOutputVo.setRegUserName("test_name");
 		taskOutputVo.setRegUserId("test");
 		taskOutputVo.setRegDate("2020-04-10 10:00:00");
@@ -359,14 +367,16 @@ public class BusCompanyControllerDocumentTest {
 	             		fieldWithPath("result.data.taskInfo.taskId").type(NUMBER_OR_NULL).description("작업ID (작업정보 존재시)"),
 	             		fieldWithPath("result.data.taskInfo.providerId").type(JsonFieldType.NUMBER).description("BIS 지역코드"),
 	             		fieldWithPath("result.data.taskInfo.providerName").type(STRING_OR_NULL).description("BIS 지역명"),
-	             		fieldWithPath("result.data.taskInfo.taskType").type(STRING_OR_NULL).description("작업구분(register:등록, modify:수정, remove:삭제)"),
-	             		fieldWithPath("result.data.taskInfo.taskStatus").type(STRING_OR_NULL).description("작업 진행상태(00:대기, 01:진행, 02:완료, 03:예외)"),
+	             		fieldWithPath("result.data.taskInfo.taskType").type(JsonFieldType.STRING).description(CodeType.TASK_TYPE.getCodeDescription() + TaskType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data.taskInfo.taskStatusType").type(JsonFieldType.STRING).description(CodeType.TASK_STATUS_TYPE.getCodeDescription() + TaskStatusType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data.taskInfo.pubTransType").type(JsonFieldType.STRING).description(CodeType.PUB_TRANS_TYPE.getCodeDescription() + PubTransType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data.taskInfo.taskDataSourceType").type(JsonFieldType.NUMBER).description(CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+	                    fieldWithPath("result.data.taskInfo.taskCheckRequestType").type(JsonFieldType.STRING).description(CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
 	             		fieldWithPath("result.data.taskInfo.pubTransId").type(JsonFieldType.NUMBER).description("대중교통 ID"),
-	             		fieldWithPath("result.data.taskInfo.taskDataType").type(STRING_OR_NULL).description("데이터 종류(stop:정류장, route:노선, company:운수사)"),
-	             		fieldWithPath("result.data.taskInfo.taskDataName").type(STRING_OR_NULL).description("데이터 이름"),
+	             		fieldWithPath("result.data.taskInfo.pubTransName").type(STRING_OR_NULL).description("데이터 이름"),
 	             		fieldWithPath("result.data.taskInfo.taskComment").type(STRING_OR_NULL).description("작업내용"),
 	             		fieldWithPath("result.data.taskInfo.bisChangeDataInfo").type(OBJECT_OR_NULL).description("BIS 자동등록 변경내용 - Null이 아닌경우 변경된 데이터 컬럼 정보만 하위 요소로 표출"),
-	             		fieldWithPath("result.data.taskInfo.taskRegisterType").type(STRING_OR_NULL).description("작업 등록구분(A:자동, M:수동)"),
+	             		fieldWithPath("result.data.taskInfo.autoRegisterYn").type(JsonFieldType.STRING).description("자동 등록여부(Y/N)"),
 	             		fieldWithPath("result.data.taskInfo.regUserName").type(STRING_OR_NULL).description("등록자명"),
 	             		fieldWithPath("result.data.taskInfo.regUserId").type(STRING_OR_NULL).description("등록자ID"),
 	             		fieldWithPath("result.data.taskInfo.regDate").type(STRING_OR_NULL).description("등록일"),
@@ -397,18 +407,18 @@ public class BusCompanyControllerDocumentTest {
 
 		TaskSummaryOutputVo taskSummaryOuputVo1 = new TaskSummaryOutputVo();
 		taskSummaryOuputVo1.setTaskId(1);
-		taskSummaryOuputVo1.setTaskType("register");
-		taskSummaryOuputVo1.setTaskStatus("01");
-		taskSummaryOuputVo1.setTaskDataType("company");
+		taskSummaryOuputVo1.setTaskType(TaskType.REGISTER);
+		taskSummaryOuputVo1.setTaskStatusType(TaskStatusType.PROGRESS);
+		taskSummaryOuputVo1.setPubTransType(PubTransType.COMPANY);
 		taskSummaryOuputVo1.setTaskComment("신규 운수사 등록");
 		taskSummaryOuputVo1.setRegDate("2020-04-10");
 		taskSummaryOuputVo1.setWorkUserName("test");
 
 		TaskSummaryOutputVo taskSummaryOuputVo2 = new TaskSummaryOutputVo();
 		taskSummaryOuputVo2.setTaskId(2);
-		taskSummaryOuputVo2.setTaskType("modify");
-		taskSummaryOuputVo2.setTaskStatus("00");
-		taskSummaryOuputVo2.setTaskDataType("company");
+		taskSummaryOuputVo2.setTaskType(TaskType.MODIFY);
+		taskSummaryOuputVo2.setTaskStatusType(TaskStatusType.WAIT);
+		taskSummaryOuputVo2.setPubTransType(PubTransType.COMPANY);
 		taskSummaryOuputVo2.setTaskComment("전화번호 변경");
 		taskSummaryOuputVo2.setRegDate("2020-04-10");
 		taskSummaryOuputVo2.setWorkUserName("test");
@@ -458,9 +468,9 @@ public class BusCompanyControllerDocumentTest {
 
 	             		fieldWithPath("result.data[]").type(JsonFieldType.ARRAY).description("작업 정보"),
 	             		fieldWithPath("result.data[].taskId").type(JsonFieldType.NUMBER).description("작업ID"),
-	             		fieldWithPath("result.data[].taskType").type(JsonFieldType.STRING).description("작업구분(register:등록, modify:수정, remove:삭제)"),
-	             		fieldWithPath("result.data[].taskStatus").type(JsonFieldType.STRING).description("작업 진행상태(00:대기, 01:진행, 02:완료, 03:예외)"),
-	             		fieldWithPath("result.data[].taskDataType").type(JsonFieldType.STRING).description("데이터 종류(stop:정류장, route:노선, company:운수사)"),
+	             		fieldWithPath("result.data[].taskType").type(JsonFieldType.STRING).description(CodeType.TASK_TYPE.getCodeDescription() + TaskType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data[].taskStatusType").type(JsonFieldType.STRING).description(CodeType.TASK_STATUS_TYPE.getCodeDescription() + TaskStatusType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data[].pubTransType").type(JsonFieldType.STRING).description(CodeType.PUB_TRANS_TYPE.getCodeDescription() + PubTransType.getCodeAndDescriptionWithColon()),
 	             		fieldWithPath("result.data[].taskComment").type(JsonFieldType.STRING).description("작업내용"),
 	             		fieldWithPath("result.data[].regDate").type(JsonFieldType.STRING).description("등록일"),
 	             		fieldWithPath("result.data[].workUserName").type(JsonFieldType.STRING).description("작업자")
@@ -533,6 +543,8 @@ public class BusCompanyControllerDocumentTest {
 		busCompanyTaskInputVo.setComment("테스트 등록");
 		busCompanyTaskInputVo.setTaskComment("운수사 등록");
 		busCompanyTaskInputVo.setCheckUserId("test");
+		busCompanyTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busCompanyTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 
 		Map<String, Object> resultMap = new HashMap<>();
@@ -541,7 +553,7 @@ public class BusCompanyControllerDocumentTest {
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(resultMap);
 
 		//given
-		given(busCompanyService.registerBusCompanyTask(ArgumentMatchers.anyString(), any()))
+		given(busCompanyService.registerBusCompanyTask(ArgumentMatchers.eq(TaskType.REGISTER), any()))
 				.willReturn(commonResult) ;
 
 
@@ -553,7 +565,7 @@ public class BusCompanyControllerDocumentTest {
 	                .accept(MediaType.APPLICATION_JSON)
 	                .characterEncoding("UTF-8")
         );
-		
+
 
 		//then
 		result.andExpect(status().isOk())
@@ -568,6 +580,8 @@ public class BusCompanyControllerDocumentTest {
                         fieldWithPath("sourceName").type(JsonFieldType.STRING).description("출처명"),
                         fieldWithPath("sourceUrl").type(JsonFieldType.STRING).description("출처 URL"),
                         fieldWithPath("comment").type(JsonFieldType.STRING).description("비고"),
+                        fieldWithPath("taskDataSourceType").type(JsonFieldType.NUMBER).description("[필수]" + CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+                        fieldWithPath("taskCheckRequestType").type(JsonFieldType.STRING).description("[필수]" + CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
                         fieldWithPath("taskComment").type(JsonFieldType.STRING).description("[필수]변경내용"),
                         fieldWithPath("checkUserId").type(JsonFieldType.STRING).description("[필수]검수자ID")
                 ),
@@ -605,6 +619,8 @@ public class BusCompanyControllerDocumentTest {
 		busCompanyTaskInputVo.setComment("테스트 등록");
 		busCompanyTaskInputVo.setTaskComment("운수사 수정");
 		busCompanyTaskInputVo.setCheckUserId("test");
+		busCompanyTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busCompanyTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 
 		// 성공시 작업ID 리턴
@@ -614,7 +630,7 @@ public class BusCompanyControllerDocumentTest {
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(resultMap);
 
 		//given
-		given(busCompanyService.registerBusCompanyTask(ArgumentMatchers.anyString(), any()))
+		given(busCompanyService.registerBusCompanyTask(ArgumentMatchers.eq(TaskType.MODIFY), any()))
 				.willReturn(commonResult) ;
 
 		//when
@@ -641,6 +657,8 @@ public class BusCompanyControllerDocumentTest {
                         fieldWithPath("sourceName").type(JsonFieldType.STRING).description("출처명"),
                         fieldWithPath("sourceUrl").type(JsonFieldType.STRING).description("출처 URL"),
                         fieldWithPath("comment").type(JsonFieldType.STRING).description("비고"),
+                        fieldWithPath("taskDataSourceType").type(JsonFieldType.NUMBER).description("[필수]" + CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+                        fieldWithPath("taskCheckRequestType").type(JsonFieldType.STRING).description("[필수]" + CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
                         fieldWithPath("taskComment").type(JsonFieldType.STRING).description("[필수]변경내용"),
                         fieldWithPath("checkUserId").type(JsonFieldType.STRING).description("[필수]검수자ID")
                 ),
@@ -676,6 +694,8 @@ public class BusCompanyControllerDocumentTest {
 		busCompanyTaskInputVo.setComment("테스트 등록");
 		busCompanyTaskInputVo.setTaskComment("운수사 등록");
 		busCompanyTaskInputVo.setCheckUserId("test");
+		busCompanyTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busCompanyTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 
 
@@ -704,6 +724,8 @@ public class BusCompanyControllerDocumentTest {
                         fieldWithPath("sourceName").type(JsonFieldType.STRING).description("출처명"),
                         fieldWithPath("sourceUrl").type(JsonFieldType.STRING).description("출처 URL"),
                         fieldWithPath("comment").type(JsonFieldType.STRING).description("비고"),
+                        fieldWithPath("taskDataSourceType").type(JsonFieldType.NUMBER).description("[필수]" + CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+                        fieldWithPath("taskCheckRequestType").type(JsonFieldType.STRING).description("[필수]" + CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
                         fieldWithPath("taskComment").type(JsonFieldType.STRING).description("[필수]변경내용"),
                         fieldWithPath("checkUserId").type(JsonFieldType.STRING).description("[필수]검수자ID")
 
@@ -730,6 +752,8 @@ public class BusCompanyControllerDocumentTest {
 		busCompanyRemoveInputVo.setCompanyId(3);
 		busCompanyRemoveInputVo.setTaskComment("미존재 운수사 - 삭제 처리");
 		busCompanyRemoveInputVo.setCheckUserId("test");
+		busCompanyRemoveInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busCompanyRemoveInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		// 성공시 작업ID 리턴
 		Map<String, Object> resultMap = new HashMap<>();
@@ -759,6 +783,8 @@ public class BusCompanyControllerDocumentTest {
 	            getDocumentResponse(),
 	            requestFields(
 	            		fieldWithPath("companyId").type(JsonFieldType.NUMBER).description("[필수]운수사ID"),
+	            		fieldWithPath("taskDataSourceType").type(JsonFieldType.NUMBER).description("[필수]" + CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+                        fieldWithPath("taskCheckRequestType").type(JsonFieldType.STRING).description("[필수]" + CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
                         fieldWithPath("taskComment").type(JsonFieldType.STRING).description("[필수]변경내용"),
                         fieldWithPath("checkUserId").type(JsonFieldType.STRING).description("[필수]검수자ID")
                 ),

@@ -34,6 +34,8 @@ import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.ApiUtils;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
+import com.naver.pubtrans.itn.api.consts.TaskCheckRequestType;
+import com.naver.pubtrans.itn.api.consts.TaskDataSourceType;
 import com.naver.pubtrans.itn.api.consts.TaskType;
 import com.naver.pubtrans.itn.api.service.BusRouteService;
 import com.naver.pubtrans.itn.api.vo.bus.graph.BusStopGraphVo;
@@ -600,7 +602,7 @@ public class BusRouteControllerTest {
 		List<BusStopGraphVo> busStopGraphVoList = busRouteService.makeBusStopGraphVoList(busRouteTaskInputVo);
 
 		int graphRouteCnt = busStopGraphVoList.size();
-		int graphRouteCheckCnt = 71;		// 해당 노선이 서비스중인 경유 정류장 수
+		int graphRouteCheckCnt = 86;		// 해당 노선이 서비스중인 경유 정류장 수
 
 		assertEquals(graphRouteCnt, graphRouteCheckCnt);
 	}
@@ -618,7 +620,7 @@ public class BusRouteControllerTest {
 		BusRouteTaskInputVo busRouteTaskInputVo = this.getBusRouteTaskInputInfo(TaskType.MODIFY.getCode());
 		List<BusStopGraphVo> busStopGraphVoList = busRouteService.makeBusStopGraphVoList(busRouteTaskInputVo);
 
-		boolean isSame = busRouteService.isTheSameAsBusRouteStopVoListOfDb(TaskType.MODIFY.getCode(), busRouteTaskInputVo.getRouteId(), busStopGraphVoList);
+		boolean isSame = busRouteService.isTheSameAsBusRouteStopVoListOfDb(TaskType.MODIFY, busRouteTaskInputVo.getRouteId(), busStopGraphVoList);
 
 		assertTrue(isSame);
 	}
@@ -637,7 +639,7 @@ public class BusRouteControllerTest {
 		// 임의로 뒤 1개 정류장을 삭제한다
 		busStopGraphVoList.remove(busStopGraphVoList.size()-1);
 
-		boolean isSame = busRouteService.isTheSameAsBusRouteStopVoListOfDb(TaskType.MODIFY.getCode(), busRouteTaskInputVo.getRouteId(), busStopGraphVoList);
+		boolean isSame = busRouteService.isTheSameAsBusRouteStopVoListOfDb(TaskType.MODIFY, busRouteTaskInputVo.getRouteId(), busStopGraphVoList);
 		assertFalse(isSame);
 	}
 
@@ -692,7 +694,8 @@ public class BusRouteControllerTest {
 
 
 		// 정류장 상세정보 가져오기
-		String busRouteDetailJson = apiUtils.getBusRouteDetailInfo(11000000);
+		// 11000000 노선 그래프 테스트에 따른 Test ID 변경
+		String busRouteDetailJson = apiUtils.getBusRouteDetailInfo(11000001);
 
 
 		JsonNode rootNode = objectMapper.readTree(busRouteDetailJson);
@@ -739,7 +742,8 @@ public class BusRouteControllerTest {
 		}
 
 
-
+		busRouteTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busRouteTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 		busRouteTaskInputVo.setTaskComment("노선등록 Junit 테스트");
 		busRouteTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
 
@@ -760,6 +764,8 @@ public class BusRouteControllerTest {
 		busRouteRemoveTaskInputVo.setRouteId(11000000);
 		busRouteRemoveTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
 		busRouteRemoveTaskInputVo.setTaskComment("노선삭제 Junit");
+		busRouteRemoveTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busRouteRemoveTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		mockMvc.perform(post("/v1/ntool/api/busRouteTask/removeTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -786,6 +792,8 @@ public class BusRouteControllerTest {
 		busRouteRemoveTaskInputVo.setRouteId(13000000);
 		busRouteRemoveTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
 		busRouteRemoveTaskInputVo.setTaskComment("노선삭제 Junit");
+		busRouteRemoveTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busRouteRemoveTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		mockMvc.perform(post("/v1/ntool/api/busRouteTask/removeTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -811,6 +819,8 @@ public class BusRouteControllerTest {
 		busRouteRemoveTaskInputVo.setRouteId(11000000);
 		busRouteRemoveTaskInputVo.setCheckUserId("");
 		busRouteRemoveTaskInputVo.setTaskComment("노선삭제 Junit");
+		busRouteRemoveTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busRouteRemoveTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		mockMvc.perform(post("/v1/ntool/api/busRouteTask/removeTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -849,6 +859,8 @@ public class BusRouteControllerTest {
 		busRouteTaskInputVo.setBusStopGraphInfo(geoJsonInputVo);
 		busRouteTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
 		busRouteTaskInputVo.setTaskComment("버스노선 Task 수정입니다");
+		busRouteTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busRouteTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		mockMvc.perform(put("/v1/ntool/api/modify/busRouteTask")
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -878,6 +890,8 @@ public class BusRouteControllerTest {
 
 		busRouteTaskInputVo.setCheckUserId(this.tokenMap.get("userId"));
 		busRouteTaskInputVo.setTaskComment("버스노선 Task 수정입니다");
+		busRouteTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busRouteTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		mockMvc.perform(put("/v1/ntool/api/modify/busRouteTask")
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))

@@ -111,7 +111,7 @@ public class BusCompanyController {
 		CommonResult commonResult = outputFmtUtil.setCommonDocFmt(busCompanyService.selectBusCompanySchemaAll());
 		return new CommonOutput(commonResult);
 	}
-	
+
 
 
 
@@ -123,7 +123,7 @@ public class BusCompanyController {
 	 */
 	@PostMapping("/v1/ntool/api/busCompanyTask/addTask")
 	public CommonOutput registerBusCompanyAddTask(@RequestBody @Valid BusCompanyTaskInputVo busCompanyTaskInputVo) throws Exception {
-		CommonResult commonResult = busCompanyService.registerBusCompanyTask(TaskType.REGISTER.getCode(), busCompanyTaskInputVo);
+		CommonResult commonResult = busCompanyService.registerBusCompanyTask(TaskType.REGISTER, busCompanyTaskInputVo);
 		return new CommonOutput(commonResult);
 	}
 
@@ -140,7 +140,7 @@ public class BusCompanyController {
     		throw new MethodArgumentNotValidException(null, bindingResult);
 		}
 
-		CommonResult commonResult = busCompanyService.registerBusCompanyTask(TaskType.MODIFY.getCode(), busCompanyTaskInputVo);
+		CommonResult commonResult = busCompanyService.registerBusCompanyTask(TaskType.MODIFY, busCompanyTaskInputVo);
 		return new CommonOutput(commonResult);
 	}
 

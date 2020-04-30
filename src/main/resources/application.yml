@@ -5,7 +5,7 @@
 # [운영] -Dspring.profiles.active=real
 
 server:
-  port: 80
+  port: 8080
   tomcat:
     uri-encoding: UTF-8
 
@@ -31,4 +31,5 @@ security:
 mybatis:
   config-location: classpath:mybatis-config.xml
   mapper-locations: classpath*:mappers/*_mapper.xml
+  type-handlers-package: com.naver.pubtrans.itn.api.config.mybatis.typehandler
     

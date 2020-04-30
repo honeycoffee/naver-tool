@@ -3,6 +3,8 @@ package com.naver.pubtrans.itn.api.vo.task;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.naver.pubtrans.itn.api.consts.TaskAssignType;
+
 /**
  * 작업 할당정보
  * @author adtec10
@@ -16,7 +18,7 @@ public class TaskAssignInfoVo {
 	private long taskId;
 
 	// 할당 타입
-	private String taskAssignType;
+	private TaskAssignType taskAssignType;
 
 	// 할당 대상자 ID
 	private String assigneeUserId;
@@ -29,4 +31,5 @@ public class TaskAssignInfoVo {
 
 	// 등록자 이름
 	private String regUserName;
+
 }

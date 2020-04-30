@@ -163,4 +163,18 @@ public class Util {
 		}
 	}
 
+	/**
+	 * code, description 형태의 코드 enum들을 "code":"description" 형태의 String으로 만들어 리턴한다.
+	 * @param code - 코드 enum의 코드
+	 * @param description - 코드 enum의 설명
+	 * @return
+	 */
+	public static String getCodeDescriptionWithColon(String code, String description) {
+		StringBuilder stringBuilder = new StringBuilder(code);
+		stringBuilder.append(CommonConstant.COLON);
+		stringBuilder.append(description);
+		
+		return stringBuilder.toString();
+	}
+
 }

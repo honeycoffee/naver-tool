@@ -214,5 +214,23 @@
 			AND member.user_name LIKE CONCAT(#{userName}, '%')
 		</if>
 	</select>
+    
+	<insert id="insertMemberAutoAssign" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberUpdateVo">
+		INSERT INTO 
+			tb_z_svc_member_auto_assign(user_id, pub_trans_type, city_code, task_assign_type, reg_user_id, reg_user_name) 
+		VALUES
+		<foreach collection="cityCodes" item="cityCode" separator=" , "  >
+			(#{userId}, #{pubTransType}, #{cityCode}, #{taskAssignType}, #{regUserId}, #{regUserName})
+        </foreach>
+	</insert>
+	
+	<delete id="deleteMemberAutoAssign" parameterType="com.naver.pubtrans.itn.api.vo.member.input.MemberSearchVo">
+		DELETE FROM
+			tb_z_svc_member_auto_assign
+		WHERE
+			user_id = #{userId}
+		AND
+			pub_trans_type = #{pubTransType}
+	</delete>
 
 </mapper>

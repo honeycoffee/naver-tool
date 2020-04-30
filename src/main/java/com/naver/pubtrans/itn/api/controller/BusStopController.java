@@ -1,17 +1,22 @@
 package com.naver.pubtrans.itn.api.controller;
 
 
+import java.util.List;
+import java.util.Objects;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
@@ -121,7 +126,7 @@ public class BusStopController {
 	 */
 	@PostMapping("/v1/ntool/api/busStopTask/addTask")
 	public CommonOutput registerBusStopAddTask(@RequestBody @Valid BusStopTaskInputVo busStopTaskInputVo) throws Exception {
-		CommonResult commonResult = busStopService.registerBusStopTask(TaskType.REGISTER.getCode(), busStopTaskInputVo);
+		CommonResult commonResult = busStopService.registerBusStopTask(TaskType.REGISTER, busStopTaskInputVo);
 		return new CommonOutput(commonResult);
 	}
 
@@ -139,7 +144,7 @@ public class BusStopController {
     		throw new MethodArgumentNotValidException(null, bindingResult);
 		}
 
-		CommonResult commonResult = busStopService.registerBusStopTask(TaskType.MODIFY.getCode(), busStopTaskInputVo);
+		CommonResult commonResult = busStopService.registerBusStopTask(TaskType.MODIFY, busStopTaskInputVo);
 		return new CommonOutput(commonResult);
 	}
 
@@ -171,5 +176,22 @@ public class BusStopController {
 	}
 
 
+	/**
+	 * 지도영역에 속하는 버스정류장 목록을 가져온다
+	 * @param busStopSearchVo - 검색조건
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/v1/ntool/api/list/busStopFromMapBounds")
+	public CommonOutput listBusStopFromMapBounds(BusStopSearchVo busStopSearchVo) throws Exception {
+
+		if(Objects.isNull(busStopSearchVo) || Objects.isNull(busStopSearchVo.getRightTopCoordinates()) || Objects.isNull(busStopSearchVo.getLeftBottomCoordinates())) {
+			throw new MissingServletRequestParameterException(String.valueOf(ResultCode.PARAMETER_ERROR.getApiErrorCode()),
+				ResultCode.PARAMETER_ERROR.getDisplayMessage());
+		}
+
+		CommonResult commonResult = busStopService.getBusStopListFromMapBounds(busStopSearchVo);
+		return new CommonOutput(commonResult);
+	}
 
 }

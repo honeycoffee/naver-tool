@@ -29,8 +29,8 @@ import com.naver.pubtrans.itn.api.consts.PubTransId;
 import com.naver.pubtrans.itn.api.consts.PubTransTable;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.consts.TaskAssignType;
-import com.naver.pubtrans.itn.api.consts.TaskDataType;
-import com.naver.pubtrans.itn.api.consts.TaskStatus;
+import com.naver.pubtrans.itn.api.consts.PubTransType;
+import com.naver.pubtrans.itn.api.consts.TaskStatusType;
 import com.naver.pubtrans.itn.api.consts.TaskType;
 import com.naver.pubtrans.itn.api.exception.ApiException;
 import com.naver.pubtrans.itn.api.repository.BusGraphRepository;
@@ -178,7 +178,7 @@ public class BusRouteService {
 	 * @throws Exception
 	 */
 	public CommonResult getBusRouteTaskSummaryList(int busRouteId, SearchVo searchVo) throws Exception {
-		return taskService.getTaskSummaryList(busRouteId, TaskDataType.ROUTE.getCode(), searchVo);
+		return taskService.getTaskSummaryList(busRouteId, PubTransType.ROUTE, searchVo);
 	}
 
 	/**
@@ -254,10 +254,10 @@ public class BusRouteService {
 	 * @throws Exception
 	 */
 	private List<CommonSchema> selectBusRouteSchema() throws Exception {
-		ArrayList<String> ignoreColumnNameList = new ArrayList<>();
-		ignoreColumnNameList.add("transport_id");
+		ArrayList<String> exceptionColumnNameList = new ArrayList<>();
+		exceptionColumnNameList.add("transport_id");
 
-		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_ROUTES.getName(), CommonConstant.IGNORE_COLUMN, ignoreColumnNameList);
+		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_ROUTES.getName(), CommonConstant.EXCEPTION_COLUMN, exceptionColumnNameList);
 		return commonSchemaList;
 	}
 
@@ -267,16 +267,16 @@ public class BusRouteService {
 	 * @throws Exception
 	 */
 	private List<CommonSchema> selectBusRouteInfoSchema() throws Exception {
-		ArrayList<String> ignoreColumnNameList = new ArrayList<>();
-		ignoreColumnNameList.add("alias_kor");
-		ignoreColumnNameList.add("express_way");
-		ignoreColumnNameList.add("run_bus");
-		ignoreColumnNameList.add("main_bus_stop");
-		ignoreColumnNameList.add("run_time");
-		ignoreColumnNameList.add("bus_stop_cnt");
-		ignoreColumnNameList.add("service_id");
+		ArrayList<String> exceptionColumnNameList = new ArrayList<>();
+		exceptionColumnNameList.add("alias_kor");
+		exceptionColumnNameList.add("express_way");
+		exceptionColumnNameList.add("run_bus");
+		exceptionColumnNameList.add("main_bus_stop");
+		exceptionColumnNameList.add("run_time");
+		exceptionColumnNameList.add("bus_stop_cnt");
+		exceptionColumnNameList.add("service_id");
 
-		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_BUS_ROUTES_INFO.getName(), CommonConstant.IGNORE_COLUMN, ignoreColumnNameList);
+		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_BUS_ROUTES_INFO.getName(), CommonConstant.EXCEPTION_COLUMN, exceptionColumnNameList);
 		return commonSchemaList;
 	}
 
@@ -299,10 +299,10 @@ public class BusRouteService {
 	 * @throws Exception
 	 */
 	private List<CommonSchema> selectBusRouteBypassMappingSchema() throws Exception {
-		ArrayList<String> ignoreColumnNameList = new ArrayList<>();
-		ignoreColumnNameList.add("bypass_route_id");
+		ArrayList<String> exceptionColumnNameList = new ArrayList<>();
+		exceptionColumnNameList.add("bypass_route_id");
 
-		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_BUS_ROUTE_BYPASS_MAPPING.getName(), CommonConstant.IGNORE_COLUMN, ignoreColumnNameList);
+		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_BUS_ROUTE_BYPASS_MAPPING.getName(), CommonConstant.EXCEPTION_COLUMN, exceptionColumnNameList);
 		return commonSchemaList;
 	}
 
@@ -312,13 +312,13 @@ public class BusRouteService {
 	 * @throws Exception
 	 */
 	private List<CommonSchema> selectBusRouteCalendarSchema() throws Exception {
-		ArrayList<String> ignoreColumnNameList = new ArrayList<>();
-		ignoreColumnNameList.add("service_id");
-		ignoreColumnNameList.add("start_date");
-		ignoreColumnNameList.add("end_date");
-		ignoreColumnNameList.add("comment");
+		ArrayList<String> exceptionColumnNameList = new ArrayList<>();
+		exceptionColumnNameList.add("service_id");
+		exceptionColumnNameList.add("start_date");
+		exceptionColumnNameList.add("end_date");
+		exceptionColumnNameList.add("comment");
 
-		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_CALENDAR.getName(), CommonConstant.IGNORE_COLUMN, ignoreColumnNameList);
+		List<CommonSchema> commonSchemaList = commonService.selectCommonSchemaList(PubTransTable.TB_CALENDAR.getName(), CommonConstant.EXCEPTION_COLUMN, exceptionColumnNameList);
 		return commonSchemaList;
 	}
 
@@ -572,11 +572,11 @@ public class BusRouteService {
 	 * @throws Exception
 	 */
 	@Transactional
-	public CommonResult registerBusRouteTask(String taskType, BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
+	public CommonResult registerBusRouteTask(TaskType taskType, BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
 
 		// 작업등록 유형이 '신규등록' 이나 "수정'인 경우 노선별 경유정류장 그래프 유효성 검사를 수행한다
 		// 작업등록 유형이 '노선삭제' 인 경우에는 노선별 경유장 그래프 유효성 검사를 수행하지 않는다.
-		if(taskType.equals(TaskType.REGISTER.getCode()) || taskType.equals(TaskType.MODIFY.getCode())) {
+		if(taskType.equals(TaskType.REGISTER) || taskType.equals(TaskType.MODIFY)) {
 			boolean result = this.verifyBusRouteGraphInfo(busRouteTaskInputVo.getBusStopGraphInfo());
 			 if (result == false) {
 		        throw new ApiException(ResultCode.BUS_ROUTE_STOPS_NOT_VALID.getApiErrorCode(), ResultCode.BUS_ROUTE_STOPS_NOT_VALID.getDisplayMessage());
@@ -585,7 +585,7 @@ public class BusRouteService {
 
 
 		// 노선 신규등록인 경우
-		if(taskType.equals(TaskType.REGISTER.getCode())) {
+		if(taskType.equals(TaskType.REGISTER)) {
 			/**
 			 * 노선 임시 ID 설정
 			 * Task 검수 완료 후 배포시 노선 테이블의 auto increment값을 사용하여 ID를 부여한다.
@@ -603,7 +603,7 @@ public class BusRouteService {
 
 
 		// Task 기본정보
-		TaskInputVo taskInputVo = this.createTaskInputInfo(taskType, TaskStatus.PROGRESS.getCode(), busRouteTaskInputVo);
+		TaskInputVo taskInputVo = this.createTaskInputInfo(taskType, TaskStatusType.CHECKING, busRouteTaskInputVo);
 
 
 		/**
@@ -650,7 +650,7 @@ public class BusRouteService {
 		}
 
 
-		if(taskType.equals(TaskType.REGISTER.getCode()) || taskType.equals(TaskType.MODIFY.getCode())) {
+		if(taskType.equals(TaskType.REGISTER) || taskType.equals(TaskType.MODIFY)) {
 
 			/**
 			 * 요금정보
@@ -659,7 +659,7 @@ public class BusRouteService {
 
 			// 요금ID 변경여부
 			boolean isBusRouteFareChange = false;
-			if(taskType.equals(TaskType.MODIFY.getCode())) {
+			if(taskType.equals(TaskType.MODIFY)) {
 			    // 노선정보
 			    BusRouteVo busRouteVo = busRouteRepository.getBusRoute(busRouteTaskInputVo.getRouteId());
 
@@ -669,7 +669,7 @@ public class BusRouteService {
 			    }
 			}
 
-			if(taskType.equals(TaskType.REGISTER.getCode()) || isBusRouteFareChange) {
+			if(taskType.equals(TaskType.REGISTER) || isBusRouteFareChange) {
 				Integer fareId = busRouteRepository.getBaseFareId(busRouteTaskInputVo);
 				if(fareId == null) {
 					throw new ApiException(ResultCode.BUS_FARE_NOT_MATCH.getApiErrorCode(), ResultCode.BUS_FARE_NOT_MATCH.getDisplayMessage());
@@ -687,7 +687,7 @@ public class BusRouteService {
 
 		}
 
-		if(taskType.equals(TaskType.REMOVE.getCode())) {
+		if(taskType.equals(TaskType.REMOVE)) {
 
 			// 현재 서비스중인 경유정류장 목록을 작업정보로 저장한다
 			List<BusStopGraphVo> busStopGraphVoList = busGraphRepository.selectBusRouteGraphList(busRouteTaskInputVo.getRouteId());
@@ -887,13 +887,13 @@ public class BusRouteService {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean isTheSameAsBusRouteStopVoListOfDb(String taskType, int routeId, List<BusStopGraphVo> busStopGraphVoList) throws Exception {
+	public boolean isTheSameAsBusRouteStopVoListOfDb(TaskType taskType, int routeId, List<BusStopGraphVo> busStopGraphVoList) throws Exception {
 
 		// 사용자 입력 경유정류장 목록
 		List<BusRouteStopVo> busRouteStopVoListOfTask = this.buildBusRouteStopVoList(routeId, busStopGraphVoList);
 
 		// 노선 수정
-		if(taskType.equals(TaskType.MODIFY.getCode())) {
+		if(taskType.equals(TaskType.MODIFY)) {
 
 			// 경유정류장 및 그래프 원본
 			List<BusStopGraphVo> busStopGraphVoListOfDb = busGraphRepository.selectBusRouteGraphList(routeId);
@@ -993,29 +993,31 @@ public class BusRouteService {
 	 * @return
 	 * @throws Exception
 	 */
-	private TaskInputVo createTaskInputInfo(String taskType, String taskStatus, BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
+	private TaskInputVo createTaskInputInfo(TaskType taskType, TaskStatusType taskStatus, BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
 		// Task 기본정보
 		TaskInputVo taskInputVo = new TaskInputVo();
 		taskInputVo.setTaskType(taskType);
+		taskInputVo.setCityCode(busRouteTaskInputVo.getCityCode());
 		taskInputVo.setPubTransId(busRouteTaskInputVo.getRouteId());
 
 		taskInputVo.setProviderId(busRouteTaskInputVo.getProviderId());
-		taskInputVo.setTaskStatus(taskStatus);
-		taskInputVo.setTaskDataType(TaskDataType.ROUTE.getCode());
-		taskInputVo.setTaskDataName(busRouteTaskInputVo.getRouteName());
+		taskInputVo.setTaskStatusType(taskStatus);
+		taskInputVo.setPubTransType(PubTransType.ROUTE);
+		taskInputVo.setPubTransName(busRouteTaskInputVo.getRouteName());
 		taskInputVo.setTaskComment(busRouteTaskInputVo.getTaskComment());
-		taskInputVo.setTaskRegisterType(CommonConstant.MANUAL);
 		taskInputVo.setCheckUserId(busRouteTaskInputVo.getCheckUserId());
+		taskInputVo.setTaskCheckRequestType(busRouteTaskInputVo.getTaskCheckRequestType());
+		taskInputVo.setTaskDataSourceType(busRouteTaskInputVo.getTaskDataSourceType());
 
 		/*
 		 * 등록자, 작업자 정보
 		 * 작업 등록시  등록자,작업자는 본인 자신이다.
 		 */
-		taskService.addTaskMemberInfo(TaskAssignType.REGISTER.getCode(), taskInputVo);
-		taskService.addTaskMemberInfo(TaskAssignType.WORK.getCode(), taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.REGISTER, taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.WORK, taskInputVo);
 
 		// 검수자 정보
-		taskService.addTaskMemberInfo(TaskAssignType.CHECK.getCode(), taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.CHECK, taskInputVo);
 
 
 		return taskInputVo;
@@ -1167,6 +1169,8 @@ public class BusRouteService {
 		BusRouteTaskInputVo busRouteTaskInputVo = new BusRouteTaskInputVo();
 		BeanUtils.copyProperties(busRouteVo, busRouteTaskInputVo);
 
+		busRouteTaskInputVo.setTaskCheckRequestType(busRouteRemoveTaskInputVo.getTaskCheckRequestType());
+		busRouteTaskInputVo.setTaskDataSourceType(busRouteRemoveTaskInputVo.getTaskDataSourceType());
 		busRouteTaskInputVo.setTaskComment(busRouteRemoveTaskInputVo.getTaskComment());
 		busRouteTaskInputVo.setCheckUserId(busRouteRemoveTaskInputVo.getCheckUserId());
 
@@ -1182,7 +1186,7 @@ public class BusRouteService {
 		busRouteTaskInputVo.setCompanyList(busRouteCompanyTaskInputVoList);;
 
 		// 노선 삭제요청 Task 등록
-		CommonResult commonResult = this.registerBusRouteTask(TaskType.REMOVE.getCode(), busRouteTaskInputVo);
+		CommonResult commonResult = this.registerBusRouteTask(TaskType.REMOVE, busRouteTaskInputVo);
 		return commonResult;
 	}
 
@@ -1200,7 +1204,7 @@ public class BusRouteService {
 		// Task 정보
 		TaskOutputVo taskOutputVo = taskService.getTaskInfo(taskId);
 
-		TaskInputVo taskInputVo = this.createTaskInputInfo(taskOutputVo.getTaskType(), taskOutputVo.getTaskStatus(), busRouteTaskInputVo);
+		TaskInputVo taskInputVo = this.createTaskInputInfo(taskOutputVo.getTaskType(), taskOutputVo.getTaskStatusType(), busRouteTaskInputVo);
 		taskInputVo.setTaskId(taskId);
 
 		/**
@@ -1288,7 +1292,7 @@ public class BusRouteService {
 			}
 
 			// 노선 수정인경우 routeId 체크
-			if(TaskType.MODIFY.getCode().equals(taskOutputVo.getTaskType())) {
+			if(TaskType.MODIFY.equals(taskOutputVo.getTaskType())) {
 				Integer tempRouteId = busRouteTaskInputVo.getRouteId();
 
 				if (tempRouteId == null || tempRouteId < PubTransId.ROUTE_MIN.getId() || tempRouteId > PubTransId.ROUTE_MAX.getId()) {
@@ -1326,7 +1330,7 @@ public class BusRouteService {
 	 * @param busRouteTaskInputVo - 노선 작업정보
 	 * @throws Exception
 	 */
-	public void registerBusRouteStopAndBusStopGraphTask(String taskType, BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
+	public void registerBusRouteStopAndBusStopGraphTask(TaskType taskType, BusRouteTaskInputVo busRouteTaskInputVo) throws Exception {
 
 		// 사용자 입력 경유정류장 및 그래프 정보 가져오기
 		List<BusStopGraphVo> busStopGraphVoList = this.makeBusStopGraphVoList(busRouteTaskInputVo);
@@ -1339,7 +1343,7 @@ public class BusRouteService {
 		List<BusRouteStopVo> busRouteStopVoList = null;
 
 		// 원본 노선별 경유정류장 목록과 사용자 입력 경유 정류장이 동일한지 확인한다
-		if (taskType.equals(TaskType.MODIFY.getCode())) {
+		if (taskType.equals(TaskType.MODIFY)) {
 		   isSame = isTheSameAsBusRouteStopVoListOfDb(taskType, busRouteTaskInputVo.getRouteId(), busStopGraphVoList);
 		} else {
 		  isSame = false;

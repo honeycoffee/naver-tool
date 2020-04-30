@@ -36,8 +36,10 @@ import com.naver.pubtrans.itn.api.common.ApiUtils;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.PubTransId;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
-import com.naver.pubtrans.itn.api.consts.TaskDataType;
-import com.naver.pubtrans.itn.api.consts.TaskStatus;
+import com.naver.pubtrans.itn.api.consts.TaskCheckRequestType;
+import com.naver.pubtrans.itn.api.consts.TaskDataSourceType;
+import com.naver.pubtrans.itn.api.consts.PubTransType;
+import com.naver.pubtrans.itn.api.consts.TaskStatusType;
 import com.naver.pubtrans.itn.api.repository.BusStopRepository;
 import com.naver.pubtrans.itn.api.service.TaskService;
 import com.naver.pubtrans.itn.api.vo.bus.stop.input.BusStopRemoveTaskInputVo;
@@ -322,6 +324,8 @@ public class BusStopControllerTest {
 		busStopInputVo.setDisplayId("01123");
 		busStopInputVo.setTaskComment("정류장 등록");
 		busStopInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busStopInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busStopInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		MvcResult mvcResult = mockMvc.perform(post("/v1/ntool/api/busStopTask/addTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -372,7 +376,7 @@ public class BusStopControllerTest {
 	public void caseBusStopEditTask() throws Exception {
 
 		BusStopTaskInputVo busStopInputVo = new BusStopTaskInputVo();
-		busStopInputVo.setStopId(500002);
+		busStopInputVo.setStopId(55000000);
 		busStopInputVo.setStopName("jUnit Test");
 		busStopInputVo.setLongitude(126.123456);
 		busStopInputVo.setLatitude(34.5678);
@@ -393,6 +397,8 @@ public class BusStopControllerTest {
 		busStopInputVo.setDisplayId("01123");
 		busStopInputVo.setTaskComment("정류장 등록");
 		busStopInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busStopInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busStopInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/editTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -458,6 +464,8 @@ public class BusStopControllerTest {
 		busStopInputVo.setDisplayId("01123");
 		busStopInputVo.setTaskComment("정류장 등록");
 		busStopInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		//busStopInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		//busStopInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		mockMvc.perform(put("/v1/ntool/api/modify/busStopTask")
 			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -563,6 +571,8 @@ public class BusStopControllerTest {
 		busStopRemoveInputVo.setStopId(55000848);
 		busStopRemoveInputVo.setTaskComment("미존재 정류장 - 삭제 처리");
 		busStopRemoveInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busStopRemoveInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busStopRemoveInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/removeTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -585,6 +595,8 @@ public class BusStopControllerTest {
 		busStopRemoveInputVo.setStopId(3);
 		busStopRemoveInputVo.setTaskComment("미존재 정류장 - 삭제 처리");
 		busStopRemoveInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busStopRemoveInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busStopRemoveInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/removeTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -607,6 +619,9 @@ public class BusStopControllerTest {
 		busStopRemoveInputVo.setStopId(55000000);
 		busStopRemoveInputVo.setTaskComment("미존재 정류장 - 삭제 처리");
 		busStopRemoveInputVo.setCheckUserId(this.tokenMap.get("userId"));
+		busStopRemoveInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busStopRemoveInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
+
 
 		mockMvc.perform(post("/v1/ntool/api/busStopTask/removeTask")
 				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
@@ -629,9 +644,9 @@ public class BusStopControllerTest {
 		TaskInputVo taskInputVo = new TaskInputVo();
 		taskInputVo.setPubTransId(0);
 		taskInputVo.setProviderId(0);
-		taskInputVo.setTaskStatus(TaskStatus.PROGRESS.getCode());
-		taskInputVo.setTaskDataType(TaskDataType.STOP.getCode());
-		taskInputVo.setTaskDataName("테스트 정류장");
+		taskInputVo.setTaskStatusType(TaskStatusType.PROGRESS);
+		taskInputVo.setPubTransType(PubTransType.STOP);
+		taskInputVo.setPubTransName("테스트 정류장");
 
 		assertThrows(DataAccessException.class, () -> {
 			taskService.registerTaskInfoAll(taskInputVo);
@@ -655,5 +670,60 @@ public class BusStopControllerTest {
 		assertThrows(DataAccessException.class, () -> {
 			busStopRepository.insertBusStopTask(busStopTaskInputVo);
 		});
+	}
+
+
+	/**
+	 * 지도영역의 버스정류장 목록 - 데이터가 존재할때
+	 * @throws Exception
+	 */
+	@Test
+	public void caseExistsBusStopListFromMapBounds() throws Exception {
+		mockMvc.perform(get("/v1/ntool/api/list/busStopFromMapBounds")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
+            	.param("rightTopCoordinates", "126.982676,37.575861")
+            	.param("leftBottomCoordinates", "126.983191,37.569500")
+            	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8"))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
+				.andExpect(jsonPath("$.result.data", is(not(hasSize(0)))));
+	}
+
+	/**
+	 * 지도영역의 버스정류장 목록 - 데이터가 존재하지 않을때
+	 * @throws Exception
+	 */
+	@Test
+	public void caseNotExistsBusStopListFromMapBounds() throws Exception {
+		mockMvc.perform(get("/v1/ntool/api/list/busStopFromMapBounds")
+				.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
+            	.param("rightTopCoordinates", "126.879366,37.608285")
+            	.param("leftBottomCoordinates", "126.894129,37.601162")
+            	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .characterEncoding("UTF-8"))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.code", is(ResultCode.OK.getApiErrorCode())))
+				.andExpect(jsonPath("$.result.data", is(hasSize(0))));
+	}
+
+	/**
+	 * 지도영역의 버스정류장 목록 유효성 검사를 진행한다 - 좌표정보가 잘못되었을 경우
+	 * @throws Exception
+	 */
+	@Test
+	public void verifyBusStopListFromMapBounds() throws Exception {
+		mockMvc.perform(get("/v1/ntool/api/list/busStopFromMapBounds")
+			.header(JwtAdapter.HEADER_NAME, this.tokenMap.get(CommonConstant.ACCESS_TOKEN_KEY))
+        	.param("rightTopCoordinates", "126.879366,37.608285,37.608285")
+        	.param("leftBottomCoordinates", "126.894129,37.601162")
+        	.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .characterEncoding("UTF-8"))
+			.andDo(print())
+			.andExpect(status().is5xxServerError())
+			.andExpect(jsonPath("$.code", is(ResultCode.PARAMETER_RULE_ERROR.getApiErrorCode())))
+			.andExpect(jsonPath("$.message", is(ResultCode.PARAMETER_RULE_ERROR.getDisplayMessage())));
 	}
 }

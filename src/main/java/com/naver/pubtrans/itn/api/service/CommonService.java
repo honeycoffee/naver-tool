@@ -15,6 +15,11 @@ import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
 import com.naver.pubtrans.itn.api.consts.CodeType;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.PubTransTable;
+import com.naver.pubtrans.itn.api.consts.PubTransType;
+import com.naver.pubtrans.itn.api.consts.TaskCheckRequestType;
+import com.naver.pubtrans.itn.api.consts.TaskDataSourceType;
+import com.naver.pubtrans.itn.api.consts.TaskStatusType;
+import com.naver.pubtrans.itn.api.consts.TaskType;
 import com.naver.pubtrans.itn.api.repository.CommonRepository;
 import com.naver.pubtrans.itn.api.vo.common.AliasColumnNameVo;
 import com.naver.pubtrans.itn.api.vo.common.BusProviderVo;
@@ -134,6 +139,68 @@ public class CommonService {
 
 
 	/**
+	 * 작업 데이터 출처 코드목록 전체 가져오기
+	 * @return
+	 */
+	public List<FieldValue> selectTaskDataSourceTypeListAll() {
+		List<FieldValue> fieldValueList = new ArrayList<>();
+		for(TaskDataSourceType taskDataSourceType : TaskDataSourceType.values()) {
+
+			fieldValueList.add(new FieldValue(taskDataSourceType.getCode(), taskDataSourceType.getCodeName()));
+		}
+		return fieldValueList;
+	}
+
+	/**
+	 * 작업 검수요청 구분 코드목록 전체 가져오기
+	 * @return
+	 */
+	public List<FieldValue> selectTaskCheckRequestTypeListAll() {
+		List<FieldValue> fieldValueList = new ArrayList<>();
+		for(TaskCheckRequestType taskCheckRequestType : TaskCheckRequestType.values()) {
+			fieldValueList.add(new FieldValue(taskCheckRequestType.getCode(), taskCheckRequestType.getDescription()));
+		}
+		return fieldValueList;
+	}
+
+	/**
+	 * 작업 진행상태 구분 코드목록 전체 가져오기
+	 * @return
+	 */
+	public List<FieldValue> selectTaskStatusTypeListAll() {
+		List<FieldValue> fieldValueList = new ArrayList<>();
+		for(TaskStatusType taskStatusType : TaskStatusType.values()) {
+			fieldValueList.add(new FieldValue(taskStatusType.getCode(), taskStatusType.getDescription()));
+		}
+		return fieldValueList;
+	}
+
+	/**
+	 * 대중교통 구분 코드목록 전체 가져오기
+	 * @return
+	 */
+	public List<FieldValue> selectPubTransTypeListAll() {
+		List<FieldValue> fieldValueList = new ArrayList<>();
+		for(PubTransType pubTransType : PubTransType.values()) {
+			fieldValueList.add(new FieldValue(pubTransType.getCode(), pubTransType.getDescription()));
+		}
+		return fieldValueList;
+	}
+
+	/**
+	 * 작업 구분 코드목록 전체 가져오기
+	 * @return
+	 */
+	public List<FieldValue> selectTaskTypeListAll() {
+		List<FieldValue> fieldValueList = new ArrayList<>();
+		for(TaskType taskType : TaskType.values()) {
+			fieldValueList.add(new FieldValue(taskType.getCode(), taskType.getDescription()));
+		}
+		return fieldValueList;
+	}
+
+
+	/**
 	 * 공통 코드 목록을 가져온다
 	 * @param codeName - 코드타입(CodType.class 참조)
 	 * @return
@@ -175,8 +242,8 @@ public class CommonService {
 		if(Objects.nonNull(columnNameList)) {
 			if(refineType.equals(CommonConstant.USABLE_COLUMN)) {
 				schemaVoList = outputFmtUtil.refineSchemaVo(schemaVoList, columnNameList);
-			}else if(refineType.equals(CommonConstant.IGNORE_COLUMN)) {
-				schemaVoList = outputFmtUtil.refineSchemaVoWithIgnoreColumns(schemaVoList, columnNameList);
+			}else if(refineType.equals(CommonConstant.EXCEPTION_COLUMN)) {
+				schemaVoList = outputFmtUtil.refineSchemaVoWithExceptionColumns(schemaVoList, columnNameList);
 			}
 		}
 
@@ -251,6 +318,14 @@ public class CommonService {
 		 * 회원 권한 정보
 		 */
 		fieldValuesMap.put("authority_id", this.selectCommonCode(CodeType.AUTHORITY_ID.getCodeName()));
+		/**
+		 * Task 코드 정보
+		 */
+		fieldValuesMap.put("task_data_source_type", this.selectCommonCode(CodeType.TASK_DATA_SOURCE_TYPE.getCodeName()));
+		fieldValuesMap.put("task_check_request_type", this.selectCommonCode(CodeType.TASK_CHECK_REQUEST_TYPE.getCodeName()));
+		fieldValuesMap.put("pub_trans_type", this.selectCommonCode(CodeType.PUB_TRANS_TYPE.getCodeName()));
+		fieldValuesMap.put("task_status_type", this.selectCommonCode(CodeType.TASK_STATUS_TYPE.getCodeName()));
+		fieldValuesMap.put("task_type", this.selectCommonCode(CodeType.TASK_TYPE.getCodeName()));
 
 
 		return fieldValuesMap;
@@ -282,6 +357,16 @@ public class CommonService {
 				FieldValue fN = new FieldValue(CommonConstant.N, CommonConstant.N);
 				fieldValueList.add(fY);
 				fieldValueList.add(fN);
+			}else if(codeType.getCodeName().equals(CodeType.TASK_DATA_SOURCE_TYPE.getCodeName())) {	// 작업 데이터 출처
+				fieldValueList = this.selectTaskDataSourceTypeListAll();
+			}else if(codeType.getCodeName().equals(CodeType.TASK_CHECK_REQUEST_TYPE.getCodeName())) {	// 작업 검수요청 구분
+				fieldValueList = this.selectTaskCheckRequestTypeListAll();
+			}else if(codeType.getCodeName().equals(CodeType.TASK_STATUS_TYPE.getCodeName())) {		// 작업 진행상태
+				fieldValueList = this.selectTaskStatusTypeListAll();
+			}else if(codeType.getCodeName().equals(CodeType.PUB_TRANS_TYPE.getCodeName())) {		// 대중교통 데이터 구분
+				fieldValueList = this.selectPubTransTypeListAll();
+			}else if(codeType.getCodeName().equals(CodeType.TASK_TYPE.getCodeName())) {				// 작업 구분
+				fieldValueList = this.selectTaskTypeListAll();
 			}
 
 			commonCodeMap.put(codeType.getCodeName(), fieldValueList);

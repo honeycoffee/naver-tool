@@ -2,6 +2,7 @@ package com.naver.pubtrans.itn.api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -11,6 +12,11 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.naver.pubtrans.itn.api.config.converter.PubTransTypeConverter;
+import com.naver.pubtrans.itn.api.config.converter.TaskDataSourceTypeConverter;
+import com.naver.pubtrans.itn.api.config.converter.TaskStatusTypeConverter;
+import com.naver.pubtrans.itn.api.config.converter.TaskTypeConverter;
 
 /**
  * 프로젝트 글로벌 WebConfig
@@ -65,4 +71,14 @@ public class WebConfig implements WebMvcConfigurer {
 			.ignoreAcceptHeader(true);
 
 	}
+
+	@Override
+    public void addFormatters(FormatterRegistry registry) {
+
+		// GET Parameter를 통해 전송되는 Enum 값들을 각 타입에 맞게 변환한다
+        registry.addConverter(new PubTransTypeConverter());
+        registry.addConverter(new TaskDataSourceTypeConverter());
+        registry.addConverter(new TaskStatusTypeConverter());
+        registry.addConverter(new TaskTypeConverter());
+    }
 }

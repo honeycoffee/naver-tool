@@ -37,7 +37,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.naver.pubtrans.itn.api.common.ApiUtils;
 import com.naver.pubtrans.itn.api.auth.JwtAdapter;
 import com.naver.pubtrans.itn.api.common.OutputFmtUtil;
+import com.naver.pubtrans.itn.api.consts.CodeType;
 import com.naver.pubtrans.itn.api.consts.CommonConstant;
+import com.naver.pubtrans.itn.api.consts.PubTransType;
+import com.naver.pubtrans.itn.api.consts.TaskCheckRequestType;
+import com.naver.pubtrans.itn.api.consts.TaskDataSourceType;
+import com.naver.pubtrans.itn.api.consts.TaskStatusType;
 import com.naver.pubtrans.itn.api.consts.TaskType;
 import com.naver.pubtrans.itn.api.controller.BusRouteController;
 import com.naver.pubtrans.itn.api.controller.BusRouteControllerTest;
@@ -247,18 +252,18 @@ public class BusRouteControllerDocumentTest {
 
 		TaskSummaryOutputVo taskSummaryOuputVo1 = new TaskSummaryOutputVo();
 		taskSummaryOuputVo1.setTaskId(1);
-		taskSummaryOuputVo1.setTaskType("modify");
-		taskSummaryOuputVo1.setTaskStatus("01");
-		taskSummaryOuputVo1.setTaskDataType("route");
+		taskSummaryOuputVo1.setTaskType(TaskType.MODIFY);
+		taskSummaryOuputVo1.setTaskStatusType(TaskStatusType.PROGRESS);
+		taskSummaryOuputVo1.setPubTransType(PubTransType.ROUTE);
 		taskSummaryOuputVo1.setTaskComment("노선 이름변경");
 		taskSummaryOuputVo1.setRegDate("2020-03-06");
 		taskSummaryOuputVo1.setWorkUserName("안경현");
 
 		TaskSummaryOutputVo taskSummaryOuputVo2 = new TaskSummaryOutputVo();
 		taskSummaryOuputVo2.setTaskId(2);
-		taskSummaryOuputVo2.setTaskType("modify");
-		taskSummaryOuputVo2.setTaskStatus("00");
-		taskSummaryOuputVo2.setTaskDataType("route");
+		taskSummaryOuputVo2.setTaskType(TaskType.MODIFY);
+		taskSummaryOuputVo2.setTaskStatusType(TaskStatusType.WAIT);
+		taskSummaryOuputVo2.setPubTransType(PubTransType.ROUTE);
 		taskSummaryOuputVo2.setTaskComment("DCC 노선 이름변경");
 		taskSummaryOuputVo2.setRegDate("2020-03-09");
 		taskSummaryOuputVo2.setWorkUserName("안경현");
@@ -308,9 +313,9 @@ public class BusRouteControllerDocumentTest {
 
 	             		fieldWithPath("result.data[]").type(JsonFieldType.ARRAY).description("작업 정보"),
 	             		fieldWithPath("result.data[].taskId").type(JsonFieldType.NUMBER).description("작업ID"),
-	             		fieldWithPath("result.data[].taskType").type(JsonFieldType.STRING).description("작업구분(register:등록, modify:수정, remove:삭제)"),
-	             		fieldWithPath("result.data[].taskStatus").type(JsonFieldType.STRING).description("작업 진행상태(00:대기, 01:진행, 02:완료, 03:예외)"),
-	             		fieldWithPath("result.data[].taskDataType").type(JsonFieldType.STRING).description("데이터 종류(stop:정류장, route:노선, company:운수사)"),
+	             		fieldWithPath("result.data[].taskType").type(JsonFieldType.STRING).description(CodeType.TASK_TYPE.getCodeDescription() + TaskType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data[].taskStatusType").type(JsonFieldType.STRING).description(CodeType.TASK_STATUS_TYPE.getCodeDescription() + TaskStatusType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data[].pubTransType").type(JsonFieldType.STRING).description(CodeType.PUB_TRANS_TYPE.getCodeDescription() + PubTransType.getCodeAndDescriptionWithColon()),
 	             		fieldWithPath("result.data[].taskComment").type(JsonFieldType.STRING).description("작업내용"),
 	             		fieldWithPath("result.data[].regDate").type(JsonFieldType.STRING).description("등록일"),
 	             		fieldWithPath("result.data[].workUserName").type(JsonFieldType.STRING).description("작업자")
@@ -721,14 +726,16 @@ public class BusRouteControllerDocumentTest {
 	             		fieldWithPath("result.data.taskInfo.taskId").type(NUMBER_OR_NULL).description("작업ID (작업정보 존재시)"),
 	             		fieldWithPath("result.data.taskInfo.providerId").type(JsonFieldType.NUMBER).description("BIS 지역코드"),
 	             		fieldWithPath("result.data.taskInfo.providerName").type(STRING_OR_NULL).description("BIS 지역명"),
-	             		fieldWithPath("result.data.taskInfo.taskType").type(STRING_OR_NULL).description("작업구분(register:등록, modify:수정, remove:삭제)"),
-	             		fieldWithPath("result.data.taskInfo.taskStatus").type(STRING_OR_NULL).description("작업 진행상태(00:대기, 01:진행, 02:완료, 03:예외)"),
+	             		fieldWithPath("result.data.taskInfo.taskType").type(JsonFieldType.STRING).description(CodeType.TASK_TYPE.getCodeDescription() + TaskType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data.taskInfo.taskStatusType").type(JsonFieldType.STRING).description(CodeType.TASK_STATUS_TYPE.getCodeDescription() + TaskStatusType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data.taskInfo.pubTransType").type(JsonFieldType.STRING).description(CodeType.PUB_TRANS_TYPE.getCodeDescription() + PubTransType.getCodeAndDescriptionWithColon()),
+	             		fieldWithPath("result.data.taskInfo.taskDataSourceType").type(NUMBER).description(CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+	                    fieldWithPath("result.data.taskInfo.taskCheckRequestType").type(STRING).description(CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
 	             		fieldWithPath("result.data.taskInfo.pubTransId").type(JsonFieldType.NUMBER).description("대중교통 ID"),
-	             		fieldWithPath("result.data.taskInfo.taskDataType").type(STRING_OR_NULL).description("데이터 종류(stop:정류장, route:노선, company:운수사)"),
-	             		fieldWithPath("result.data.taskInfo.taskDataName").type(STRING_OR_NULL).description("데이터 이름"),
+	             		fieldWithPath("result.data.taskInfo.pubTransName").type(STRING_OR_NULL).description("데이터 이름"),
 	             		fieldWithPath("result.data.taskInfo.taskComment").type(STRING_OR_NULL).description("작업내용"),
 	             		fieldWithPath("result.data.taskInfo.bisChangeDataInfo").type(OBJECT_OR_NULL).description("BIS 자동등록 변경내용 - Null이 아닌경우 변경된 데이터 컬럼 정보만 하위 요소로 표출"),
-	             		fieldWithPath("result.data.taskInfo.taskRegisterType").type(STRING_OR_NULL).description("작업 등록구분(A:자동, M:수동)"),
+	             		fieldWithPath("result.data.taskInfo.autoRegisterYn").type(JsonFieldType.STRING).description("자동 등록여부(Y/N)"),
 	             		fieldWithPath("result.data.taskInfo.regUserName").type(STRING_OR_NULL).description("등록자명"),
 	             		fieldWithPath("result.data.taskInfo.regUserId").type(STRING_OR_NULL).description("등록자ID"),
 	             		fieldWithPath("result.data.taskInfo.regDate").type(STRING_OR_NULL).description("등록일"),
@@ -770,7 +777,7 @@ public class BusRouteControllerDocumentTest {
 
 
 		//given
-		given(busRouteService.registerBusRouteTask(ArgumentMatchers.anyString(), any()))
+		given(busRouteService.registerBusRouteTask(ArgumentMatchers.eq(TaskType.REGISTER), any()))
 				.willReturn(commonResult) ;
 
 		//when
@@ -831,6 +838,8 @@ public class BusRouteControllerDocumentTest {
                     fieldWithPath("parentRouteId").type(NUMBER).description("본 노선 ID").optional(),
                     fieldWithPath("bypassStartDateTime").type(STRING).description("우회 시작일시(yyyyMMddHHmm)").optional(),
                     fieldWithPath("bypassEndDateTime").type(STRING).description("우회 종료일시(yyyyMMddHHmm)").optional(),
+                    fieldWithPath("taskDataSourceType").type(NUMBER).description("[필수]" + CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+                    fieldWithPath("taskCheckRequestType").type(STRING).description("[필수]" + CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
                     fieldWithPath("taskComment").type(STRING).description("[필수]작업내용"),
                     fieldWithPath("checkUserId").type(STRING).description("[필수]검수자 ID"),
                     fieldWithPath("companyList[]").type(ARRAY).description("[필수]운수회사 정보"),
@@ -883,7 +892,7 @@ public class BusRouteControllerDocumentTest {
 
 
 		//given
-		given(busRouteService.registerBusRouteTask(ArgumentMatchers.anyString(), any()))
+		given(busRouteService.registerBusRouteTask(ArgumentMatchers.eq(TaskType.MODIFY), any()))
 				.willReturn(commonResult) ;
 
 		//when
@@ -945,6 +954,8 @@ public class BusRouteControllerDocumentTest {
                     fieldWithPath("parentRouteId").type(NUMBER).description("본 노선 ID").optional(),
                     fieldWithPath("bypassStartDateTime").type(STRING).description("우회 시작일시(yyyyMMddHHmm)").optional(),
                     fieldWithPath("bypassEndDateTime").type(STRING).description("우회 종료일시(yyyyMMddHHmm)").optional(),
+                    fieldWithPath("taskDataSourceType").type(NUMBER).description("[필수]" + CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+                    fieldWithPath("taskCheckRequestType").type(STRING).description("[필수]" + CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
                     fieldWithPath("taskComment").type(STRING).description("[필수]작업내용"),
                     fieldWithPath("checkUserId").type(STRING).description("[필수]검수자 ID"),
                     fieldWithPath("companyList[]").type(ARRAY).description("[필수]운수회사 정보"),
@@ -984,6 +995,8 @@ public class BusRouteControllerDocumentTest {
 		busRouteRemoveTaskInputVo.setRouteId(11000000);
 		busRouteRemoveTaskInputVo.setCheckUserId("kr94666");
 		busRouteRemoveTaskInputVo.setTaskComment("폐선에 따른 노선정보 삭제");
+		busRouteRemoveTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busRouteRemoveTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 
 		// 성공시 작업ID 리턴
@@ -1014,6 +1027,8 @@ public class BusRouteControllerDocumentTest {
 	            getDocumentResponse(),
 	            requestFields(
 	            	fieldWithPath("routeId").type(NUMBER).description("[필수]노선ID"),
+	            	fieldWithPath("taskDataSourceType").type(NUMBER).description("[필수]" + CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+                    fieldWithPath("taskCheckRequestType").type(STRING).description("[필수]" + CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
 	            	fieldWithPath("taskComment").type(STRING).description("[필수]작업내용"),
                     fieldWithPath("checkUserId").type(STRING).description("[필수]검수자 ID")
 	            ),
@@ -1104,6 +1119,8 @@ public class BusRouteControllerDocumentTest {
                     fieldWithPath("parentRouteId").type(NUMBER).description("본 노선 ID").optional(),
                     fieldWithPath("bypassStartDateTime").type(STRING).description("우회 시작일시(yyyyMMddHHmm)").optional(),
                     fieldWithPath("bypassEndDateTime").type(STRING).description("우회 종료일시(yyyyMMddHHmm)").optional(),
+                    fieldWithPath("taskDataSourceType").type(NUMBER).description("[필수]" + CodeType.TASK_DATA_SOURCE_TYPE.getCodeDescription()),
+                    fieldWithPath("taskCheckRequestType").type(STRING).description("[필수]" + CodeType.TASK_CHECK_REQUEST_TYPE.getCodeDescription()),
                     fieldWithPath("taskComment").type(STRING).description("[필수]작업내용"),
                     fieldWithPath("checkUserId").type(STRING).description("[필수]검수자 ID"),
                     fieldWithPath("companyList[]").type(ARRAY).description("[필수]운수회사 정보"),
@@ -1282,13 +1299,15 @@ public class BusRouteControllerDocumentTest {
 		taskOutputVo.setTaskId(122);
 		taskOutputVo.setProviderId(4);
 		taskOutputVo.setProviderName("서울");
-		taskOutputVo.setTaskType("modify");
-		taskOutputVo.setTaskStatus("01");
+		taskOutputVo.setTaskType(TaskType.MODIFY);
+		taskOutputVo.setTaskStatusType(TaskStatusType.PROGRESS);
 		taskOutputVo.setPubTransId(11000000);
-		taskOutputVo.setTaskDataType("route");
-		taskOutputVo.setTaskDataName("103");
+		taskOutputVo.setPubTransType(PubTransType.ROUTE);
+		taskOutputVo.setPubTransName("103");
 		taskOutputVo.setTaskComment("노선명칭 변경");
-		taskOutputVo.setTaskRegisterType("M");
+		taskOutputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		taskOutputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
+		taskOutputVo.setAutoRegisterYn("N");
 		taskOutputVo.setRegUserName("안경현");
 		taskOutputVo.setRegUserId("kr94666");
 		taskOutputVo.setRegDate("2020-03-06 13:45:49");
@@ -1351,6 +1370,8 @@ public class BusRouteControllerDocumentTest {
 		busRouteTaskInputVo.setSundayYn("Y");
 		busRouteTaskInputVo.setTaskComment("신규노선 추가");
 		busRouteTaskInputVo.setCheckUserId("kr94666");
+		busRouteTaskInputVo.setTaskDataSourceType(TaskDataSourceType.values()[0]);
+		busRouteTaskInputVo.setTaskCheckRequestType(TaskCheckRequestType.values()[0]);
 
 
 		BusRouteCompanyTaskInputVo busRoutecompanyTaskInputVo = new BusRouteCompanyTaskInputVo();

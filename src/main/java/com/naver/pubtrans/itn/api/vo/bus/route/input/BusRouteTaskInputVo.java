@@ -10,6 +10,8 @@ import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.naver.pubtrans.itn.api.consts.TaskCheckRequestType;
+import com.naver.pubtrans.itn.api.consts.TaskDataSourceType;
 import com.naver.pubtrans.itn.api.vo.bus.graph.input.GeoJsonInputVo;
 import com.naver.pubtrans.itn.api.vo.bus.route.BusRouteTaskVo;
 
@@ -174,6 +176,12 @@ public class BusRouteTaskInputVo extends BusRouteTaskVo {
 	// 작업내용
 	@NotBlank
 	private String taskComment;
+
+	// 검수요청 구분 - 기본값 : 검수요청
+	private TaskCheckRequestType taskCheckRequestType = TaskCheckRequestType.CHECK_REQUEST;
+
+	// 데이터 출처 - 기본값 : 7(기타)
+	private TaskDataSourceType taskDataSourceType = TaskDataSourceType.ETC;
 
 	// 검수자 ID
 	@NotBlank

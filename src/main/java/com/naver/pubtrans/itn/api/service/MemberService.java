@@ -224,6 +224,17 @@ public class MemberService implements UserDetailsService {
 		// 회원 역할 수정
 		int updateMemberAuthorityCnt = memberRepository.updateMemberAuthority(memberUpdateVo);
 
+		MemberOutputVo memberOutputVo = MemberUtil.getMemberFromAccessToken();
+
+		memberUpdateVo.setRegUserId(memberOutputVo.getUserId());
+		memberUpdateVo.setRegUserName(memberOutputVo.getUserName());
+
+		// 기존 회원 자동 할당 삭제
+		memberRepository.deleteMemberAutoAssign(memberUpdateVo);
+		
+		// 회원 자동 할당 등록 
+		memberRepository.insertMemberAutoAssign(memberUpdateVo);
+
 		// 저장 오류 처리
 		if (updateMemberAuthorityCnt == 0) {
 			throw new ApiException(ResultCode.UPDATE_FAIL.getApiErrorCode(),

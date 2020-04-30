@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.naver.pubtrans.itn.api.repository.FareRepository">
+<mapper namespace="com.naver.pubtrans.itn.api.repository.FareRuleRepository">
 
 	<sql id="selectCommonFareRule">
 		fare.fare_id
 		, fare.start_stop_id
 		, fare.end_stop_id
+		, (SELECT stop.stop_name FROM tb_stops stop WHERE stop.stop_id = fare.start_stop_id) as start_stop_name
+		, (SELECT stop.stop_name FROM tb_stops stop WHERE stop.stop_id = fare.end_stop_id) as end_stop_name
 		, fare.service_id
 		, fare.transfer_group_id
 		, fare.city_code
@@ -16,9 +18,11 @@
 		, info.base_yn
 	</sql>
 
-	<select id="getBaseFareRule" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.FareVo">
+	<select id="getBaseFareRule" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.FareRuleVo">
 		SELECT
 			<include refid="selectCommonFareRule" />
+			, DATE_FORMAT(fare.create_date, '%Y.%m.%d') as create_date
+			, DATE_FORMAT(fare.update_date, '%Y.%m.%d') as update_date
 		FROM
 			tb_fare_rule fare, tb_fare_rule_info info
 		WHERE
@@ -32,22 +36,26 @@
 		
 	</select>
 	
-	<select id="getIngoredFareRule" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.FareVo">
+	<select id="getExceptionalFareRule" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.FareRuleVo">
 		SELECT
 			<include refid="selectCommonFareRule" />
+			, DATE_FORMAT(fare.create_date, '%Y.%m.%d') as create_date
+			, DATE_FORMAT(fare.update_date, '%Y.%m.%d') as update_date
 		FROM
 			tb_fare_rule fare, tb_fare_rule_info info
 		WHERE
 			fare.fare_id = info.fare_id
 		AND
+			info.base_yn = 'N'
+		AND
 			fare.fare_id = #{fareId} 
 		LIMIT 0, 1
 	</select>
 	
-	<select id="selectIgnoredFareRuleList" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.output.IgnoredFareListOutputVo">
+	<select id="selectExceptionalFareRuleList" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.output.ExceptionalFareRuleOutputVo">
 		SELECT
 			fare.fare_id
-			, substring_index(group_concat(route.route_name), ',', 5) as routes
+			, substring_index(group_concat(route.route_name), ', ', 5) as route_names
 		FROM
 			tb_fare_rule fare, tb_fare_rule_info info
 		LEFT JOIN tb_route_fare_mapping mapping on info.fare_id = mapping.fare_id
@@ -79,7 +87,7 @@
 		</if>
 	</sql>
 	
-	<select id="getFareRuleTask" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.fare.FareTaskVo">
+	<select id="getFareRuleTask" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.fare.FareRuleTaskVo">
 		SELECT
 			<include refid="selectCommonFareRule" />
 			, fare.task_id
@@ -103,7 +111,7 @@
 		, info.payment_id
 	</sql>
 	
-	<select id="getFareRuleInfo" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.FareInfoVo">
+	<select id="getFareRuleInfo" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.FareRuleInfoVo">
 		SELECT	
 			<include refid="selectCommonFareRuleInfo" />
 		FROM
@@ -115,7 +123,7 @@
 			
 	</select>
 	
-	<select id="getFareRuleInfoTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.FareInfoVo">
+	<select id="getFareRuleInfoTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleSearchVo" resultType="com.naver.pubtrans.itn.api.vo.fare.FareRuleInfoVo">
 		SELECT	
 			<include refid="selectCommonFareRuleInfo" />
 		FROM
@@ -136,14 +144,14 @@
 		</if>
 	</sql>
 
-	<insert id="insertFareRuleTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareTaskInputVo">
+	<insert id="insertFareRuleTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleTaskInputVo">
 		INSERT INTO tb_fare_rule_task
 			(fare_id, task_id, start_stop_id, end_stop_id, service_id, city_code, bus_class, source_name, source_url, comment)
 		VALUES
 			(#{fareId}, #{taskId}, #{startStopId}, #{endStopId}, #{serviceId}, #{cityCode}, #{busClass}, #{sourceName}, #{sourceUrl}, #{comment})
 	</insert>
 
-	<update id="updateFareRuleTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareTaskInputVo">
+	<update id="updateFareRuleTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleTaskInputVo">
 		UPDATE
 			tb_fare_rule_task
 		SET
@@ -154,21 +162,21 @@
 			, bus_class = #{busClass}
 			, source_name = #{sourceName}
 			, source_url = #{sourceUrl}
-			comment = #{comment}
+			, comment = #{comment}
 		WHERE
 			task_id = #{taskId}
 	</update>
 
-	<insert id="insertFareRuleInfoTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareTaskInputVo">
+	<insert id="insertFareRuleInfoTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleTaskInputVo">
 		INSERT INTO tb_fare_rule_info_task
 			(fare_id, task_id, base_fare, base_dist, unit_fare, unit_dist, max_fare, base_yn, age_id, payment_id)
 		VALUES
 			(#{fareId}, #{taskId}, #{baseFare}, #{baseDist}, #{unitFare}, #{unitDist}, #{maxFare}, #{baseYn}, #{ageId}, #{paymentId})
 	</insert>
 
-	<update id="updateFareRuleInfoTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareTaskInputVo">
+	<update id="updateFareRuleInfoTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleTaskInputVo">
 		UPDATE
-			tb_fare_rule_info_task
+			tb_fare_rule_info_task info
 		SET
 			base_fare = #{baseFare}
 			, base_dist = #{baseDist}
@@ -176,18 +184,19 @@
 			, unit_dist = #{unitDist}
 			, max_fare = #{maxFare}
 			, base_yn = #{baseYn}
-			, age_id = #{ageId}
-			, payment_id = #{payment]Id}
 		WHERE
 			task_id = #{taskId}
+			
+		<include refid="whereAgeIdAndPaymentId" />
+		
 	</update>
 
-	<select id="selectBusRouteFareMappingList" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteListOutputVo">
+	<select id="selectBusRouteListMappedToRouteFareRule" parameterType="int" resultType="com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteListOutputVo">
 		SELECT
 			city.city_code
 			, city.city_name
-		    , rc.bus_class_id as bus_class
-		    , rc.bus_class_name
+		    , route_class.bus_class_id as bus_class
+		    , route_class.bus_class_name
 		    , route.route_id
 		    , route.route_name
 			, sub.start_point_name
@@ -196,22 +205,22 @@
 			tb_routes route
 			, tb_bus_routes_info sub
 			, tb_city_code city
-			, tb_bus_route_class rc
+			, tb_bus_route_class route_class
 			, tb_route_fare_mapping mapping
         WHERE
 			mapping.fare_id = #{fareId}
 			AND route.city_code = city.city_code
-			AND sub.bus_class = rc.bus_class_id
+			AND sub.bus_class = route_class.bus_class_id
 			AND route.route_id = mapping.route_id
 			AND route.route_id = sub.route_id
 	</select>
 
-	<select id="selectBusRouteFareMappingTaskList" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteListOutputVo">
+	<select id="selectBusRouteListMappedToRouteFareRuleTask" parameterType="long" resultType="com.naver.pubtrans.itn.api.vo.bus.route.output.BusRouteListOutputVo">
 		SELECT
 			city.city_code
 			, city.city_name
-		    , rc.bus_class_id as bus_class
-		    , rc.bus_class_name
+		    , route_class.bus_class_id as bus_class
+		    , route_class.bus_class_name
 		    , route.route_id
 		    , route.route_name
 			, sub.start_point_name
@@ -220,22 +229,29 @@
 			tb_routes route
 			, tb_bus_routes_info sub
 			, tb_city_code city
-			, tb_bus_route_class rc
+			, tb_bus_route_class route_class
 			, tb_route_fare_mapping_task mapping
         WHERE
 			mapping.task_id = #{taskId}
 			AND route.city_code = city.city_code
-			AND sub.bus_class = rc.bus_class_id
+			AND sub.bus_class = route_class.bus_class_id
 			AND route.route_id = mapping.route_id
 			AND route.route_id = sub.route_id
 	</select>
 	
-	<insert id="insertRoutFareMappingTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareTaskInputVo">
-		INSERT INTO tb_fare_rule_mapping_task
+	<insert id="insertRoutFareMappingTask" parameterType="com.naver.pubtrans.itn.api.vo.fare.input.FareRuleTaskInputVo">
+		INSERT INTO tb_route_fare_mapping_task
 			(task_id, route_id, fare_id)
 		VALUES
 			(#{taskId}, #{routeId}, #{fareId})
 	</insert>
+
+	<delete id="deleteRoutFareMappingTask" parameterType="long">
+		DELETE FROM
+			tb_route_fare_mapping_task
+		WHERE
+			task_id = #{taskId}
+	</delete>
 	
 
 </mapper>

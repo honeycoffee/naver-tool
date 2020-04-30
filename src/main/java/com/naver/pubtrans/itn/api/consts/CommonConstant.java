@@ -40,17 +40,11 @@ public interface CommonConstant {
 
 	String SHOW_SCHEMA = "showSchema";
 
-	// 자동
-	String AUTO = "A";
-
-	// 수동
-	String MANUAL = "M";
-
 	// 이용컬럼
 	String USABLE_COLUMN = "usable";
 
-	// 제외컬럼
-	String IGNORE_COLUMN = "ignore";
+	// 예외컬럼
+	String EXCEPTION_COLUMN = "exception";
 
 	// 작업ID Prefix
 	String TASK_ID_PREFIX = "T";
@@ -74,9 +68,9 @@ public interface CommonConstant {
 	String KEY_COMPANY = "companyId";
 
 	// 작업ID 이름
-	String KEY_TASK = "taskId";
-
-	// 작업ID 이름 목록
+	String KEY_TASK = "taskId";	
+	
+	// 작업ID 이름 목록	
 	String KEY_TASK_LIST = "taskIdList";
 
 	// 버스정류장 Task 입력 정보 VO명
@@ -89,7 +83,7 @@ public interface CommonConstant {
 	String BUS_COMPANY_TASK_INPUT_VO = "BusCompanyTaskInputVo";
 
 	// 요금 룰 Task 입력 정보 VO명
-	String FARE_TASK_INPUT_VO = "FareTaskInputVo";
+	String FARE_RULE_TASK_INPUT_VO = "FareRuleTaskInputVo";
 
 	// geojson Geometry  type - LineString 명칭
 	String GEOJSON_GEOMETRY_TYPE_LINE_STRING = "LineString";
@@ -171,5 +165,11 @@ public interface CommonConstant {
 
 	// 초단위 마지막(59초)
 	String LAST_SECONDS = "59";
+
+	// 지도영역 검색 좌표 길이(2개 : 경도, 위도)
+	int MAP_BOUNDS_SEARCH_COORDINATES_LENGTH = 2;
+
+	// 콜론
+	String COLON = ":";
 
 }

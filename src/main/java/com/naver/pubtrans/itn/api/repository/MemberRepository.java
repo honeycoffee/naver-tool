@@ -125,6 +125,22 @@ public interface MemberRepository {
 	void deleteMemberRefreshTokenInfo(MemberSearchVo memberSearchVo) throws DataAccessException;
 
 	/**
+	 * 회원 작업 자동할당 정보를 등록한다.
+	 * @param memberUpdateVo - 회원 수정 시 입력 값
+	 * @return
+	 * @throws DataAccessException
+	 */
+	void insertMemberAutoAssign(MemberUpdateVo memberUpdateVo) throws DataAccessException;
+
+	/**
+	 * 회원의 특정 대중교통 구분 작업 자동할당 정보를 삭제한다.
+	 * @param memberUpdateVo - 회원 수정 시 입력 값
+	 * @return
+	 * @throws DataAccessException
+	 */
+	void deleteMemberAutoAssign(MemberUpdateVo memberUpdateVo) throws DataAccessException;
+
+	/**
 	 * 검수자(관리자) 목록을 가져온다.
 	 * @param memberSearchVo - 회원 검색 조건
 	 * @return

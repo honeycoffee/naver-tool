@@ -7,8 +7,10 @@ import org.springframework.stereotype.Repository;
 
 import com.naver.pubtrans.itn.api.vo.task.TaskAssignInfoVo;
 import com.naver.pubtrans.itn.api.vo.task.TaskStatusInfoVo;
+import com.naver.pubtrans.itn.api.vo.task.TaskStatusTypeCntVo;
 import com.naver.pubtrans.itn.api.vo.task.input.TaskInputVo;
 import com.naver.pubtrans.itn.api.vo.task.input.TaskSearchVo;
+import com.naver.pubtrans.itn.api.vo.task.output.TaskListOutputVo;
 import com.naver.pubtrans.itn.api.vo.task.output.TaskOutputVo;
 import com.naver.pubtrans.itn.api.vo.task.output.TaskSummaryOutputVo;
 
@@ -78,5 +80,29 @@ public interface TaskRepository {
 	 * @throws DataAccessException
 	 */
 	int updateTaskInfo(TaskInputVo taskInputVo) throws DataAccessException;
+
+	/**
+	 * 작업 목록 개수를 가져온다
+	 * @param taskSearchVo - 작업목록 검색조건
+	 * @return
+	 * @throws DataAccessException
+	 */
+	int getTaskListTotalCnt(TaskSearchVo taskSearchVo) throws DataAccessException;
+
+	/**
+	 * 작업 목록을 가져온다
+	 * @param taskSearchVo - 작업목록 검색조건
+	 * @return
+	 * @throws DataAccessException
+	 */
+	List<TaskListOutputVo> selectTaskList(TaskSearchVo taskSearchVo) throws DataAccessException;
+
+	/**
+	 * 작업상태별 개수 목록을 가져온다
+	 * @param taskSearchVo - 작업목록 검색조건
+	 * @return
+	 * @throws DataAccessException
+	 */
+	List<TaskStatusTypeCntVo> selectTaskStatusTypeCnt(TaskSearchVo taskSearchVo) throws DataAccessException;
 
 }

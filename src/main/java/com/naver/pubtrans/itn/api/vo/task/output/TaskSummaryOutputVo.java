@@ -3,6 +3,10 @@ package com.naver.pubtrans.itn.api.vo.task.output;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.naver.pubtrans.itn.api.consts.PubTransType;
+import com.naver.pubtrans.itn.api.consts.TaskStatusType;
+import com.naver.pubtrans.itn.api.consts.TaskType;
+
 /**
  * 작업 목록 요약정보
  * @author adtec10
@@ -20,17 +24,17 @@ public class TaskSummaryOutputVo {
 	/**
 	 * 작업구분
 	 */
-	private String taskType;
+	private TaskType taskType;
 
 	/**
 	 * 진행상태
 	 */
-	private String taskStatus;
+	private TaskStatusType taskStatusType;
 
 	/**
 	 * 데이터 구분
 	 */
-	private String taskDataType;
+	private PubTransType pubTransType;
 
 	/**
 	 * 변경내용

@@ -16,8 +16,8 @@ import com.naver.pubtrans.itn.api.consts.CommonConstant;
 import com.naver.pubtrans.itn.api.consts.PubTransTable;
 import com.naver.pubtrans.itn.api.consts.ResultCode;
 import com.naver.pubtrans.itn.api.consts.TaskAssignType;
-import com.naver.pubtrans.itn.api.consts.TaskDataType;
-import com.naver.pubtrans.itn.api.consts.TaskStatus;
+import com.naver.pubtrans.itn.api.consts.PubTransType;
+import com.naver.pubtrans.itn.api.consts.TaskStatusType;
 import com.naver.pubtrans.itn.api.consts.TaskType;
 import com.naver.pubtrans.itn.api.exception.ApiException;
 import com.naver.pubtrans.itn.api.repository.BusCompanyRepository;
@@ -129,7 +129,7 @@ public class BusCompanyService {
 	 */
 	public CommonResult getBusCompanyTaskSummaryList(int companyId, SearchVo searchVo) throws Exception {
 
-		CommonResult commonResult = taskService.getTaskSummaryList(companyId, TaskDataType.COMPANY.getCode(), searchVo);
+		CommonResult commonResult = taskService.getTaskSummaryList(companyId, PubTransType.COMPANY, searchVo);
 		return commonResult;
 	}
 
@@ -176,7 +176,7 @@ public class BusCompanyService {
 		if(Objects.isNull(busCompanyTaskOutputVo) || Objects.isNull(taskOutputVo)) {
 			throw new ApiException(ResultCode.NOT_MATCH.getApiErrorCode(), ResultCode.NOT_MATCH.getDisplayMessage());
 		}
-		
+
 		busCompanyTaskOutputVo.setTaskInfo(taskOutputVo);
 
 		// 데이터 스키마 조회
@@ -229,11 +229,11 @@ public class BusCompanyService {
 	 * @throws Exception
 	 */
 	@Transactional
-	public CommonResult registerBusCompanyTask(String taskType, BusCompanyTaskInputVo busCompanyTaskInputVo) throws Exception {
+	public CommonResult registerBusCompanyTask(TaskType taskType, BusCompanyTaskInputVo busCompanyTaskInputVo) throws Exception {
 
 
 		// 운수사 신규등록
-		if(taskType.equals(TaskType.REGISTER.getCode())) {
+		if(taskType.equals(TaskType.REGISTER)) {
 
 			/**
 			 * 운수사 임시 ID 설정
@@ -249,24 +249,25 @@ public class BusCompanyService {
 		// Task 기본정보
 		TaskInputVo taskInputVo = new TaskInputVo();
 		taskInputVo.setTaskType(taskType);
+		taskInputVo.setCityCode(busCompanyTaskInputVo.getCityCode());
 		taskInputVo.setPubTransId(busCompanyTaskInputVo.getCompanyId());
-
-		taskInputVo.setTaskStatus(TaskStatus.PROGRESS.getCode());
-		taskInputVo.setTaskDataType(TaskDataType.COMPANY.getCode());
-		taskInputVo.setTaskDataName(busCompanyTaskInputVo.getCompanyName());
+		taskInputVo.setTaskStatusType(TaskStatusType.CHECKING);
+		taskInputVo.setPubTransType(PubTransType.COMPANY);
+		taskInputVo.setPubTransName(busCompanyTaskInputVo.getCompanyName());
 		taskInputVo.setTaskComment(busCompanyTaskInputVo.getTaskComment());
-		taskInputVo.setTaskRegisterType(CommonConstant.MANUAL);
 		taskInputVo.setCheckUserId(busCompanyTaskInputVo.getCheckUserId());
+		taskInputVo.setTaskCheckRequestType(busCompanyTaskInputVo.getTaskCheckRequestType());
+		taskInputVo.setTaskDataSourceType(busCompanyTaskInputVo.getTaskDataSourceType());
 
 		/*
 		 * 등록자, 작업자 정보
 		 * 작업 등록시  등록자,작업자는 본인 자신이다.
 		 */
-		taskService.addTaskMemberInfo(TaskAssignType.REGISTER.getCode(), taskInputVo);
-		taskService.addTaskMemberInfo(TaskAssignType.WORK.getCode(), taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.REGISTER, taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.WORK, taskInputVo);
 
 		// 검수자 정보
-		taskService.addTaskMemberInfo(TaskAssignType.CHECK.getCode(), taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.CHECK, taskInputVo);
 
 
 
@@ -306,16 +307,19 @@ public class BusCompanyService {
 		// Task 기본정보
 		TaskInputVo taskInputVo = new TaskInputVo();
 		taskInputVo.setTaskId(busCompanyTaskInputVo.getTaskId());
-		taskInputVo.setTaskStatus(TaskStatus.PROGRESS.getCode());
-		taskInputVo.setTaskDataName(busCompanyTaskInputVo.getCompanyName());
+		taskInputVo.setTaskStatusType(TaskStatusType.CHECKING);
+		taskInputVo.setPubTransName(busCompanyTaskInputVo.getCompanyName());
 		taskInputVo.setTaskComment(busCompanyTaskInputVo.getTaskComment());
 		taskInputVo.setCheckUserId(busCompanyTaskInputVo.getCheckUserId());
+		taskInputVo.setTaskCheckRequestType(busCompanyTaskInputVo.getTaskCheckRequestType());
+		taskInputVo.setTaskDataSourceType(busCompanyTaskInputVo.getTaskDataSourceType());
+		taskInputVo.setCityCode(busCompanyTaskInputVo.getCityCode());
 
 		// 등록자 정보
-		taskService.addTaskMemberInfo(TaskAssignType.REGISTER.getCode(), taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.REGISTER, taskInputVo);
 
 		// 검수자 정보
-		taskService.addTaskMemberInfo(TaskAssignType.CHECK.getCode(), taskInputVo);
+		taskService.addTaskMemberInfo(TaskAssignType.CHECK, taskInputVo);
 
 
 		/**
@@ -349,7 +353,6 @@ public class BusCompanyService {
 	 */
 	public CommonResult registerBusCompanyRemoveTask(BusCompanyRemoveTaskInputVo busCompanyRemoveTaskInputVo) throws Exception {
 
-
 		int companyId = busCompanyRemoveTaskInputVo.getCompanyId();
 
 		// 기본정보 가져오기
@@ -362,12 +365,14 @@ public class BusCompanyService {
 		BusCompanyTaskInputVo busCompanyTaskInputVo = new BusCompanyTaskInputVo();
 		BeanUtils.copyProperties(busCompanyVo, busCompanyTaskInputVo);
 
+		busCompanyTaskInputVo.setTaskCheckRequestType(busCompanyRemoveTaskInputVo.getTaskCheckRequestType());
+		busCompanyTaskInputVo.setTaskDataSourceType(busCompanyRemoveTaskInputVo.getTaskDataSourceType());
 		busCompanyTaskInputVo.setTaskComment(busCompanyRemoveTaskInputVo.getTaskComment());
 		busCompanyTaskInputVo.setCheckUserId(busCompanyRemoveTaskInputVo.getCheckUserId());
 
 
 		// 운수사 삭제요청 Task 등록
-		return this.registerBusCompanyTask(TaskType.REMOVE.getCode(), busCompanyTaskInputVo);
+		return this.registerBusCompanyTask(TaskType.REMOVE, busCompanyTaskInputVo);
 
 	}
 

@@ -17,11 +17,11 @@ public enum ColumnKeyType {
 	private String code;
 
 	// 설명
-	private String descrition;
+	private String description;
 
 	ColumnKeyType(String code, String description){
 		this.code = code;
-		this.descrition = description;
+		this.description = description;
 	}
 
 }

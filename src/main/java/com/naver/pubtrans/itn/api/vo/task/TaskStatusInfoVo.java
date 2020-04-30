@@ -3,6 +3,8 @@ package com.naver.pubtrans.itn.api.vo.task;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.naver.pubtrans.itn.api.consts.TaskStatusType;
+
 /**
  * 작업 상태 변경정보
  * @author adtec10
@@ -16,7 +18,7 @@ public class TaskStatusInfoVo {
 	private long taskId;
 
 	// 작업 상태
-	private String tastStatus;
+	private TaskStatusType taskStatusType;
 
 	// 등록일
 	private String regDate;
@@ -26,4 +28,5 @@ public class TaskStatusInfoVo {
 
 	// 등록자 이름
 	private String regUserName;
+
 }

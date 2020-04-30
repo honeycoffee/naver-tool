@@ -555,7 +555,7 @@ include::{snippets}/busStop/busStopRemoveTask/http-response.adoc[]
 === 버스정류장 작업정보 수정
 * 버스정류장 작업정보를 수정한다
 ** 작업 관리 -> 작업 목록 -> 작업 상세 -> 정류장 상세 접근시
-** 작업정보의 진행상태가 "완료", "제외" 인 경우에는 수정 불가능.
+** 작업정보의 진행상태가 "검수완료", "예외완료" 인 경우에는 수정 불가능.
 
 ==== Request
 include::{snippets}/busStop/busStopModifyTask/request-fields.adoc[]
@@ -569,6 +569,26 @@ include::{snippets}/busStop/busStopModifyTask/response-fields.adoc[]
 
 ===== Response HTTP Example
 include::{snippets}/busStop/busStopModifyTask/http-response.adoc[]
+
+&#160;
+
+[[busStop-list-mapBounds]]
+=== 지도 영역내 버스정류장 List
+지도 영역내 존재하는 버스정류장 목록을 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/busStop/busStopListFromMapBounds/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/busStop/busStopListFromMapBounds/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/busStop/busStopListFromMapBounds/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/busStop/busStopListFromMapBounds/http-response.adoc[]
 
 &#160;
 
@@ -761,7 +781,7 @@ include::{snippets}/busRoute/busRouteRemoveTask/http-response.adoc[]
 === 버스노선 작업정보 수정
 * 버스노선 작업정보를 수정한다
 ** 작업 관리 -> 작업 목록 -> 작업 상세 -> 노선 상세 접근시
-** 작업정보의 진행상태가 "완료", "제외" 인 경우에는 수정 불가
+** 작업정보의 진행상태가 "검수완료", "예외완료" 인 경우에는 수정 불가
 
 ==== Request
 include::{snippets}/busRoute/busRouteModifyTask/request-fields.adoc[]
@@ -937,7 +957,7 @@ include::{snippets}/busCompany/busCompanyRemoveTask/http-response.adoc[]
 === 버스운수사 작업정보 수정
 * 버스운수사 작업정보를 수정한다
 ** 작업 관리 -> 작업 목록 -> 작업 상세 -> 운수사 상세 접근시
-** 작업정보의 진행상태가 "완료", "제외" 인 경우에는 수정 불가능.
+** 작업정보의 진행상태가 "검수완료", "예외완료" 인 경우에는 수정 불가능.
 
 ==== Request
 include::{snippets}/busCompany/busCompanyModifyTask/request-fields.adoc[]
@@ -954,98 +974,260 @@ include::{snippets}/busCompany/busCompanyModifyTask/http-response.adoc[]
 
 &#160;
 
-== [06]요금 룰 API
+== [06]작업관리 API
 
-[[baseFareRule-info]]
-=== 기본 요금 룰 상세정보
-기본 요금 룰을 가져온다
+[[task-list]]
+=== 작업 List
+작업 목록을 조회한다
 
 ==== Request
 [cols="1,3"]
-include::{snippets}/fare/getBaseFare/request-parameters.adoc[]
+include::{snippets}/task/taskList/request-parameters.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/fare/getBaseFare/http-request.adoc[]
+include::{snippets}/task/taskList/http-request.adoc[]
 
 ==== Response
 [cols="2,^1,4"]
-include::{snippets}/fare/getBaseFare/response-fields.adoc[]
+include::{snippets}/task/taskList/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/fare/getBaseFare/http-response.adoc[]
+include::{snippets}/task/taskList/http-response.adoc[]
 
 &#160;
 
-[[ignoredFarRule-list]]
+[[task-summary-statistics]]
+=== 작업 진행률 정보
+작업 요약 통계정보를 가져온다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/task/taskSummaryStatistics/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/task/taskSummaryStatistics/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/task/taskSummaryStatistics/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/task/taskSummaryStatistics/http-response.adoc[]
+
+&#160;
+
+[[task-info]]
+=== 작업 상세정보
+작업 상세정보를 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/task/taskInfo/path-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/task/taskInfo/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/task/taskInfo/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/task/taskInfo/http-response.adoc[]
+
+&#160;
+
+== [07]요금 룰 API
+
+[[baseFareRule-info]]
+=== 기본 요금 룰 상세정보
+기본 요금 룰 상세정보를 가져온다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/fareRule/infoBaseFareRule/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/fareRule/infoBaseFareRule/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/fareRule/infoBaseFareRule/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/fareRule/infoBaseFareRule/http-response.adoc[]
+
+&#160;
+
+[[exceptionalFareRule-list]]
 === 예외 요금 룰 List
 예외 요금 룰 목록을 조회한다
 
 ==== Request
 [cols="1,3"]
-include::{snippets}/fare/selectIgnoredFareRuleList/request-parameters.adoc[]
+include::{snippets}/fareRule/selectExceptionalFareRuleList/request-parameters.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/fare/selectIgnoredFareRuleList/http-request.adoc[]
+include::{snippets}/fareRule/selectExceptionalFareRuleList/http-request.adoc[]
 
 ==== Response
 [cols="2,^1,4"]
-include::{snippets}/fare/selectIgnoredFareRuleList/response-fields.adoc[]
+include::{snippets}/fareRule/selectExceptionalFareRuleList/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/fare/selectIgnoredFareRuleList/http-response.adoc[]
+include::{snippets}/fareRule/selectExceptionalFareRuleList/http-response.adoc[]
 
 &#160;
 
-[[ignoredFareRule-info]]
+[[exceptionalFareRule-info]]
 === 예외 요금 룰 상세정보
-예외 요금 룰을 가져온다
+예외 요금 룰 상세정보를 가져온다
 
 ==== Request
 [cols="1,3"]
-include::{snippets}/fare/getIgnoredFare/path-parameters.adoc[]
+include::{snippets}/fareRule/infoExceptionalFareRule/path-parameters.adoc[]
 
 ===== Request HTTP Example
-include::{snippets}/fare/getIgnoredFare/http-request.adoc[]
+include::{snippets}/fareRule/infoExceptionalFareRule/http-request.adoc[]
 
 ==== Response
 [cols="2,^1,4"]
-include::{snippets}/fare/getIgnoredFare/response-fields.adoc[]
+include::{snippets}/fareRule/infoExceptionalFareRule/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/fare/getIgnoredFare/http-response.adoc[]
+include::{snippets}/fareRule/infoExceptionalFareRule/http-response.adoc[]
 
 &#160;
 
-[[fare-task-info]]
+[[fareRule-task-list]]
+=== 요금 룰 작업 List
+요금 룰 작업 목록을 조회한다
+
+==== Request
+[cols="1,3"]
+include::{snippets}/fareRule/fareRuleTaskList/path-parameters.adoc[]
+include::{snippets}/fareRule/fareRuleTaskList/request-parameters.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/fareRule/fareRuleTaskList/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/fareRule/fareRuleTaskList/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/fareRule/fareRuleTaskList/http-response.adoc[]
+
+&#160;
+
+[[fareRule-task-info]]
 === 요금 룰 작업 상세정보
 요금 룰 작업 상세정보를 조회한다
 
 ==== Request
 [cols="1,3"]
-include::{snippets}/fare/fareTask/path-parameters.adoc[]
+include::{snippets}/fareRule/fareRuleTask/path-parameters.adoc[]
 
 ===== Request HTTP Example
-- 작업ID 조회 : /v1/ntool/api/info/fareTask/1
-include::{snippets}/fare/fareTask/http-request.adoc[]
+- 작업ID 조회 : /v1/ntool/api/info/fareRuleTask/1
+include::{snippets}/fareRule/fareRuleTask/http-request.adoc[]
 
 ==== Response
 [cols="2,^1,4"]
-include::{snippets}/fare/fareTask/response-fields.adoc[]
+include::{snippets}/fareRule/fareRuleTask/response-fields.adoc[]
 
 ===== Response HTTP Example
-include::{snippets}/fare/fareTask/http-response.adoc[]
+include::{snippets}/fareRule/fareRuleTask/http-response.adoc[]
 
 &#160;
 
-[[fare-schema]]
+[[fareRule-schema]]
 === 요금 룰 기본 스키마
 요금 룰 기본 스키마를 조회한다
 
 ==== Request HTTP Example
-include::{snippets}/fare/fareSchema/http-request.adoc[]
+include::{snippets}/fareRule/fareRuleSchema/http-request.adoc[]
 
 ==== Response
 [cols="2,^1,4"]
-include::{snippets}/fare/fareSchema/response-fields.adoc[]
+include::{snippets}/fareRule/fareRuleSchema/response-fields.adoc[]
+
+&#160;
+
+[[fareRule-registerTask]]
+=== 요금 룰 생성 작업등록
+요금 룰 생성 작업을 등록한다
+
+==== Request
+include::{snippets}/fareRule/fareRuleAddTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/fareRule/fareRuleAddTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/fareRule/fareRuleAddTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/fareRule/fareRuleAddTask/http-response.adoc[]
+
+&#160;
+
+[[fareRule-modifyTask]]
+=== 요금 룰 수정 작업등록
+* 요금 룰 정보를 수정하는 작업정보를 등록한다
+** 요금 관리 -> 요금 목록 -> 요금 상세 접근시
+
+==== Request
+include::{snippets}/fareRule/fareRuleEditTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/fareRule/fareRuleEditTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/fareRule/fareRuleEditTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/fareRule/fareRuleEditTask/http-response.adoc[]
+
+&#160;
+
+[[fareRule-removeTask]]
+=== 요금 룰 삭제 작업등록
+* 요금 룰을 삭제하는 작업을 등록한다
+
+==== Request
+include::{snippets}/fareRule/fareRuleRemoveTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/fareRule/fareRuleRemoveTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/fareRule/fareRuleRemoveTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/fareRule/fareRuleRemoveTask/http-response.adoc[]
+
+&#160;
+
+[[fareRule-modify]]
+=== 요금 룰 작업정보 수정
+* 요금 룰 작업정보를 수정한다
+** 작업 관리 -> 작업 목록 -> 작업 상세 -> 요금 상세 접근시
+** 작업정보의 진행상태가 "검수완료", "예외완료" 인 경우에는 수정 불가능.
+
+==== Request
+include::{snippets}/fareRule/fareRuleModifyTask/request-fields.adoc[]
+
+===== Request HTTP Example
+include::{snippets}/fareRule/fareRuleModifyTask/http-request.adoc[]
+
+==== Response
+[cols="2,^1,4"]
+include::{snippets}/fareRule/fareRuleModifyTask/response-fields.adoc[]
+
+===== Response HTTP Example
+include::{snippets}/fareRule/fareRuleModifyTask/http-response.adoc[]
 
 &#160;
